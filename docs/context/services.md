@@ -8,14 +8,14 @@
 | Docker | Ubuntu Server VM | — |
 | Portainer | Ubuntu Server VM | http://100.92.226.121:9000 |
 | Tailscale | Ubuntu Server VM | 100.92.226.121 / ubuntu-server.tail58b10c.ts.net |
-| context-server | Ubuntu Server VM | http://localhost:8000 |
+| context-server (API) | Ubuntu Server VM | http://localhost:8000 |
+| context-server (MCP) | Ubuntu Server VM | http://100.92.226.121:8001/mcp |
 
 ## Planned
 
 | Service | Host | Notes |
 |---------|------|-------|
 | Code indexer | Ubuntu Server VM | Follows doc indexer |
-| Retrieval API / MCP server | Ubuntu Server VM | Follows indexing |
 | Ollama | Ubuntu Server VM | Blocked on RAM upgrade |
 
 ## Deferred

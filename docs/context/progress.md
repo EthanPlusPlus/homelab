@@ -19,16 +19,20 @@
 - Clone repo to Ubuntu VM at ~/projects/homelab
 - Define project file structure on Ubuntu VM
 - Set up context-server repo
-- Build doc indexer (ChromaDB + sentence-transformers + FastAPI)
 - Expand VM logical volume from 15GB to 30GB
+- Build doc indexer (ChromaDB + sentence-transformers + FastAPI)
+- Build MCP server (FastMCP, streamable-http, port 8001)
+- Connect Claude Code to MCP server via Tailscale
+- Verified end-to-end retrieval from Claude Code session
 
 ## In Progress
 
-- MCP server interface for Claude Code integration
+- Requirements split (base/light) to avoid CUDA bloat on rebuilds
 
 ## Next
 
-- Build local retrieval API / MCP server
+- Code indexer (second module of context-server)
+- Embedding model upgrade (all-MiniLM-L6-v2 → all-mpnet-base-v2)
 
 ## Deferred / Blocked
 
