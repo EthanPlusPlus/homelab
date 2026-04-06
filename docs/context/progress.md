@@ -17,14 +17,17 @@
 - Migrate documentation from Word doc to markdown structure
 - Set up GitHub private repo
 - Clone repo to Ubuntu VM at ~/projects/homelab
+- Define project file structure on Ubuntu VM
+- Set up context-server repo
+- Build doc indexer (ChromaDB + sentence-transformers + FastAPI)
+- Expand VM logical volume from 15GB to 30GB
 
 ## In Progress
 
-- Define project file structure on Ubuntu VM
+- MCP server interface for Claude Code integration
 
 ## Next
 
-- Set up code indexing service (AI context layer)
 - Build local retrieval API / MCP server
 
 ## Deferred / Blocked

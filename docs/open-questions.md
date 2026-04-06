@@ -7,9 +7,10 @@
 
 ## AI Layer
 
-- Which code indexing tool to use? (qmd mentioned, others to evaluate)
 - Index the Java devcamp project first, or homelab docs first?
 - What does the MCP server interface look like in practice?
+- When to upgrade embedding model from all-MiniLM-L6-v2 to all-mpnet-base-v2?
+- Should re-indexing be triggered automatically on git pull, or remain manual?
 
 ## File Structure
 
