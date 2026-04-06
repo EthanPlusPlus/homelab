@@ -15,6 +15,8 @@
 - Install Portainer
 - Configure Tailscale
 - Migrate documentation from Word doc to markdown structure
+- Set up GitHub private repo
+- Clone repo to Ubuntu VM at ~/projects/homelab
 
 ## In Progress
 
