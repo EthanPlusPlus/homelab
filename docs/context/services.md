@@ -10,12 +10,9 @@
 | Tailscale | Ubuntu Server VM | 100.92.226.121 / ubuntu-server.tail58b10c.ts.net |
 | context-server (API) | Ubuntu Server VM | http://localhost:8000 |
 | context-server (MCP) | Ubuntu Server VM | http://100.92.226.121:8001/mcp |
+| Code indexer (context-server) | Ubuntu Server VM | POST /index/code?project=<name> |
 
 ## Planned
-
-| Service | Host | Notes |
-|---------|------|-------|
-| Code indexer | Ubuntu Server VM | Follows doc indexer |
 | Ollama | Ubuntu Server VM | Blocked on RAM upgrade |
 
 ## Deferred

@@ -24,15 +24,22 @@
 - Build MCP server (FastMCP, streamable-http, port 8001)
 - Connect Claude Code to MCP server via Tailscale
 - Verified end-to-end retrieval from Claude Code session
+- Build code indexer (tree-sitter + SQLite + ChromaDB)
+- Index devcamp project (57 Java files, 231 symbols, 1516 references)
+- Add code MCP tools: search_code, get_symbol, find_references, get_file_summary
+- Validated full retrieval loop in Claude Code session
 
 ## In Progress
 
-- Requirements split (base/light) to avoid CUDA bloat on rebuilds
+- get_related_symbols MCP tool (deferred from code indexer build)
+- Embedding model upgrade (all-MiniLM-L6-v2 → all-mpnet-base-v2)
 
 ## Next
 
-- Code indexer (second module of context-server)
-- Embedding model upgrade (all-MiniLM-L6-v2 → all-mpnet-base-v2)
+- Simple management interface for re-indexing and language config
+- Automatic re-index trigger on git pull
+- Python language support in code indexer
+- Log and service state retrieval (runtime context layer)
 
 ## Deferred / Blocked
 
