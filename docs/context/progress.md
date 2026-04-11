@@ -28,18 +28,20 @@
 - Index devcamp project (57 Java files, 231 symbols, 1516 references)
 - Add code MCP tools: search_code, get_symbol, find_references, get_file_summary
 - Validated full retrieval loop in Claude Code session
+- Git hooks implemented across homelab, context-server, and devcamp repos
+- Claude Code installed on VM
+- MCP connection to Claude Code fixed
+- iptables rules persisted on Ubuntu VM
+- ip_forward persisted on Proxmox host via /etc/sysctl.conf
 
 ## In Progress
-
-- get_related_symbols MCP tool (deferred from code indexer build)
-- Embedding model upgrade (all-MiniLM-L6-v2 → all-mpnet-base-v2)
 
 ## Next
 
 - Simple management interface for re-indexing and language config
-- Automatic re-index trigger on git pull
 - Python language support in code indexer
 - Log and service state retrieval (runtime context layer)
+- get_related_symbols tool
 
 ## Deferred / Blocked
 

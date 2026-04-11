@@ -9,7 +9,6 @@
 
 - Index the Java devcamp project first, or homelab docs first?
 - What does the MCP server interface look like in practice?
-- Should re-indexing be triggered automatically on git pull, or remain manual?
 - Should the MCP server require authentication for production use?
 - When to add get_related_symbols tool?
 - Should the management interface be a CLI, a simple web UI, or both?
