@@ -5,6 +5,7 @@ Oldest entries are removed as new ones are added.
 
 ---
 
+- **Session bootstrapping established** — CLAUDE.md added to homelab and context-server repos; Prismo system overview added to architecture/; new-machine-setup runbook added
 - **Git hooks implemented** — post-merge hooks added to homelab, context-server, and devcamp repos; auto re-indexing fires on git pull in each repo
 - **Claude Code installed on VM** — accessible via Tailscale; connected to context-server MCP on port 8001
 - **MCP connection fixed** — Claude Code can now retrieve context from context-server MCP server

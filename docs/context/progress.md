@@ -36,6 +36,8 @@
 
 ## In Progress
 
+- CLAUDE.md session bootstrapping established across project repos
+
 ## Next
 
 - Simple management interface for re-indexing and language config
