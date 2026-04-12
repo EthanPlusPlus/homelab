@@ -33,10 +33,12 @@
 - MCP connection to Claude Code fixed
 - iptables rules persisted on Ubuntu VM
 - ip_forward persisted on Proxmox host via /etc/sysctl.conf
+- CLAUDE.md session bootstrapping established across project repos
+- Convention-based multi-project doc indexing — PROJECTS_PATH discovery replaces single DOCS_PATH
 
 ## In Progress
 
-- CLAUDE.md session bootstrapping established across project repos
+_(nothing currently in progress)_
 
 ## Next
 

@@ -5,6 +5,8 @@ Oldest entries are removed as new ones are added.
 
 ---
 
+- **Convention-based multi-project doc indexing** — context-server now auto-discovers any `~/projects/<name>/docs/` folder; no compose changes needed for new projects; `doc_type` = project name, new `category` field = subdirectory
+- **exam-prep project created** — `~/projects/exam-prep/docs/` indexes 7 Applied Corporate Finance study guides; past papers kept separate for direct prompt injection
 - **Session bootstrapping established** — CLAUDE.md added to homelab and context-server repos; Prismo system overview added to architecture/; new-machine-setup runbook added
 - **Git hooks implemented** — post-merge hooks added to homelab, context-server, and devcamp repos; auto re-indexing fires on git pull in each repo
 - **Claude Code installed on VM** — accessible via Tailscale; connected to context-server MCP on port 8001

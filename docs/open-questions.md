@@ -17,7 +17,7 @@
 ## File Structure
 
 - ~~Where does the devcamp Java project live?~~ resolved: `~/projects/devcamp/`
-- How are projects linked to the retrieval system?
+- ~~How are projects linked to the retrieval system?~~ resolved: create `~/projects/<name>/docs/`, POST /index — auto-discovered
 - When to migrate from GitHub to Gitea + mirror setup?
 
 ## Deferred

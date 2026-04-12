@@ -38,7 +38,8 @@ Scores on the current model sit in the 0.33–0.39 range — functional but not 
 ## Consequences
 - context-server repo lives at ~/projects/context-server on the VM
 - Doc indexer is the first module — code indexer follows
-- MCP server exposes three tools: search_docs, get_doc_section, list_related_decisions
+- MCP server exposes tools: search_docs, get_doc_section, list_related_decisions, search_code, get_symbol, find_references, get_file_summary
 - Re-index triggered manually via POST /index after doc changes
 - Model upgrade deferred until retrieval quality becomes a bottleneck
 - CPU-only torch required — CUDA build fills the 30GB disk during Docker build
+- **Updated (2026-04-12):** Doc indexer moved to convention-based multi-project discovery — see decision 010
