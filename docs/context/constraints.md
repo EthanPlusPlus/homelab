@@ -5,6 +5,32 @@ If a constraint disappeared, something would work differently.
 
 ---
 
+## Claude Reasoning
+
+### MCP Before Every Thought
+
+Every idea, finding, or proposed solution must pass through a two-phase MCP query
+before being surfaced:
+
+1. **Educate first** — before forming any opinion, query MCP on the topic and
+   everything connected to it. If that context was already fetched this session,
+   use it — no re-query needed.
+
+   If MCP returns nothing and the topic plausibly has prior canon (it's within
+   Prismo's established scope, or a decision that would have had to be made to
+   reach the current system state), fall back to a direct read of the relevant
+   ~/canon/ file before reasoning. If it's genuinely new territory, reason fresh.
+
+2. **Validate the solution** — once a decision is formed, query MCP against that
+   specific decision: what it implies, what it assumes, what it touches. Check for
+   conflicts with existing decisions and duplication of already-resolved questions.
+   Skip if the relevant docs are already in context.
+
+This applies to every thought — not just infrastructure changes or major decisions.
+The fuzziness around "should technically be there" is a known open question.
+
+---
+
 ## Infrastructure
 
 | Constraint | Detail |
