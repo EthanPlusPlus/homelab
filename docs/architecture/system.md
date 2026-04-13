@@ -14,17 +14,32 @@ that govern all of it.
 | Portainer | Docker management UI |
 | Tailscale | Mesh VPN, hostname ubuntu-server.tail58b10c.ts.net |
 
-## Projects
+## Directory Structure
 
-| Repo | Purpose |
-|------|---------|
-| ~/projects/homelab | Prismo's own docs — decisions, runbooks, architecture, context |
-| ~/projects/context-server | The AI context retrieval service |
-| ~/projects/devcamp | Active development project |
+Two sibling directories separate code from knowledge:
+
+```
+~/projects/          ← code repos only (sparse — no docs/)
+  context-server/
+  devcamp/
+
+~/canon/             ← knowledge only (docs worktrees + knowledge bases)
+  homelab/           ← primary clone of homelab repo (docs-only)
+  context-server/    ← linked git worktree from context-server repo (docs/ only)
+  exam-prep/         ← study materials (no git repo)
+```
+
+## Repos
+
+| Repo | Primary location | Purpose |
+|------|-----------------|---------|
+| homelab | `~/canon/homelab/` | Prismo's own docs — decisions, runbooks, architecture, context |
+| context-server | `~/projects/context-server/` (code) + `~/canon/context-server/` (docs) | The AI context retrieval service |
+| devcamp | `~/projects/devcamp/` | Active development project |
 
 ## Working Model
 
-- Prismo infrastructure work happens at the VM root (`/home/ethan`)
-- Project work happens inside the relevant repo directory
-- The homelab repo follows the same project lifecycle as code projects —
-  it just contains docs instead of code
+- Code work happens in `~/projects/<name>/` — no docs present (sparse-checkout)
+- Doc editing happens in `~/canon/<name>/` — deliberate context switch
+- context-server indexes from `~/canon/` via `CANON_PATH=/canon`
+- The homelab repo lives entirely in `~/canon/` — it is knowledge, not code
