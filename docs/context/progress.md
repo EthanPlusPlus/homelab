@@ -18,23 +18,11 @@
 - Set up GitHub private repo
 - Clone repo to Ubuntu VM at ~/projects/homelab
 - Define project file structure on Ubuntu VM
-- Set up context-server repo
 - Expand VM logical volume from 15GB to 30GB
-- Build doc indexer (ChromaDB + sentence-transformers + FastAPI)
-- Build MCP server (FastMCP, streamable-http, port 8001)
-- Connect Claude Code to MCP server via Tailscale
-- Verified end-to-end retrieval from Claude Code session
-- Build code indexer (tree-sitter + SQLite + ChromaDB)
-- Index devcamp project (57 Java files, 231 symbols, 1516 references)
-- Add code MCP tools: search_code, get_symbol, find_references, get_file_summary
-- Validated full retrieval loop in Claude Code session
-- Git hooks implemented across homelab, context-server, and devcamp repos
 - Claude Code installed on VM
-- MCP connection to Claude Code fixed
 - iptables rules persisted on Ubuntu VM
 - ip_forward persisted on Proxmox host via /etc/sysctl.conf
 - CLAUDE.md session bootstrapping established across project repos
-- Convention-based multi-project doc indexing — PROJECTS_PATH discovery replaces single DOCS_PATH
 
 ## In Progress
 
@@ -42,10 +30,7 @@ _(nothing currently in progress)_
 
 ## Next
 
-- Simple management interface for re-indexing and language config
-- Python language support in code indexer
-- Log and service state retrieval (runtime context layer)
-- get_related_symbols tool
+_(no infrastructure work queued)_
 
 ## Deferred / Blocked
 
