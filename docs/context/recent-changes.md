@@ -5,6 +5,7 @@ Oldest entries are removed as new ones are added.
 
 ---
 
+- **`proposed-ideas/` folder added to doc structure** — new layer between open-questions and decisions; for ideas with some reasoning but not yet adopted or fully unpacked; first entry: subagent usage in Prismo
 - **MCP dual-query discipline established** — constraint added: query MCP before reasoning (educate) and after forming a solution (validate conflicts/duplication) for every thought; session caching and ~/canon/ fallback documented; fuzziness around null-result handling noted as open question
 - **~/canon/ introduced — code/knowledge separation** — docs removed from code working trees via sparse-checkout; all knowledge (homelab, context-server docs, exam-prep) now lives in ~/canon/; context-server indexes from CANON_PATH=/canon; doc_type names unchanged (homelab, context-server); enforces motto: Claude reasons via MCP, not filesystem scans
 - **context-server/docs/ established** — context-server decisions and context split out; each project repo is now self-contained

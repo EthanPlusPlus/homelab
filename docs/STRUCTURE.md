@@ -171,6 +171,29 @@ Drafts are not indexed by default.
 
 ---
 
+### `proposed-ideas/`
+
+Purpose: Ideas worth capturing that have some reasoning behind them but are not yet adopted or fully unpacked.
+
+Belongs here:
+- Ideas raised in conversation with enough substance to be worth tracking
+- Directions that are partially or fully reasoned but not yet implemented
+- Anything too developed for `open-questions.md` but not ready for `decisions/`
+
+Does not belong here:
+- Adopted decisions (→ `decisions/`)
+- Unresolved questions with no position yet (→ `open-questions.md`)
+- Random notes with no reasoning behind them
+
+Lifecycle:
+```
+proposed-ideas/ → unpack further or build → promote to decisions/ (Adopted), or remove if rejected
+```
+
+Naming: `NNN-short-slug.md`, same numbering convention as decisions.
+
+---
+
 ### `open-questions.md`
 
 Purpose: Flat list of unresolved questions not yet mature enough to become decisions.
