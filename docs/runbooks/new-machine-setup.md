@@ -6,111 +6,63 @@ Steps to configure a new machine to work on Prismo via Claude Code.
 
 - Claude Code installed
 - Tailscale connected with access to `ubuntu-server.tail58b10c.ts.net`
+- SSH access to the VM (for optional memory sync)
 
 ## Steps
 
-### 1. Create the directory structure
-
-```bash
-mkdir ~/projects
-mkdir ~/canon
-```
-
-### 2. Clone and set up homelab (knowledge base)
+### 1. Clone homelab
 
 ```bash
 git clone git@github.com:EthanPlusPlus/homelab.git ~/canon/homelab
 cd ~/canon/homelab && bash scripts/install-hooks.sh
 ```
 
-### 3. Clone code repos (sparse — no docs/)
-
-For each code repo:
+### 2. Run the setup script
 
 ```bash
-git clone <repo-url> ~/projects/<repo-name>
-cd ~/projects/<repo-name>
-
-# Exclude docs/ from the working tree
-git sparse-checkout init --cone
-git sparse-checkout set <dir1> <dir2> ...   # list all dirs except docs/
-
-# Install the code re-index hook
-bash scripts/install-hooks.sh
+~/canon/homelab/scripts/prismo new-machine
 ```
 
-Current code repos and their directories to include (omitting docs/):
+The script will:
+- Create `~/projects` and `~/canon`
+- Offer to clone and configure each known code repo (sparse checkout, docs worktree, hooks)
+- Register the MCP server for each directory
+- Offer to copy memory from the VM
+
+### 3. Verify
+
+```bash
+~/canon/homelab/scripts/prismo status
+```
+
+All hooks should be green and context-server reachable.
+
+---
+
+## Memory gotcha
+
+Memory is scoped to the directory Claude Code is launched from. Launching from
+`~/canon/homelab` vs `~/projects/context-server` gives a different (or empty)
+memory context — with no warning.
+
+**Always launch Claude Code from the same root directory on every machine.**
+The recommended launch directory is `~/canon/homelab`.
+
+---
+
+## Sparse checkout reference
+
+If you need to add or update sparse checkout dirs manually for a code repo:
 
 **context-server:**
 ```bash
-git sparse-checkout set api chroma_store context_mcp indexers
+git -C ~/projects/context-server sparse-checkout set api chroma_store context_mcp indexers
 ```
 
-### 4. Create docs worktrees in ~/canon/
+---
 
-For each code repo that has docs:
+## Adding a new repo later
 
-```bash
-cd ~/projects/context-server
-
-# Enable per-worktree config
-git config extensions.worktreeConfig true
-
-# Create the docs worktree
-git worktree add ~/canon/context-server
-
-# Scope the worktree to docs/ only
-cd ~/canon/context-server
-git sparse-checkout init --cone
-git sparse-checkout set docs
-
-# Install a worktree-specific hook (calls /index, not /index/code)
-WORKTREE_GIT_DIR="/home/ethan/projects/context-server/.git/worktrees/context-server"
-mkdir -p "$WORKTREE_GIT_DIR/hooks"
-cat > "$WORKTREE_GIT_DIR/hooks/post-merge" << 'EOF'
-#!/bin/bash
-curl -s -X POST http://localhost:8000/index
-EOF
-chmod +x "$WORKTREE_GIT_DIR/hooks/post-merge"
-git config --worktree core.hooksPath "$WORKTREE_GIT_DIR/hooks"
-```
-
-Each repo has a `CLAUDE.md` at its root that bootstraps Claude Code sessions
-automatically — no additional context setup required.
-
-### 5. Add the MCP server
-
-Run from inside the repo directory you'll be working in:
-
-    claude mcp add context-server --transport http \
-      http://ubuntu-server.tail58b10c.ts.net:8001/mcp
-
-Verify: `claude mcp list`
-
-### 6. Copy the memory directory (optional — personal memory only)
-
-The memory directory holds personal behavioral preferences and session feedback.
-It is not required to work on Prismo, but restores continuity across machines.
-
-Find your local memory path — it is derived from the directory Claude Code is
-launched from:
-
-    # macOS example, launching from ~/projects/homelab:
-    ~/.claude/projects/-Users-<username>-projects-homelab/memory/
-
-> **Gotcha:** Memory is scoped to the directory Claude Code is launched from. If
-> you launch from `~/canon/homelab` vs `~/projects/context-server`, you get
-> different (or empty) memory with no warning. Always launch from the same root
-> directory on each machine, or memory will be silently absent.
-
-Copy from a machine that already has it:
-
-    scp -r <user>@ubuntu-server.tail58b10c.ts.net:~/.claude/projects/<source-path>/memory/ \
-      ~/.claude/projects/<local-path>/memory/
-
-This is an accepted manual step with no automation.
-
-## Notes
-
-- The MCP server requires Tailscale to be active.
-- Re-run the MCP add command for each new repo you work in.
+Run `prismo new-machine` again — it skips anything already set up and only
+handles what's missing. Or run `prismo new-project <name> <url>` for a repo
+that wasn't part of the original setup.

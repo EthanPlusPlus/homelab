@@ -1,0 +1,487 @@
+#!/usr/bin/env bash
+# prismo — Prismo project automation
+# Usage: prismo <command> [args]
+set -euo pipefail
+
+VM_HOST="ubuntu-server.tail58b10c.ts.net"
+CONTEXT_API="http://${VM_HOST}:8000"
+MCP_URL="http://${VM_HOST}:8001/mcp"
+HOMELAB_REPO="git@github.com:EthanPlusPlus/homelab.git"
+
+# ── Output helpers ────────────────────────────────────────────────────────────
+
+RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
+BLUE='\033[0;34m'; BOLD='\033[1m'; NC='\033[0m'
+
+step()    { echo -e "\n${BLUE}${BOLD}==> $*${NC}"; }
+ok()      { echo -e "  ${GREEN}✓ $*${NC}"; }
+warn()    { echo -e "  ${YELLOW}! $*${NC}"; }
+info()    { echo -e "    $*"; }
+die()     { echo -e "  ${RED}✗ $*${NC}" >&2; exit 1; }
+confirm() { local _a; echo -en "${YELLOW}  ? $* [y/N] ${NC}"; read -r _a; [[ "$_a" =~ ^[Yy]$ ]]; }
+
+# ── Shared checks ─────────────────────────────────────────────────────────────
+
+check_prereqs() {
+  step "Checking prerequisites"
+  command -v git   >/dev/null 2>&1 || die "git not found"
+  ok "git"
+  command -v curl  >/dev/null 2>&1 || die "curl not found"
+  ok "curl"
+  command -v claude >/dev/null 2>&1 || die "Claude Code not found — install from https://claude.ai/code"
+  ok "Claude Code"
+}
+
+check_vm() {
+  step "Checking VM connectivity"
+  curl -sf --max-time 5 "${CONTEXT_API}/health" >/dev/null 2>&1 \
+    || die "Cannot reach context-server at ${CONTEXT_API} — is Tailscale connected?"
+  ok "context-server reachable"
+}
+
+# ── Worktree hook install ─────────────────────────────────────────────────────
+
+install_worktree_hook() {
+  local project_git="$1"   # e.g. ~/projects/foo/.git
+  local worktree_name="$2" # e.g. foo (matches dir name under ~/canon/)
+  local hook_script="$3"
+
+  local wt_git="${project_git}/worktrees/${worktree_name}"
+  [[ -d "$wt_git" ]] || die "Worktree git dir not found: $wt_git"
+
+  mkdir -p "${wt_git}/hooks"
+  printf '%s\n' "$hook_script" > "${wt_git}/hooks/post-merge"
+  chmod +x "${wt_git}/hooks/post-merge"
+  git -C "${HOME}/canon/${worktree_name}" config --worktree core.hooksPath "${wt_git}/hooks"
+  ok "Re-index hook installed for ${worktree_name} worktree"
+}
+
+# ── MCP registration ──────────────────────────────────────────────────────────
+
+add_mcp() {
+  local dir="$1"
+  local label
+  label=$(basename "$dir")
+  info "Adding MCP for $label ($dir)"
+  ( cd "$dir" && claude mcp add context-server --transport http "$MCP_URL" 2>&1 ) \
+    && ok "MCP registered for $label" \
+    || warn "MCP add failed for $label — run manually:\n    cd $dir && claude mcp add context-server --transport http $MCP_URL"
+}
+
+# ── new-machine ───────────────────────────────────────────────────────────────
+
+_setup_repo() {
+  local name="$1"
+  local repo_url="$2"
+  local sparse_dirs="$3"   # space-separated, empty = no sparse checkout
+  local docs_branch="$4"   # branch the docs worktree tracks
+
+  local project_dir="${HOME}/projects/${name}"
+  local canon_dir="${HOME}/canon/${name}"
+
+  step "Setting up ${name}"
+
+  # Clone
+  if [[ -d "${project_dir}/.git" ]]; then
+    ok "${name} already cloned — skipping"
+  else
+    git clone "$repo_url" "$project_dir"
+    ok "Cloned → $project_dir"
+  fi
+
+  # Sparse checkout (code only)
+  if [[ -n "$sparse_dirs" ]]; then
+    git -C "$project_dir" sparse-checkout init --cone
+    # shellcheck disable=SC2086
+    git -C "$project_dir" sparse-checkout set $sparse_dirs
+    ok "Sparse checkout: $sparse_dirs"
+  fi
+
+  # Install scripts/install-hooks.sh if it exists
+  if [[ -f "${project_dir}/scripts/install-hooks.sh" ]]; then
+    (cd "$project_dir" && bash scripts/install-hooks.sh)
+    ok "Code repo hook installed"
+  fi
+
+  # Docs worktree
+  if [[ -d "$canon_dir" ]]; then
+    ok "Docs worktree already at $canon_dir"
+  else
+    git -C "$project_dir" config extensions.worktreeConfig true
+    git -C "$project_dir" worktree add "$canon_dir" "$docs_branch"
+    git -C "$canon_dir" sparse-checkout init --cone
+    git -C "$canon_dir" sparse-checkout set docs
+    ok "Docs worktree → $canon_dir (branch: $docs_branch)"
+  fi
+
+  # Worktree re-index hook
+  local hook_body
+  hook_body="$(printf '#!/bin/bash\ncurl -s -X POST %s/index' "$CONTEXT_API")"
+  install_worktree_hook "${project_dir}/.git" "$name" "$hook_body"
+
+  # MCP
+  add_mcp "$project_dir"
+  add_mcp "$canon_dir"
+}
+
+cmd_new_machine() {
+  echo -e "\n${BOLD}Prismo — New Machine Setup${NC}"
+  echo "Homelab is already cloned. This sets up the rest."
+  echo ""
+
+  check_prereqs
+  check_vm
+
+  step "Creating directory structure"
+  mkdir -p "${HOME}/projects" "${HOME}/canon"
+  ok "~/projects and ~/canon ready"
+
+  # MCP for homelab itself
+  step "MCP for homelab"
+  add_mcp "${HOME}/canon/homelab"
+
+  # Known projects
+  echo ""
+  if confirm "Set up context-server?"; then
+    _setup_repo \
+      "context-server" \
+      "git@github.com:EthanPlusPlus/context-server.git" \
+      "api chroma_store context_mcp indexers" \
+      "context-server"
+  fi
+
+  echo ""
+  if confirm "Set up devcamp?"; then
+    _setup_repo \
+      "devcamp" \
+      "git@github.com:EthanPlusPlus/devcamp.git" \
+      "" \
+      "master"
+  fi
+
+  # Memory
+  step "Memory sync (optional)"
+  warn "Memory is scoped to the directory Claude Code is launched from."
+  warn "Always launch from the same dir on every machine (recommended: ~/canon/homelab)."
+  echo ""
+  if confirm "Copy memory from VM now?"; then
+    local src="ethan@${VM_HOST}:~/.claude/projects/-home-ethan/memory/"
+    local key
+    key=$(echo "${HOME}/canon/homelab" | sed 's|^/||; s|/|-|g')
+    local dst="${HOME}/.claude/projects/${key}/memory/"
+    mkdir -p "$dst"
+    scp -r "$src" "$dst" && ok "Memory synced" || warn "scp failed — copy manually from $src"
+  fi
+
+  echo ""
+  echo -e "${GREEN}${BOLD}✓ Machine setup complete.${NC}"
+  echo ""
+  echo "  Start a session:  cd ~/canon/homelab && claude"
+  echo "  Check everything: prismo status"
+}
+
+# ── new-project ───────────────────────────────────────────────────────────────
+
+cmd_new_project() {
+  local name="${1:-}"
+  local repo_url="${2:-}"
+  [[ -n "$name" && -n "$repo_url" ]] || die "Usage: prismo new-project <name> <repo-url>"
+
+  echo -e "\n${BOLD}Prismo — New Project: ${name}${NC}\n"
+
+  check_prereqs
+  check_vm
+
+  local project_dir="${HOME}/projects/${name}"
+  local canon_dir="${HOME}/canon/${name}"
+
+  # 1. Clone
+  step "Clone"
+  if [[ -d "${project_dir}/.git" ]]; then
+    ok "Already cloned at $project_dir"
+  else
+    git clone "$repo_url" "$project_dir"
+    ok "Cloned → $project_dir"
+  fi
+
+  # 2. CLAUDE.md (on master/main, before branching)
+  step "CLAUDE.md"
+  local default_branch
+  default_branch=$(git -C "$project_dir" symbolic-ref --short HEAD 2>/dev/null || echo "master")
+
+  if [[ -f "${project_dir}/CLAUDE.md" ]]; then
+    ok "CLAUDE.md already exists"
+  else
+    cat > "${project_dir}/CLAUDE.md" << EOF
+# ${name}
+
+Brief description of what this project is.
+
+## MCP
+
+Always retrieve context via MCP before reasoning or planning.
+
+To add the MCP server (run from this repo directory):
+
+    claude mcp add context-server --transport http \\
+      ${MCP_URL}
+
+## Workflow
+
+1. Retrieve context from MCP
+2. Check docs/context/ — progress.md, recent-changes.md, constraints.md
+3. Propose a plan — wait for approval before touching anything
+4. Execute the approved plan
+5. Update docs/context/ and any affected docs
+6. Re-index: curl -X POST ${CONTEXT_API}/index
+7. Commit and push
+EOF
+    git -C "$project_dir" add CLAUDE.md
+    git -C "$project_dir" commit -m "add CLAUDE.md session bootstrap"
+    git -C "$project_dir" push
+    ok "CLAUDE.md created and pushed"
+  fi
+
+  # 3. Sparse checkout (exclude docs/)
+  step "Sparse checkout"
+  local top_dirs
+  top_dirs=$(git -C "$project_dir" ls-tree --name-only HEAD 2>/dev/null | grep -v '^docs$' | tr '\n' ' ' || true)
+  if [[ -n "$top_dirs" ]]; then
+    info "Top-level dirs (excluding docs/): $top_dirs"
+    if confirm "Apply sparse checkout to exclude docs/ from ~/projects/${name}?"; then
+      git -C "$project_dir" sparse-checkout init --cone
+      # shellcheck disable=SC2086
+      git -C "$project_dir" sparse-checkout set $top_dirs
+      ok "Sparse checkout applied"
+    fi
+  else
+    warn "Repo is empty — sparse checkout skipped (configure later once dirs exist)"
+  fi
+
+  # 4. Docs branch + scaffold
+  step "Docs branch"
+  local has_docs
+  has_docs=$(git -C "$project_dir" ls-remote --heads origin docs 2>/dev/null || echo "")
+
+  if [[ -n "$has_docs" ]]; then
+    ok "docs branch already exists on origin"
+    git -C "$project_dir" fetch origin docs
+  else
+    info "Creating docs branch from $default_branch"
+    git -C "$project_dir" checkout -b docs
+
+    mkdir -p "${project_dir}/docs/"{decisions,runbooks,architecture,context,proposed-ideas}
+
+    cat > "${project_dir}/docs/context/progress.md" << 'DOCEOF'
+# Progress
+
+## In Progress
+
+_(nothing currently in progress)_
+
+## Next
+
+_(see proposed-ideas/ for upcoming directions)_
+
+## Done
+
+_(nothing yet)_
+DOCEOF
+
+    cat > "${project_dir}/docs/context/recent-changes.md" << 'DOCEOF'
+# Recent Changes
+
+Rolling log of meaningful system changes. Keep last ~10 entries.
+
+---
+
+_(no changes yet)_
+DOCEOF
+
+    cat > "${project_dir}/docs/context/constraints.md" << 'DOCEOF'
+# Constraints
+
+Active limitations that materially affect design or system behavior.
+
+---
+
+_(none documented yet)_
+DOCEOF
+
+    cat > "${project_dir}/docs/context/open-questions.md" << 'DOCEOF'
+# Open Questions
+
+_(none yet)_
+DOCEOF
+
+    # Copy STRUCTURE.md template from homelab
+    local tmpl="${HOME}/canon/homelab/docs/STRUCTURE.md"
+    if [[ -f "$tmpl" ]]; then
+      cp "$tmpl" "${project_dir}/docs/STRUCTURE.md"
+      warn "docs/STRUCTURE.md copied from homelab template — update it for this project"
+    fi
+
+    git -C "$project_dir" add -A
+    git -C "$project_dir" commit -m "bootstrap docs structure"
+    git -C "$project_dir" push -u origin docs
+    ok "docs branch created and pushed"
+
+    # Merge back so master has the full picture (CLAUDE.md already there)
+    git -C "$project_dir" checkout "$default_branch"
+  fi
+
+  # 5. Docs worktree
+  step "Docs worktree at ~/canon/${name}"
+  if [[ -d "$canon_dir" ]]; then
+    ok "Already exists"
+  else
+    git -C "$project_dir" config extensions.worktreeConfig true
+    git -C "$project_dir" worktree add "$canon_dir" docs
+    git -C "$canon_dir" sparse-checkout init --cone
+    git -C "$canon_dir" sparse-checkout set docs
+    ok "Worktree created → $canon_dir"
+  fi
+
+  # 6. Worktree re-index hook
+  step "Re-index hook"
+  local hook_body
+  hook_body="$(printf '#!/bin/bash\ncurl -s -X POST %s/index' "$CONTEXT_API")"
+  install_worktree_hook "${project_dir}/.git" "$name" "$hook_body"
+
+  # 7. Initial index
+  step "Initial index"
+  info "Indexing docs..."
+  curl -sf -X POST "${CONTEXT_API}/index" >/dev/null && ok "Docs indexed"
+  info "Indexing code..."
+  curl -sf -X POST "${CONTEXT_API}/index/code?project=${name}" >/dev/null \
+    && ok "Code indexed" \
+    || warn "Code index skipped (empty repo is fine — re-run: prismo index ${name})"
+
+  # 8. MCP
+  step "MCP registration"
+  add_mcp "$project_dir"
+  add_mcp "$canon_dir"
+
+  # 9. Homelab reminder
+  echo ""
+  warn "Update homelab docs before next session:"
+  info "  ~/canon/homelab/docs/context/     — add ${name} to service inventory"
+  info "  ~/canon/homelab/docs/runbooks/new-machine-setup.md — add sparse-checkout dirs"
+  info "Then: prismo index && cd ~/canon/homelab && git add -A && git commit && git push"
+
+  echo ""
+  echo -e "${GREEN}${BOLD}✓ Project '${name}' is ready.${NC}"
+  echo ""
+  echo "  Code:    ~/projects/${name}"
+  echo "  Docs:    ~/canon/${name}/docs/"
+  echo ""
+  echo "  Start a session:  cd ~/projects/${name} && claude"
+}
+
+# ── index ─────────────────────────────────────────────────────────────────────
+
+cmd_index() {
+  local project="${1:-}"
+  check_vm
+  if [[ -n "$project" ]]; then
+    step "Indexing code: $project"
+    curl -sf -X POST "${CONTEXT_API}/index/code?project=${project}" \
+      | python3 -m json.tool 2>/dev/null \
+      || curl -f -X POST "${CONTEXT_API}/index/code?project=${project}"
+  else
+    step "Indexing all docs"
+    curl -sf -X POST "${CONTEXT_API}/index" \
+      | python3 -m json.tool 2>/dev/null \
+      || curl -f -X POST "${CONTEXT_API}/index"
+  fi
+}
+
+# ── status ────────────────────────────────────────────────────────────────────
+
+cmd_status() {
+  echo -e "\n${BOLD}Prismo Status${NC}\n"
+
+  echo -e "${BOLD}VM / context-server${NC}"
+  if curl -sf --max-time 5 "${CONTEXT_API}/health" 2>/dev/null | grep -q '"ok"'; then
+    local count
+    count=$(curl -sf --max-time 5 "${CONTEXT_API}/health" | python3 -c "import sys,json; print(json.load(sys.stdin).get('docs_indexed','?'))" 2>/dev/null || echo "?")
+    ok "context-server  ${CONTEXT_API}  (${count} docs indexed)"
+  else
+    warn "context-server unreachable — ${CONTEXT_API}"
+    info "Is Tailscale running? Try: tailscale status"
+  fi
+
+  echo ""
+  echo -e "${BOLD}Git hooks${NC}"
+  local repos=(
+    "${HOME}/canon/homelab"
+    "${HOME}/projects/context-server"
+    "${HOME}/canon/context-server"
+    "${HOME}/projects/devcamp"
+  )
+  for repo in "${repos[@]}"; do
+    if [[ ! -d "$repo" ]]; then
+      info "(not cloned)  $repo"
+      continue
+    fi
+    local git_dir hook
+    git_dir=$(git -C "$repo" rev-parse --git-dir 2>/dev/null || echo "")
+    [[ -n "$git_dir" ]] || { info "(not a git repo)  $repo"; continue; }
+    hook="${git_dir}/hooks/post-merge"
+    if [[ -x "$hook" ]]; then
+      ok "$repo"
+    else
+      warn "$repo  — post-merge hook missing"
+      info "    Fix: cd $repo && bash scripts/install-hooks.sh"
+    fi
+  done
+
+  echo ""
+  echo -e "${BOLD}Memory${NC}"
+  local key
+  key=$(echo "$(pwd)" | sed 's|^/||; s|/|-|g')
+  local mem="${HOME}/.claude/projects/${key}/memory"
+  if [[ -d "$mem" ]]; then
+    ok "Memory found for launch dir: $(pwd)"
+  else
+    warn "No memory at $mem"
+    info "Launch from ~/canon/homelab for memory to load, or sync from VM."
+  fi
+}
+
+# ── help ──────────────────────────────────────────────────────────────────────
+
+cmd_help() {
+  echo ""
+  echo -e "${BOLD}prismo${NC} — Prismo project automation"
+  echo ""
+  echo -e "  ${BOLD}new-machine${NC}                      Set up this machine for Prismo"
+  echo -e "  ${BOLD}new-project${NC} <name> <repo-url>   Add a new project end-to-end"
+  echo -e "  ${BOLD}index${NC} [<project>]               Re-index docs (or code for a project)"
+  echo -e "  ${BOLD}status${NC}                          Check VM connectivity and hook health"
+  echo ""
+  echo "Examples:"
+  echo "  prismo new-machine"
+  echo "  prismo new-project myapp git@github.com:you/myapp.git"
+  echo "  prismo index"
+  echo "  prismo index myapp"
+  echo "  prismo status"
+  echo ""
+  echo "Bootstrap a new machine (two commands):"
+  echo "  git clone git@github.com:EthanPlusPlus/homelab.git ~/canon/homelab"
+  echo "  ~/canon/homelab/scripts/prismo new-machine"
+}
+
+# ── dispatch ──────────────────────────────────────────────────────────────────
+
+CMD="${1:-help}"
+shift 2>/dev/null || true
+
+case "$CMD" in
+  new-machine)    cmd_new_machine ;;
+  new-project)    cmd_new_project "$@" ;;
+  index)          cmd_index "$@" ;;
+  status)         cmd_status ;;
+  help|--help|-h) cmd_help ;;
+  *) die "Unknown command: $CMD  (run 'prismo help')" ;;
+esac

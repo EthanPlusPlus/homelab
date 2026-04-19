@@ -1,14 +1,14 @@
 ---
 id: "005"
 title: Prismo CLI / Automation Script
-status: Proposed — design needed before implementation
+status: Implemented — 2026-04-19
 ---
 
 # 005 — Prismo CLI / Automation Script
 
 ## Status
 
-Proposed — design needed before implementation
+Implemented — 2026-04-19. Script lives at `scripts/prismo` in the homelab repo.
 
 ## Problem
 
