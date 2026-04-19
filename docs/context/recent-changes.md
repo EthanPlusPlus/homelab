@@ -5,6 +5,7 @@ Oldest entries are removed as new ones are added.
 
 ---
 
+- **proposed-idea 006: mobile gateway** — concept captured; Claude Dispatch as leading candidate but approach not decided
 - **`prismo` CLI script implemented** — `scripts/prismo` in homelab repo; `new-machine`, `new-project`, `index`, `status` subcommands; new-machine-setup.md simplified to 2 commands; 005 marked implemented
 - **Workflow audit — onboarding and new-project gaps closed** — new-machine-setup.md step numbering bug fixed; memory path gotcha documented (CWD-scoped, silent on mismatch); new-project.md runbook written (full sparse-checkout + worktree + hook + indexing flow); proposed-ideas 004 (git-backed memory) and 005 (prismo CLI) added
 - **Canon distilled into `proposed-ideas/`** — open-questions cleaned up (3 resolved items struck through, gitea/embedding model moved to proposed-ideas); context-server Next items migrated to proposed-ideas/; both STRUCTURE.md files updated; 5 proposed-ideas entries total across homelab and context-server
