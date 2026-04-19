@@ -29,6 +29,26 @@ before being surfaced:
 This applies to every thought — not just infrastructure changes or major decisions.
 The fuzziness around "should technically be there" is a known open question.
 
+### Mandatory Proposal Template
+
+Every proposal, plan, or recommendation surfaced to Ethan must begin with this
+header. A proposal without it is structurally incomplete — do not skip it.
+
+```
+Phase 1 — Educate
+  Queries: [MCP queries run before reasoning]
+  Key findings: [what informed the approach]
+
+Phase 2 — Validate
+  Queries: [MCP queries run against this specific solution]
+  Conflicts: [conflicts with existing decisions, or "none"]
+  Duplication: [overlap with existing canon, or "none"]
+```
+
+Direct reads of `~/canon/` are only permitted as a Phase 1 fallback when MCP
+returns nothing for a topic that plausibly has prior canon. They are not a
+substitute for MCP. If a direct read was used, note it under Phase 1 queries.
+
 ---
 
 ## Infrastructure
