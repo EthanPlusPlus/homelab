@@ -5,6 +5,7 @@ Oldest entries are removed as new ones are added.
 
 ---
 
+- **Workflow audit — onboarding and new-project gaps closed** — new-machine-setup.md step numbering bug fixed; memory path gotcha documented (CWD-scoped, silent on mismatch); new-project.md runbook written (full sparse-checkout + worktree + hook + indexing flow); proposed-ideas 004 (git-backed memory) and 005 (prismo CLI) added
 - **Canon distilled into `proposed-ideas/`** — open-questions cleaned up (3 resolved items struck through, gitea/embedding model moved to proposed-ideas); context-server Next items migrated to proposed-ideas/; both STRUCTURE.md files updated; 5 proposed-ideas entries total across homelab and context-server
 - **`proposed-ideas/` folder added to doc structure** — new layer between open-questions and decisions; for ideas with some reasoning but not yet adopted or fully unpacked; first entry: subagent usage in Prismo
 - **MCP dual-query discipline established** — constraint added: query MCP before reasoning (educate) and after forming a solution (validate conflicts/duplication) for every thought; session caching and ~/canon/ fallback documented; fuzziness around null-result handling noted as open question

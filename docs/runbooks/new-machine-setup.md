@@ -78,7 +78,7 @@ git config --worktree core.hooksPath "$WORKTREE_GIT_DIR/hooks"
 Each repo has a `CLAUDE.md` at its root that bootstraps Claude Code sessions
 automatically — no additional context setup required.
 
-### 2. Add the MCP server
+### 5. Add the MCP server
 
 Run from inside the repo directory you'll be working in:
 
@@ -87,7 +87,7 @@ Run from inside the repo directory you'll be working in:
 
 Verify: `claude mcp list`
 
-### 3. Copy the memory directory (optional — personal memory only)
+### 6. Copy the memory directory (optional — personal memory only)
 
 The memory directory holds personal behavioral preferences and session feedback.
 It is not required to work on Prismo, but restores continuity across machines.
@@ -97,6 +97,11 @@ launched from:
 
     # macOS example, launching from ~/projects/homelab:
     ~/.claude/projects/-Users-<username>-projects-homelab/memory/
+
+> **Gotcha:** Memory is scoped to the directory Claude Code is launched from. If
+> you launch from `~/canon/homelab` vs `~/projects/context-server`, you get
+> different (or empty) memory with no warning. Always launch from the same root
+> directory on each machine, or memory will be silently absent.
 
 Copy from a machine that already has it:
 
