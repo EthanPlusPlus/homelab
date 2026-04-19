@@ -25,6 +25,10 @@
 - CLAUDE.md session bootstrapping established across project repos
 - Shared memory layer implemented — git-backed, symlinked into Claude Code sessions
 
+## Working On
+
+_(add a one-liner when you start a session — clear it when you're done)_
+
 ## In Progress
 
 _(nothing currently in progress)_

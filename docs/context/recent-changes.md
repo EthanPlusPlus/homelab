@@ -5,6 +5,7 @@ Oldest entries are removed as new ones are added.
 
 ---
 
+- **Canon conflict protocol + "send it Bobby" shorthand** — `prismo status` now shows last commit per canon repo; `## Working On` added to progress.md template; pull-before-commit rule added to make-canon runbook and workflow.md; new shorthand added to shorthands.md
 - **Shared memory implemented (decision 010)** — `~/canon/homelab/docs/memory/` added with system.md, workflow.md, mcp.md, shorthands.md; symlinked into each machine's Claude Code memory dir by `prismo new-machine`; personal MEMORY.md pruned to index only; proposed-idea 004 superseded; STRUCTURE.md updated
 - **proposed-idea 006: mobile gateway** — concept captured; Claude Dispatch as leading candidate but approach not decided
 - **`prismo` CLI script implemented** — `scripts/prismo` in homelab repo; `new-machine`, `new-project`, `index`, `status` subcommands; new-machine-setup.md simplified to 2 commands; 005 marked implemented

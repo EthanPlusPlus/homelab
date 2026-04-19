@@ -29,3 +29,13 @@ Everything in this system is iterable — code, docs, infrastructure, and these 
 - Do not modify docs outside the relevant project's docs folder
 - After any doc changes, re-index: `curl -X POST http://localhost:8000/index`
 - Full constraints live in ~/canon/homelab/docs/context/constraints.md — read them
+
+---
+
+## Parallel Session Protocol
+
+Before committing to canon, always `git pull` in the relevant worktree first.
+Check `progress.md` → `## Working On` to see if someone else is actively in that area.
+
+At the start of a session, add a one-liner to `## Working On` in `progress.md`.
+Clear it when the session ends.

@@ -12,35 +12,40 @@ This is the shorthand for the full doc workflow, triggered on demand.
 
 ## The Workflow
 
-1. **Identify what needs documenting** — a decision, a new runbook, an architecture
+1. **Pull first** — before writing anything, pull the latest canon:
+   ```bash
+   cd ~/canon/<project> && git pull
+   ```
+
+2. **Identify what needs documenting** — a decision, a new runbook, an architecture
    change, a constraint, a recent change. Pick the right doc type and location.
 
-2. **Write it** — in the correct file under `~/canon/<project>/docs/`:
+3. **Write it** — in the correct file under `~/canon/<project>/docs/`:
    - New decision → `decisions/00N-name.md`
    - New procedure → `runbooks/name.md`
    - State change → `context/recent-changes.md` + `context/progress.md`
    - Architecture change → `architecture/*.md`
 
-3. **Re-index**
+4. **Re-index**
    ```bash
    curl -X POST http://localhost:8000/index
    ```
 
-4. **Commit and push** — from the canon worktree:
+5. **Commit and push** — from the canon worktree:
    ```bash
    cd ~/canon/<project>
    git add -A && git commit -m "..."
    git push
    ```
 
-5. **Merge docs branch into master** (for code repos with docs worktrees):
+6. **Merge docs branch into master** (for code repos with docs worktrees):
    ```bash
    cd ~/projects/<project>
    git merge <docs-branch>
    git push
    ```
 
-6. **Done** — the knowledge is indexed, committed, and retrievable via MCP.
+7. **Done** — the knowledge is indexed, committed, and retrievable via MCP.
 
 ---
 

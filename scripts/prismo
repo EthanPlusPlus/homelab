@@ -288,6 +288,10 @@ EOF
     cat > "${project_dir}/docs/context/progress.md" << 'DOCEOF'
 # Progress
 
+## Working On
+
+_(add a one-liner when you start a session — clear it when you're done)_
+
 ## In Progress
 
 _(nothing currently in progress)_
@@ -450,15 +454,33 @@ cmd_status() {
   done
 
   echo ""
+  echo -e "${BOLD}Canon — last commit${NC}"
+  local canon_repos=(
+    "${HOME}/canon/homelab"
+    "${HOME}/canon/context-server"
+  )
+  for repo in "${canon_repos[@]}"; do
+    if [[ ! -d "$repo" ]]; then
+      info "(not cloned)  $repo"
+      continue
+    fi
+    local log
+    log=$(git -C "$repo" log -1 --format="%C(yellow)%h%Creset  %an  %ar  —  %s" 2>/dev/null || echo "(no commits)")
+    echo -e "  ${BOLD}$(basename "$repo")${NC}  $log"
+  done
+
+  echo ""
   echo -e "${BOLD}Memory${NC}"
   local key
   key=$(echo "$(pwd)" | sed 's|^/||; s|/|-|g')
   local mem="${HOME}/.claude/projects/${key}/memory"
   if [[ -d "$mem" ]]; then
-    ok "Memory found for launch dir: $(pwd)"
+    local symlink_count
+    symlink_count=$(find "$mem" -maxdepth 1 -type l 2>/dev/null | wc -l)
+    ok "Memory found for launch dir: $(pwd)  (${symlink_count} shared symlinks)"
   else
     warn "No memory at $mem"
-    info "Launch from ~/canon/homelab for memory to load, or sync from VM."
+    info "Launch from ~/canon/homelab for memory to load, or run: prismo new-machine"
   fi
 }
 
