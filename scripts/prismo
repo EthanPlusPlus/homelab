@@ -160,17 +160,30 @@ cmd_new_machine() {
   fi
 
   # Memory
-  step "Memory sync (optional)"
-  warn "Memory is scoped to the directory Claude Code is launched from."
-  warn "Always launch from the same dir on every machine (recommended: ~/canon/homelab)."
+  step "Shared memory"
+  local key
+  key=$(echo "${HOME}/canon/homelab" | sed 's|^/||; s|/|-|g')
+  local mem_dir="${HOME}/.claude/projects/${key}/memory"
+  mkdir -p "$mem_dir"
+
+  local shared=("system.md" "workflow.md" "mcp.md" "shorthands.md")
+  for f in "${shared[@]}"; do
+    local src="${HOME}/canon/homelab/docs/memory/${f}"
+    local dst="${mem_dir}/${f}"
+    [[ -e "$dst" && ! -L "$dst" ]] && rm "$dst"
+    [[ ! -L "$dst" ]] && ln -s "$src" "$dst"
+    ok "Shared: $f"
+  done
+  info "Shared memory updates automatically on git pull."
+
   echo ""
-  if confirm "Copy memory from VM now?"; then
-    local src="ethan@${VM_HOST}:~/.claude/projects/-home-ethan/memory/"
-    local key
-    key=$(echo "${HOME}/canon/homelab" | sed 's|^/||; s|/|-|g')
-    local dst="${HOME}/.claude/projects/${key}/memory/"
-    mkdir -p "$dst"
-    scp -r "$src" "$dst" && ok "Memory synced" || warn "scp failed — copy manually from $src"
+  if confirm "Copy personal memory from VM? (MEMORY.md, feedback files)"; then
+    local vm_mem="ethan@${VM_HOST}:~/.claude/projects/-home-ethan/memory/"
+    for pf in MEMORY.md feedback_mcp_dual_query.md; do
+      scp "${vm_mem}${pf}" "${mem_dir}/${pf}" 2>/dev/null \
+        && ok "Synced: $pf" \
+        || warn "Not found: $pf (skip if this is the source VM)"
+    done
   fi
 
   echo ""

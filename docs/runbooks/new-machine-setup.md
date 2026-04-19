@@ -39,14 +39,18 @@ All hooks should be green and context-server reachable.
 
 ---
 
-## Memory gotcha
+## Memory
 
-Memory is scoped to the directory Claude Code is launched from. Launching from
-`~/canon/homelab` vs `~/projects/context-server` gives a different (or empty)
-memory context — with no warning.
+Shared memory (system overview, workflow, MCP details, shorthands) lives in
+`~/canon/homelab/docs/memory/` and is symlinked into your local Claude Code memory
+directory by `prismo new-machine`. It updates automatically on `git pull`.
 
-**Always launch Claude Code from the same root directory on every machine.**
-The recommended launch directory is `~/canon/homelab`.
+Personal memory (behavioral preferences, feedback) is synced optionally via scp
+and stays local — it is never committed to the repo.
+
+Memory is still scoped to the directory Claude Code is launched from.
+**Always launch from `~/canon/homelab`** — that is the directory `prismo new-machine`
+wires the symlinks for.
 
 ---
 

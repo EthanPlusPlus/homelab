@@ -23,6 +23,7 @@
 - iptables rules persisted on Ubuntu VM
 - ip_forward persisted on Proxmox host via /etc/sysctl.conf
 - CLAUDE.md session bootstrapping established across project repos
+- Shared memory layer implemented — git-backed, symlinked into Claude Code sessions
 
 ## In Progress
 

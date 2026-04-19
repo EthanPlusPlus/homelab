@@ -1,7 +1,7 @@
 ---
 id: "004"
 title: Git-Backed Memory Portability
-status: Proposed — trade-off requires deliberate decision
+status: Superseded — see decision 010
 ---
 
 # 004 — Git-Backed Memory Portability

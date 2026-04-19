@@ -16,6 +16,7 @@ Every doc should earn its place. If removing it would not hurt, it should not ex
 
 - `decisions/`, `runbooks/`, `architecture/`, `context/` — **indexed and trusted**
 - `drafts/` — **not indexed by default**; treated as non-canonical until distilled
+- `memory/` — **not indexed**; injected directly into Claude Code sessions via symlinks
 - `STRUCTURE.md` — indexed; shapes retrieval behavior
 
 ---
@@ -191,6 +192,29 @@ proposed-ideas/ → unpack further or build → promote to decisions/ (Adopted),
 ```
 
 Naming: `NNN-short-slug.md`, same numbering convention as decisions.
+
+---
+
+### `memory/`
+
+Purpose: Shared session bootstrap files — injected into every Claude Code session via symlinks
+in `~/.claude/projects/<key>/memory/`. Updates automatically on `git pull`.
+
+Note: This folder exists only in the homelab repo. Individual project repos do not have a
+`memory/` folder — they use `CLAUDE.md` for project-specific session context.
+
+Belongs here:
+- System overview (hardware, services, directory structure)
+- Shared workflow steps
+- MCP connection details and query discipline
+- Named workflow shorthands
+
+Does not belong here:
+- Personal behavioral preferences (→ personal memory, not committed)
+- User-specific feedback (→ personal memory)
+- Project-specific context (→ CLAUDE.md or project docs)
+
+Not indexed by context-server. Content here is loaded directly into sessions, not via MCP.
 
 ---
 
