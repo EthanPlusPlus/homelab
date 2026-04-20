@@ -82,7 +82,7 @@ tail -f /tmp/canon-sync.log
 The server runs a cron job every 2 minutes to pull and re-index:
 
 ```
-*/2 * * * * cd /home/ethan/canon/homelab && git pull --ff-only >> /tmp/canon-pull.log 2>&1
+*/2 * * * * cd /home/ethan/canon/homelab && git pull --ff-only && curl -s -X POST http://localhost:8000/index >> /tmp/canon-pull.log 2>&1
 */2 * * * * cd /home/ethan/canon/context-server && git pull --ff-only && curl -s -X POST http://localhost:8000/index >> /tmp/canon-pull.log 2>&1
 ```
 
