@@ -3,8 +3,8 @@
 # Sets up the ~/obsidian-canon vault, sync script, and launchd auto-sync on macOS.
 # Safe to re-run — skips steps already done.
 #
-# Usage:
-#   bash <(curl -fsSL https://raw.githubusercontent.com/EthanPlusPlus/homelab/main/scripts/obsidian-bootstrap.sh)
+# Usage (requires Tailscale):
+#   bash <(curl -fsSL http://ubuntu-server.tail58b10c.ts.net:8000/scripts/obsidian-bootstrap.sh)
 
 set -e
 

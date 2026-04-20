@@ -6,15 +6,19 @@ View and edit all of Prismo's canon from a single Obsidian vault on your Mac (or
 
 ## Mac Setup — One-liner
 
+> **Prerequisite:** Tailscale must be connected before running this.
+
 Run this on your Mac. It clones the repos, installs the sync script, and sets up auto-sync via launchd:
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/EthanPlusPlus/homelab/main/scripts/obsidian-bootstrap.sh)
+bash <(curl -fsSL http://ubuntu-server.tail58b10c.ts.net:8000/scripts/obsidian-bootstrap.sh)
 ```
 
 Then open Obsidian → "Open folder as vault" → `~/obsidian-canon/`.
 
 That's it. The rest of this document explains the architecture and manual steps if needed.
+
+The script is served directly by the context-server API (`/scripts` static mount → `/canon/homelab/scripts/`), so it always reflects the latest version in canon.
 
 ---
 
