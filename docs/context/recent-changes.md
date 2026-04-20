@@ -5,6 +5,7 @@ Oldest entries are removed as new ones are added.
 
 ---
 
+- **VM user onboarding — add-vm-user.md runbook + findings** — two use cases clarified: working on Prismo = SSH to VM directly (add-vm-user.md); working on a Prismo project = new-project runbook; new-machine-setup.md scoped to remote/local machines only (rare case); prismo script bug noted: VM_HOST hardcoded, env var override has no effect; dev (devakmistry) account created, docker/sudo groups added, homelab cloned — memory/MCP pending next session
 - **Canon conflict protocol + "send it Bobby" shorthand** — `prismo status` now shows last commit per canon repo; `## Working On` added to progress.md template; pull-before-commit rule added to make-canon runbook and workflow.md; new shorthand added to shorthands.md
 - **Shared memory implemented (decision 010)** — `~/canon/homelab/docs/memory/` added with system.md, workflow.md, mcp.md, shorthands.md; symlinked into each machine's Claude Code memory dir by `prismo new-machine`; personal MEMORY.md pruned to index only; proposed-idea 004 superseded; STRUCTURE.md updated
 - **proposed-idea 006: mobile gateway** — concept captured; Claude Dispatch as leading candidate but approach not decided

@@ -1,6 +1,10 @@
 # Runbook — New Machine Setup (Prismo)
 
-Steps to configure a new machine to work on Prismo via Claude Code.
+> **Note:** This runbook is for the rare case of a remote developer working from their
+> local machine. The primary onboarding path is SSH access to the VM — see
+> `add-vm-user.md` instead.
+
+Steps to configure a new **local machine** to connect to Prismo remotely via Claude Code.
 
 ## Prerequisites
 
