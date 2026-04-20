@@ -47,12 +47,13 @@ The bootstrap script handles all of this automatically. These steps are here for
 
 ```bash
 mkdir -p ~/obsidian-canon
-git clone git@github.com:EthanPlusPlus/homelab.git ~/obsidian-canon/homelab
-git clone git@github.com:EthanPlusPlus/context-server.git ~/obsidian-canon/context-server
+git clone https://github.com/EthanPlusPlus/homelab.git ~/obsidian-canon/homelab
+git clone https://github.com/EthanPlusPlus/context-server.git ~/obsidian-canon/context-server
 git -C ~/obsidian-canon/context-server checkout context-server
 ```
 
 > The context-server docs live on the `context-server` branch — not master.
+> macOS will prompt for GitHub credentials on first clone — use a Personal Access Token as the password.
 
 ### 2. Open as an Obsidian vault
 

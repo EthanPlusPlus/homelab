@@ -23,7 +23,7 @@ if [ -d "$VAULT/homelab/.git" ]; then
   git -C "$VAULT/homelab" pull --ff-only
 else
   echo "--- cloning homelab"
-  git clone git@github.com:EthanPlusPlus/homelab.git "$VAULT/homelab"
+  git clone https://github.com/EthanPlusPlus/homelab.git "$VAULT/homelab"
 fi
 
 if [ -d "$VAULT/context-server/.git" ]; then
@@ -31,7 +31,7 @@ if [ -d "$VAULT/context-server/.git" ]; then
   git -C "$VAULT/context-server" pull --ff-only
 else
   echo "--- cloning context-server"
-  git clone git@github.com:EthanPlusPlus/context-server.git "$VAULT/context-server"
+  git clone https://github.com/EthanPlusPlus/context-server.git "$VAULT/context-server"
 fi
 
 echo "--- checking out context-server docs branch"
