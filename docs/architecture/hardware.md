@@ -2,12 +2,12 @@
 
 ## Machine
 
-| Component | Detail |
-|-----------|--------|
-| Model | 2017 iMac 21.5" Retina 4K (A1418) |
-| CPU | Intel Core i5 Quad-Core 3GHz |
-| RAM | 8GB DDR4 2400MHz |
-| GPU | Radeon Pro 555 2GB |
+| Component | Detail                            |
+| --------- | --------------------------------- |
+| Model     | 2017 iMac 21.5" Retina 4K (A1418) |
+| CPU       | Intel Core i5 Quad-Core 3GHz      |
+| RAM       | 8GB DDR4 2400MHz                  |
+| GPU       | Radeon Pro 555 2GB                |
 
 ## RAM Upgrade Path
 
