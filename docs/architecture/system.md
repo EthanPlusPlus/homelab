@@ -43,3 +43,25 @@ Two sibling directories separate code from knowledge:
 - Doc editing happens in `~/canon/<name>/` — deliberate context switch
 - context-server indexes from `~/canon/` via `CANON_PATH=/canon`
 - The homelab repo lives entirely in `~/canon/` — it is knowledge, not code
+
+## Obsidian Sync Pipeline
+
+Edits made in Obsidian on a Mac flow through two asynchronous hops before the index reflects them:
+
+```
+Obsidian edit
+  → launchd (every 5 min) → git push to GitHub
+    → server cron (every 2 min) → git pull + POST /index
+```
+
+**Timing:**
+| Scenario | Lag |
+|----------|-----|
+| Worst case | ~7 min (5 min launchd + 2 min cron) |
+| Average case | ~3.5 min (timers are independent, mid-cycle on average) |
+| Manual sync | ~2 min (run `~/bin/canon-sync.sh` on Mac, then wait for next cron tick) |
+
+**Implications:**
+- MCP queries in a Claude session started within 7 minutes of an Obsidian edit may not reflect those changes. If freshness matters, run the sync script manually before starting the session.
+- The server cron re-indexes every 2 minutes unconditionally — `git pull --ff-only` exits 0 even when nothing changed, so the index POST fires regardless. Acceptable background cost for now.
+- The parallel session protocol (always `git pull` before committing from the server) is the safety net if a Claude session and an Obsidian edit touch the same file in the same window.
