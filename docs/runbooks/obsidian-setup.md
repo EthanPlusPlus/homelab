@@ -4,6 +4,20 @@ View and edit all of Prismo's canon from a single Obsidian vault on your Mac (or
 
 ---
 
+## Mac Setup — One-liner
+
+Run this on your Mac. It clones the repos, installs the sync script, and sets up auto-sync via launchd:
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/EthanPlusPlus/homelab/main/scripts/obsidian-bootstrap.sh)
+```
+
+Then open Obsidian → "Open folder as vault" → `~/obsidian-canon/`.
+
+That's it. The rest of this document explains the architecture and manual steps if needed.
+
+---
+
 ## Architecture
 
 ```
@@ -21,89 +35,39 @@ The server runs a cron every 2 minutes that pulls from GitHub and re-indexes.
 
 ---
 
-## Mac Setup
+## Mac Setup (manual)
 
-### 1. Clone the repos into the vault root
+The bootstrap script handles all of this automatically. These steps are here for reference or troubleshooting.
+
+### 1. Clone the repos
 
 ```bash
 mkdir -p ~/obsidian-canon
-cd ~/obsidian-canon
-
-git clone git@github.com:EthanPlusPlus/homelab.git
-git clone git@github.com:EthanPlusPlus/context-server.git
-cd context-server && git checkout context-server && cd ..
+git clone git@github.com:EthanPlusPlus/homelab.git ~/obsidian-canon/homelab
+git clone git@github.com:EthanPlusPlus/context-server.git ~/obsidian-canon/context-server
+git -C ~/obsidian-canon/context-server checkout context-server
 ```
 
 > The context-server docs live on the `context-server` branch — not master.
 
 ### 2. Open as an Obsidian vault
 
-- Open Obsidian → "Open folder as vault" → select `~/obsidian-canon/`
-- All docs from both repos are now visible and cross-searchable
+Open Obsidian → "Open folder as vault" → select `~/obsidian-canon/`
 
-### 3. Install the sync script
+### 3. Sync script
+
+Installed to `~/bin/canon-sync.sh` by the bootstrap. Run manually to push changes immediately:
 
 ```bash
-mkdir -p ~/bin
-cat > ~/bin/canon-sync.sh << 'EOF'
-#!/bin/bash
-set -e
-
-VAULT=~/obsidian-canon
-
-for dir in homelab context-server; do
-  cd "$VAULT/$dir"
-  git pull --ff-only
-  git add -A
-  if ! git diff --cached --quiet; then
-    git commit -m "obsidian: auto-save $(date '+%Y-%m-%d %H:%M')"
-    git push
-  fi
-done
-
-echo "canon synced at $(date '+%H:%M')"
-EOF
-
-chmod +x ~/bin/canon-sync.sh
+~/bin/canon-sync.sh
 ```
 
-Run manually with `~/bin/canon-sync.sh` whenever you want to push changes.
+### 4. Auto-sync
 
-### 4. (Optional) Auto-sync via launchd
-
-To sync automatically every 5 minutes in the background:
+The bootstrap installs and loads a launchd agent (`com.prismo.canon-sync`) that runs the sync script every 5 minutes. Check the log with:
 
 ```bash
-cat > ~/Library/LaunchAgents/com.prismo.canon-sync.plist << 'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>Label</key>
-  <string>com.prismo.canon-sync</string>
-  <key>ProgramArguments</key>
-  <array>
-    <string>/bin/bash</string>
-    <string>/Users/YOUR_USERNAME/bin/canon-sync.sh</string>
-  </array>
-  <key>StartInterval</key>
-  <integer>300</integer>
-  <key>RunAtLoad</key>
-  <false/>
-  <key>StandardOutPath</key>
-  <string>/tmp/canon-sync.log</string>
-  <key>StandardErrorPath</key>
-  <string>/tmp/canon-sync.log</string>
-</dict>
-</plist>
-EOF
-```
-
-Replace `YOUR_USERNAME` with your Mac username, then load it:
-
-```bash
-launchctl load ~/Library/LaunchAgents/com.prismo.canon-sync.plist
+tail -f /tmp/canon-sync.log
 ```
 
 ---
