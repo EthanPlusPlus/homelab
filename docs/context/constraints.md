@@ -7,47 +7,37 @@ If a constraint disappeared, something would work differently.
 
 ## Claude Reasoning
 
-### MCP Before Every Thought
+### Two-Phase Canon Discipline (Decision 011)
 
-Every idea, finding, or proposed solution must pass through a two-phase MCP query
-before being surfaced:
+Applies to any project with a canon at `~/canon/<project-name>/`. Triggered, not always-on.
 
-1. **Educate first** — before forming any opinion, query MCP on the topic and
-   everything connected to it. If that context was already fetched this session,
-   use it — no re-query needed.
+**Triggers — engage when about to:**
+- Surface a proposal, plan, recommendation, or decision to Ethan
+- Write or modify canon
+- Change architecture or service config
 
-   If MCP returns nothing and the topic plausibly has prior canon (it's within
-   Prismo's established scope, or a decision that would have had to be made to
-   reach the current system state), fall back to a direct read of the relevant
-   ~/canon/ file before reasoning. If it's genuinely new territory, reason fresh.
+Skip for: clarifying questions, code reads, tool discovery, factual lookups about system state.
 
-2. **Validate the solution** — once a decision is formed, query MCP against that
-   specific decision: what it implies, what it assumes, what it touches. Check for
-   conflicts with existing decisions and duplication of already-resolved questions.
-   Skip if the relevant docs are already in context.
+**Phase 1 — Saturate:**
+Query the context-server MCP with `doc_type=<project-name>` before forming a view. Reuse
+session context if already fetched. If MCP returns empty but canon should plausibly exist
+(topic in-scope, decision-type, adjacent hits, system state implies prior decision), fall
+back to a direct `~/canon/<project-name>/` read.
 
-This applies to every thought — not just infrastructure changes or major decisions.
-The fuzziness around "should technically be there" is a known open question.
+**Phase 2 — Mandatory Hermes Dispatch:**
+Before surfacing, dispatch the `hermes` subagent with the proposal, project name
+(`doc_type`), and canon path. Hermes returns findings in four buckets: (1) conflicts with
+canon, (2) duplication of resolved questions, (3) assumptions canon contradicts, (4) canon
+gaps the proposal would fill. Surface Hermes' full output to Ethan. Do not silently revise.
+Re-dispatch on revision.
 
-### Mandatory Proposal Template
+The tool call is the evidence. A self-reported check does not count.
 
-Every proposal, plan, or recommendation surfaced to Ethan must begin with this
-header. A proposal without it is structurally incomplete — do not skip it.
+**Structural enforcement (per-machine):**
+- `UserPromptSubmit` hook in `~/.claude/settings.json` — preventative per-turn reminder
+- `Stop` hook in `~/.claude/settings.json` — detection gate before response ends
 
-```
-Phase 1 — Educate
-  Queries: [MCP queries run before reasoning]
-  Key findings: [what informed the approach]
-
-Phase 2 — Validate
-  Queries: [MCP queries run against this specific solution]
-  Conflicts: [conflicts with existing decisions, or "none"]
-  Duplication: [overlap with existing canon, or "none"]
-```
-
-Direct reads of `~/canon/` are only permitted as a Phase 1 fallback when MCP
-returns nothing for a topic that plausibly has prior canon. They are not a
-substitute for MCP. If a direct read was used, note it under Phase 1 queries.
+See Decision 011 for full rationale and open risks.
 
 ---
 
@@ -62,4 +52,3 @@ substitute for MCP. If a direct read was used, note it under Phase 1 queries.
 | VM networking | VMs on internal subnet (192.168.100.0/24) via NAT — not directly addressable on home network (192.168.1.x) |
 | Remote access | VM services require Tailscale or port forwarding — no direct LAN access |
 | Proxmox IP | Static at 192.168.1.9 — no DHCP reservation, but ip_forward and iptables rules are now persisted |
-

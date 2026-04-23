@@ -47,4 +47,7 @@ Agents that write back to canon autonomously, combined with a quality-assessment
 
 ## Status
 
-Thinking stage. No implementation started.
+Partial implementation: The **Validator** agent from the Structured Decision Pipeline is
+instantiated as the `hermes` adversarial reviewer subagent (Decision 011 — Adopted). The
+broader pipeline (Proposer, Devil's Advocate, Scribe), Persistent Observing Agents, and
+Self-Learning Feedback Loop remain at thinking stage.

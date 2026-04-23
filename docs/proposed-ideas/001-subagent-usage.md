@@ -29,6 +29,12 @@ Before proposing to Ethan, a Plan subagent validates the solution against curren
 and returns a conflict report. Adds opacity at the step where Prismo most needs transparency.
 Probably not worth it.
 
+_Update (Decision 011 — Adopted):_ Pattern 3 is resolved as adopted. The `hermes`
+adversarial reviewer subagent implements this pattern. The opacity concern is addressed:
+Hermes' four-bucket output (conflicts, duplication, contradicted assumptions, canon gaps) is
+surfaced in full to Ethan before Claude commits to a position; findings are not silently
+applied.
+
 ## Key Tension
 Subagents fail silently from the main context's perspective — you get a result, not a
 reasoning chain. Prismo's workflow requires human review before execution. Subagent opacity
@@ -39,6 +45,7 @@ concrete gains beyond cleanliness are background execution and parallelism — b
 current scale.
 
 ## Open
+_(These questions pertain to Patterns 1 and 2; Pattern 3 is resolved — see above.)_
 - At what project scale does the Explore subagent become clearly worth it?
 - Is there a lightweight way to surface subagent reasoning for review?
 - Does the doc-update subagent make sense once the workflow grows more complex?

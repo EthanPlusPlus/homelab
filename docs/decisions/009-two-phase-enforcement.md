@@ -1,7 +1,7 @@
 # Decision 009 — Structural enforcement of the two-phase MCP query discipline
 
 ## Status
-Adopted
+Superseded by Decision 011
 
 ## Context
 The two-phase MCP query discipline (constraints.md — "MCP Before Every Thought") was
