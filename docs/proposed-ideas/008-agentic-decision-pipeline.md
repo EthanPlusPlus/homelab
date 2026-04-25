@@ -47,7 +47,8 @@ Agents that write back to canon autonomously, combined with a quality-assessment
 
 ## Status
 
-Partial implementation: The **Validator** agent from the Structured Decision Pipeline is
-instantiated as the `hermes` adversarial reviewer subagent (Decision 011 — Adopted). The
-broader pipeline (Proposer, Devil's Advocate, Scribe), Persistent Observing Agents, and
-Self-Learning Feedback Loop remain at thinking stage.
+No implementation. The `hermes` subagent (Decision 011) was a brief attempt at the
+Validator role but was reversed by Decision 012 — cold-start cost and token overhead
+outweighed the benefit at current scale. Inline Phase 2 MCP queries serve the validation
+need for now. The broader pipeline (Proposer, Devil's Advocate, Scribe), Persistent
+Observing Agents, and Self-Learning Feedback Loop remain at thinking stage.
