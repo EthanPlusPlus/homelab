@@ -24,10 +24,8 @@ Two-phase MCP pattern. Triggered, not always-on. Applies to any project with a c
 
 **Triggers:** about to surface a proposal/plan/recommendation/decision, write or modify canon, or change architecture or service config. Skip for clarifying questions, code reads, tool discovery, and factual lookups.
 
-**Phase 1 — Saturate (main agent):**
-Query MCP with `doc_type=<project-name>` to scope by project. Reuse session context if already fetched. If MCP returns empty but canon should plausibly exist (topic in-scope, decision-type, adjacent hits, system state implies prior decision), fall back to a direct `~/canon/<project-name>/` read.
+**Phase 1 — Saturate:**
+Query MCP with `doc_type=<project-name>` to scope by project. Search the topic and adjacent areas. Reuse session context if already fetched. If MCP returns empty but canon should plausibly exist, fall back to a direct `~/canon/<project-name>/` read.
 
-**Phase 2 — Adversarial review (Hermes subagent, mandatory):**
-Before surfacing, dispatch the `hermes` subagent with the full proposal, the project name (doc_type), and the canon path. Hermes returns findings in four buckets — (1) conflicts with canon, (2) duplication of resolved questions, (3) assumptions canon contradicts, (4) canon gaps the proposal would fill. Surface the full output to the user; do not silently revise. If revised post-review, re-dispatch.
-
-The tool call is the evidence. A self-reported check does not count.
+**Phase 2 — Validate (inline):**
+Query MCP against the specific proposal: what it implies, assumes, and touches. Check for conflicts and duplication. The MCP tool calls in the transcript are the evidence — a self-reported check does not count. Skip if relevant docs are already in context from Phase 1.

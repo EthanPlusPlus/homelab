@@ -7,7 +7,7 @@ If a constraint disappeared, something would work differently.
 
 ## Claude Reasoning
 
-### Two-Phase Canon Discipline (Decision 011)
+### Canon Discipline (Decision 012)
 
 Applies to any project with a canon at `~/canon/<project-name>/`. Triggered, not always-on.
 
@@ -20,24 +20,20 @@ Skip for: clarifying questions, code reads, tool discovery, factual lookups abou
 
 **Phase 1 — Saturate:**
 Query the context-server MCP with `doc_type=<project-name>` before forming a view. Reuse
-session context if already fetched. If MCP returns empty but canon should plausibly exist
-(topic in-scope, decision-type, adjacent hits, system state implies prior decision), fall
-back to a direct `~/canon/<project-name>/` read.
+session context if already fetched. If MCP returns empty but canon should plausibly exist,
+fall back to a direct `~/canon/<project-name>/` read.
 
-**Phase 2 — Mandatory Hermes Dispatch:**
-Before surfacing, dispatch the `hermes` subagent with the proposal, project name
-(`doc_type`), and canon path. Hermes returns findings in four buckets: (1) conflicts with
-canon, (2) duplication of resolved questions, (3) assumptions canon contradicts, (4) canon
-gaps the proposal would fill. Surface Hermes' full output to Ethan. Do not silently revise.
-Re-dispatch on revision.
+**Phase 2 — Validate (inline):**
+Query MCP against the specific proposal: what it implies, assumes, and touches. Check for
+conflicts and duplication. MCP tool calls in the transcript are the evidence — a self-reported
+check does not count. Skip if relevant docs are already in context from Phase 1.
 
-The tool call is the evidence. A self-reported check does not count.
+**Session bootstrap (first message of every session):**
+Read `~/canon/homelab/docs/context/recent-changes.md` directly. Then run a warm-up before
+any task: ask one question about what the user wants to build, query MCP on their answer,
+repeat until context is saturated (2–4 exchanges). One question at a time, conversational tone.
 
-**Structural enforcement (per-machine):**
-- `UserPromptSubmit` hook in `~/.claude/settings.json` — preventative per-turn reminder
-- `Stop` hook in `~/.claude/settings.json` — detection gate before response ends
-
-See Decision 011 for full rationale and open risks.
+See Decision 012 for full rationale.
 
 ---
 

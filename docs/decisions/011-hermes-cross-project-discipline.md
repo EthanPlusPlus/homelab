@@ -1,7 +1,7 @@
 # Decision 011 — Hermes: triggered cross-project canon discipline
 
 ## Status
-Adopted
+Superseded by Decision 012
 
 ## Supersedes
 Decision 009 — Structural enforcement of the two-phase MCP query discipline

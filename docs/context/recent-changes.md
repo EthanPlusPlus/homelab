@@ -5,7 +5,7 @@ Oldest entries are removed as new ones are added.
 
 ---
 
-- **Two-phase discipline redesigned — Decision 011 (supersedes 009)** — Hermes adversarial reviewer replaces self-check Phase 2; triggered engagement replaces "every thought"; cross-project scope via doc_type; UserPromptSubmit + Stop hooks; hermes agent at ~/.claude/agents/hermes.md (per-machine); constraints.md + proposed-ideas 001/008 updated
+- **Session bootstrap + inline canon discipline — Decision 012 (supersedes 011)** — Hermes dropped; Phase 2 restored to inline MCP queries; session bootstrap added: read recent-changes.md on first message, warm-up conversation (ask → MCP → ask) before any task; workflow.md step 0 added; constraints.md, mcp.md, CLAUDE.md, hooks updated
 - **VM user onboarding — add-vm-user.md runbook + findings** — two use cases clarified: working on Prismo = SSH to VM directly (add-vm-user.md); working on a Prismo project = new-project runbook; new-machine-setup.md scoped to remote/local machines only (rare case); prismo script bug noted: VM_HOST hardcoded, env var override has no effect; dev (devakmistry) account created, docker/sudo groups added, homelab cloned — memory/MCP pending next session
 - **Canon conflict protocol + "send it Bobby" shorthand** — `prismo status` now shows last commit per canon repo; `## Working On` added to progress.md template; pull-before-commit rule added to make-canon runbook and workflow.md; new shorthand added to shorthands.md
 - **Shared memory implemented (decision 010)** — `~/canon/homelab/docs/memory/` added with system.md, workflow.md, mcp.md, shorthands.md; symlinked into each machine's Claude Code memory dir by `prismo new-machine`; personal MEMORY.md pruned to index only; proposed-idea 004 superseded; STRUCTURE.md updated

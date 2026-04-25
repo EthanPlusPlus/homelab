@@ -1,6 +1,6 @@
 ---
 name: Prismo session workflow
-description: The 9-step workflow that applies to every change in every project — shared across all team sessions
+description: The 10-step workflow that applies to every change in every project — shared across all team sessions
 type: project
 ---
 
@@ -8,7 +8,8 @@ type: project
 
 This applies to every change in every project — code, docs, config, infrastructure:
 
-1. **Read shared memory** — system, workflow, mcp, shorthands (these files)
+0. **Session bootstrap** (first message only) — read `~/canon/homelab/docs/context/recent-changes.md` directly; run a warm-up before any task: ask one question about what the user wants to build, query MCP based on their answer, repeat until context is saturated (2–4 exchanges). One question at a time. Skip if intent is already unambiguous.
+1. **Read shared memory** — system, workflow, mcp, shorthands (auto-loaded via symlinks)
 2. **Educate via MCP (Phase 1)** — before forming any opinion, query MCP on the topic and everything related. If already fetched this session, use what's in context. If MCP returns nothing and the topic plausibly has prior canon, fall back to a direct ~/canon/ read. If it's genuinely new territory, reason fresh.
 3. **Reason and form a solution**
 4. **Validate via MCP (Phase 2)** — query MCP against the specific solution: what it implies, assumes, and touches. Check for conflicts and duplication. Skip if relevant docs are already in context.
