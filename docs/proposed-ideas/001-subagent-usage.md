@@ -35,7 +35,7 @@ Before proposing to Ethan, a Plan subagent validates the solution against curren
 and returns a conflict report. Adds opacity at the step where Prismo most needs transparency.
 Probably not worth it.
 
-_Update (Decision 012 — Supersedes 011):_ Pattern 3 was briefly adopted as the `hermes`
+_Update ([[012-session-bootstrap-inline-discipline|Decision 012]] — Supersedes [[011-hermes-cross-project-discipline|011]]):_ Pattern 3 was briefly adopted as the `hermes`
 subagent but reversed. Subagent spawn overhead and cold-start cost outweighed the benefit;
 inline Phase 2 MCP queries by the main agent are cheaper and equally auditable. Pattern 3
 remains unresolved.

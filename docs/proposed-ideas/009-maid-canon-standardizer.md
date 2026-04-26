@@ -55,6 +55,8 @@ Direct autonomous commits to canonical folders are blocked by Decision 003:
 Sukuna writes to `~/canon/homelab/docs/drafts/sukuna-YYYY-MM-DD.md` only. It commits and pushes
 the draft file — nothing else. Ethan reviews, applies what's useful, and commits to canon directly.
 
+Direct autonomous commits to canonical folders are blocked by [[003-markdown-knowledge-structure|Decision 003]].
+
 ---
 
 ## Implementation

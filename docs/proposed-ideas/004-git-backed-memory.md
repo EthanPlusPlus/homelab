@@ -1,14 +1,14 @@
 ---
 id: "004"
 title: Git-Backed Memory Portability
-status: Superseded — see decision 010
+status: Superseded — see Decision 010
 ---
 
 # 004 — Git-Backed Memory Portability
 
 ## Status
 
-Superseded — see Decision 010
+Superseded — see [[010-shared-memory|Decision 010]]
 
 ## Problem
 

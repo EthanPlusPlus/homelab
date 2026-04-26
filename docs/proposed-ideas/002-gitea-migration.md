@@ -10,7 +10,7 @@ status: Proposed — conditions not yet met
 Proposed — conditions not yet met
 
 ## Background
-Decision 005 chose GitHub as the canonical remote because Gitea would share the same failure
+[[005-github-over-gitea|Decision 005]] chose GitHub as the canonical remote because Gitea would share the same failure
 domain as the rest of the homelab — a single machine with no redundancy. GitHub provides
 off-site durability in the interim.
 

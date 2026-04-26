@@ -9,12 +9,12 @@ status: Partially closed — see notes per section
 ## 1. Structured Decision Pipeline — Closed
 
 The original idea: replace self-policing Phase 2 with a pipeline of dedicated agents
-(Proposer, Validator, Devil's Advocate, Scribe). Hermes (Decision 011) was the attempt at
+(Proposer, Validator, Devil's Advocate, Scribe). [[011-hermes-cross-project-discipline|Hermes (Decision 011)]] was the attempt at
 the Validator role.
 
 **Closed.** Hermes proved the premise wrong — subagents start cold, re-derive context the
 main agent already has, and add token cost without adding insight. Inline Phase 2 MCP queries
-(Decision 012) serve the validation need more cheaply. No further investment here.
+([[012-session-bootstrap-inline-discipline|Decision 012]]) serve the validation need more cheaply. No further investment here.
 
 ---
 
@@ -22,8 +22,8 @@ main agent already has, and add token cost without adding insight. Inline Phase 
 
 Three agent types were envisioned:
 
-- **Canon scanner** — reads canon periodically, identifies staleness and gaps → **implemented as Sukuna (009)**
-- **Non-use agent** — continues working between sessions, synthesising and cross-referencing → **implemented as Sukuna section 3**
+- **Canon scanner** — reads canon periodically, identifies staleness and gaps → **implemented as [[009-maid-canon-standardizer|Sukuna (009)]]**
+- **Non-use agent** — continues working between sessions, synthesising and cross-referencing → **implemented as [[009-maid-canon-standardizer|Sukuna]] section 3**
 - **Interaction observer** — watches session logs or summaries, extracts decisions/insights that should be in canon but aren't, proposes them for canonisation → **open**
 
 The Interaction observer is genuinely useful but requires a mechanism for session log access.
