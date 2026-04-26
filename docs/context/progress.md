@@ -32,8 +32,7 @@ _(add a one-liner when you start a session — clear it when you're done)_
 ## In Progress
 
 - **Dev (devakmistry) VM onboarding** — account created (sudo + docker groups), SSH key installed,
-  homelab cloned at ~/canon/homelab; memory symlinks and MCP setup still pending (prismo new-machine
-  can't run on VM — VM_HOST hardcoded); complete manually next session using add-vm-user.md step 5+
+  homelab cloned at ~/canon/homelab; memory symlinks and MCP setup still pending; run add-vm-user.md step 5+ to complete
 
 ## Next
 

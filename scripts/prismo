@@ -3,7 +3,7 @@
 # Usage: prismo <command> [args]
 set -euo pipefail
 
-VM_HOST="ubuntu-server.tail58b10c.ts.net"
+VM_HOST="${VM_HOST:-ubuntu-server.tail58b10c.ts.net}"
 CONTEXT_API="http://${VM_HOST}:8000"
 MCP_URL="http://${VM_HOST}:8001/mcp"
 HOMELAB_REPO="git@github.com:EthanPlusPlus/homelab.git"

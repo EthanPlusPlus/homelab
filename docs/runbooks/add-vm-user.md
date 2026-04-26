@@ -113,10 +113,3 @@ git clone https://github.com/EthanPlusPlus/devcamp.git ~/projects/devcamp
 prismo status
 ```
 
----
-
-## Known Issue — prismo script
-
-`VM_HOST` is hardcoded at the top of `scripts/prismo`. Running `VM_HOST=localhost prismo new-machine`
-does not override it — the script reassigns the variable internally. Until this is fixed,
-use the manual memory/MCP steps above (step 5) instead of `prismo new-machine`.
