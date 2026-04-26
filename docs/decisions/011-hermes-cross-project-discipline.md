@@ -119,10 +119,12 @@ unnecessary Hermes call is low; the cost of a missed canon conflict is high.
 tentatively rejected for adding opacity. The Hermes design addresses this: output is
 structured and surfaced in full before Claude commits to a position; findings are not
 silently applied. Pattern 3 is resolved as adopted via this decision.
+_(Update: Decision 012 reversed Hermes. Pattern 3 is therefore unresolved again — no current implementation.)_
 
 **Proposed-idea 008 (Validator) partially resolved:** The Validator agent described in
 008's Structured Decision Pipeline is instantiated by Hermes. The broader pipeline
 (Proposer, Devil's Advocate, Scribe) and Persistent Observing Agents remain proposed.
+_(Update: Decision 012 reversed Hermes. 008's Validator is no longer instantiated.)_
 
 ## Open Risks
 
