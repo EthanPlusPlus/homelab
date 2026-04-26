@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# sukuna — invoke the Sukuna canon agent
+# Usage: sukuna [optional: direction text for the thinking section]
+#   sukuna                                  → free run
+#   sukuna "focus on the mobile gateway"    → directed thinking
+set -euo pipefail
+
+DIRECTION="${*:-}"
+
+if [[ -n "$DIRECTION" ]]; then
+    PROMPT="Run Sukuna. Direction for the thinking section: ${DIRECTION}"
+else
+    PROMPT="Run Sukuna. No direction provided — free run for the thinking section."
+fi
+
+claude --agent sukuna \
+    --permission-mode bypassPermissions \
+    -p "$PROMPT"

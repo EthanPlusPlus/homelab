@@ -1,23 +1,42 @@
-# 009 — Maid: Automated Canon Standardizer
+# 009 — Sukuna: Canon Maintenance and Thinking Agent
 
 ## Status
-Proposed — design constraint identified, not yet implemented
+In progress — agent definition and invocation script built; onboarding wired; pending first run
 
 ## Background
 
-Canon accumulates inconsistency over time: terminology drifts, cross-references rot, formatting diverges between files written at different sessions. Fixing this manually is tedious and easy to defer. A recurring agent could handle the mechanical parts — but canon discipline constrains how far it can go autonomously.
+Canon accumulates inconsistency over time: terminology drifts, cross-references rot, formatting
+diverges between files written at different sessions. A recurring agent can handle the mechanical
+parts — but canon discipline constrains how far it can go autonomously.
 
-Related to proposed-idea 008's "Canon scanner" concept under Persistent Observing Agents. That section already called out the unresolved prerequisite: write-back governance.
+Originally scoped as "Maid" (a consistency-only standardizer). Expanded during design to absorb
+the thinking/synthesis role from proposed-idea 008's "Non-use agent" concept — since the agent
+already loads all of `~/canon/` for the consistency pass, the context is free to reuse.
 
 ---
 
-## The Idea
+## Design
 
-A "maid" subagent that runs on a cron job, reads through all of `~/canon/`, and identifies:
+A single agent reads all of `~/canon/` in one pass and works through three sections in order:
 
-- Inconsistent terminology (e.g. "Prismo" vs "prismo", service names)
-- Formatting divergence (headers, frontmatter, list style)
-- Broken or stale cross-references between docs
+### Section 1 — Consistency Pass
+- Terminology drift, formatting divergence, stale cross-references
+- Output: diff-style wording fixes + bulleted structural findings
+
+### Section 2 — Observations
+- Patterns across projects without decision records
+- Contradictions between proposed-ideas and decisions
+- Gaps: concepts assumed but never formally defined
+- Capped at 7 bullets, specific file references required
+
+### Section 3 — Thinking (directed or free-wheel)
+- If a direction is provided at invocation: focus on that topic
+- If no direction: free-wheel across open proposed-ideas
+- Unconstrained — challenge decisions, tear apart assumptions, propose conflicts
+- 10 bullets max, punchy not verbose
+
+**Directable thinking** solves the diminishing-returns concern (Critic, council session): when
+canon stabilises between runs, a direction keeps section 3 fresh and targeted.
 
 ---
 
@@ -27,27 +46,36 @@ Direct autonomous commits to canonical folders are blocked by Decision 003:
 
 > "Truth is not automated — it is curated. The pipeline reduces effort but does not replace judgment."
 
-The established lifecycle for AI-proposed changes is: `drafts/ → human review → distilled into canonical docs`. The maid must respect this lifecycle.
+Sukuna writes to `~/canon/homelab/docs/drafts/sukuna-YYYY-MM-DD.md` only. It commits and pushes
+the draft file — nothing else. Ethan reviews, applies what's useful, and commits to canon directly.
 
-**The maid writes to `drafts/` only. It does not commit to canonical folders.**
+---
 
-Each run produces a diff-style or annotated proposal in `drafts/maid-YYYY-MM-DD.md`. Ethan reviews it, applies what's good, and commits. The maid reduces effort; it does not replace judgment.
+## Implementation
 
-This also sidesteps the worktree branch complexity (Decision 008) — writing a draft file requires no branch discipline.
+- Agent definition: `~/canon/homelab/scripts/sukuna.md` → symlinked to `~/.claude/agents/sukuna.md`
+- Invocation script: `~/canon/homelab/scripts/sukuna [optional direction]`
+- Onboarding: agent symlink added to `add-vm-user.md` step 5
+- Cross-machine: symlink wired on each machine via onboarding flow; homelab repo is the distribution mechanism
+
+Invoke:
+```bash
+~/canon/homelab/scripts/sukuna                          # free run
+~/canon/homelab/scripts/sukuna "focus on proposed-idea 008"  # directed
+```
+
+---
+
+## Scalability Hook
+
+The architecture is designed for future thinker subagents. The invocation script runs a Claude
+orchestrator session; additional subagents can be spawned alongside Sukuna to read its output
+and respond. No architectural rework needed — add subagents to the orchestrator call.
 
 ---
 
 ## Open Questions
 
-- **Scope**: All of `~/canon/` crosses project boundaries. Each project may have different conventions. Should maid be per-project or global?
-- **Cron cadence**: Weekly? On-demand only? After each canon commit?
-- **Output format**: Inline diff, annotated copy, or bulleted list of findings?
-- **Canon write-back governance**: Before maid could ever auto-commit (even to non-canonical folders), a decision record defining what autonomous agents may write needs to exist. That decision doesn't exist yet.
-- **Relationship to 008**: Maid is a concrete, scoped instance of 008's Canon scanner. Should it be tracked there, or is a standalone proposal cleaner?
-
----
-
-## Prerequisites
-
-- No new tooling needed for the drafts-only mode — Claude Code cron via the `schedule` skill is sufficient.
-- Canon write-back governance decision required before expanding maid's write scope beyond `drafts/`.
+- **Cadence**: on-command for now; scheduling TBD
+- **add-vm-user.md improvement**: the onboarding runbook needs a proper script (currently manual steps)
+- **Section 3 gating**: consider running section 3 only when new proposed-ideas have been added since last run, to manage diminishing returns at scale

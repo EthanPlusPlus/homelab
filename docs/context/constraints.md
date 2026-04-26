@@ -37,6 +37,20 @@ See Decision 012 for full rationale.
 
 ---
 
+## Tooling & Agents
+
+### Cross-Machine Portability
+
+All scripts, agent definitions, and tooling must work on any machine that has cloned
+the homelab repo. Cross-machine access is always a concern — never design Prismo tooling
+as VM-only. The homelab repo (`~/canon/homelab/`) is the distribution mechanism: anything
+committed there is available everywhere via `git pull`.
+
+Corollary: agent definitions (e.g. `~/.claude/agents/`) must be symlinked from
+`~/canon/homelab/scripts/` and wired up by the onboarding flow, not installed ad-hoc.
+
+---
+
 ## Infrastructure
 
 | Constraint | Detail |
