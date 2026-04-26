@@ -8,7 +8,7 @@ status: Superseded — see decision 010
 
 ## Status
 
-Proposed — trade-off requires deliberate decision
+Superseded — see Decision 010
 
 ## Problem
 

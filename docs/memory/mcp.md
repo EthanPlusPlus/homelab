@@ -2,7 +2,6 @@
 name: MCP context server
 description: How to connect to and use the context-server MCP — shared across all team sessions
 type: reference
-originSessionId: c00c74fa-0251-4ade-aab2-2060bf3b0968
 ---
 ## MCP Server
 

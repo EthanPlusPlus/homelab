@@ -1,3 +1,9 @@
+---
+id: "009"
+title: Sukuna — Canon Maintenance and Thinking Agent
+status: In progress — agent built, pending review cadence
+---
+
 # 009 — Sukuna: Canon Maintenance and Thinking Agent
 
 ## Status

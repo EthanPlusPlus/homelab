@@ -1,4 +1,10 @@
-# Proposed Idea 001 — Subagent usage in Prismo
+---
+id: "001"
+title: Subagent Usage in Prismo
+status: Proposed — needs further unpacking
+---
+
+# 001 — Subagent Usage in Prismo
 
 ## Status
 Proposed — needs further unpacking
@@ -47,4 +53,4 @@ current scale.
 - At what project scale does the Explore subagent become clearly worth it?
 - Is there a lightweight way to surface subagent reasoning for review?
 - Does the doc-update subagent make sense once the workflow grows more complex?
-- Can Pattern 3 be satisfied inline without a subagent? (Current answer: yes — inline Phase 2 MCP queries.)
+- Pattern 3 (plan validation subagent): Hermes was the implementation; reversed by Decision 012. Current status: unresolved, no implementation.

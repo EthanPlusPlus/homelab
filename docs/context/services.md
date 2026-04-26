@@ -6,10 +6,10 @@
 |---------|------|--------|
 | Proxmox VE | iMac (bare metal) | https://192.168.1.9:8006 |
 | Docker | Ubuntu Server VM | — |
-| Portainer | Ubuntu Server VM | http://100.92.226.121:9000 |
+| Portainer | Ubuntu Server VM | http://ubuntu-server.tail58b10c.ts.net:9000 |
 | Tailscale | Ubuntu Server VM | 100.92.226.121 / ubuntu-server.tail58b10c.ts.net |
 | context-server (API) | Ubuntu Server VM | http://localhost:8000 |
-| context-server (MCP) | Ubuntu Server VM | http://100.92.226.121:8001/mcp |
+| context-server (MCP) | Ubuntu Server VM | http://ubuntu-server.tail58b10c.ts.net:8001/mcp |
 | Code indexer (context-server) | Ubuntu Server VM | POST /index/code?project=<name> |
 
 ## Planned

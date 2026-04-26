@@ -1,3 +1,9 @@
+---
+id: "008"
+title: Agentic Decision Pipeline and Self-Learning System
+status: Proposed — thinking stage only, no implementation
+---
+
 # 008 — Agentic Decision Pipeline and Self-Learning System
 
 ## The Problem

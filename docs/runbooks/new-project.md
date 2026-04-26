@@ -103,7 +103,7 @@ Active limitations that materially affect design or system behavior.
 _(none documented yet)_
 EOF
 
-cat > docs/context/open-questions.md << 'EOF'
+cat > docs/open-questions.md << 'EOF'
 # Open Questions
 
 _(none yet)_
@@ -136,6 +136,7 @@ To add the MCP server (run from this repo directory):
 
 ## Workflow
 
+0. Start sessions with "hi" to trigger session bootstrap
 1. Retrieve context from MCP
 2. Check docs/context/ — progress.md, recent-changes.md, constraints.md
 3. Propose a plan — wait for approval before touching anything

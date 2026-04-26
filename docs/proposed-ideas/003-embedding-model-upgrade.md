@@ -1,4 +1,10 @@
-# Proposed Idea 003 — Embedding model upgrade
+---
+id: "003"
+title: Embedding Model Upgrade
+status: Proposed — deferred until triggered
+---
+
+# 003 — Embedding Model Upgrade
 
 ## Status
 Proposed — deferred until triggered
