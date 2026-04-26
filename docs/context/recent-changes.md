@@ -5,6 +5,7 @@ Oldest entries are removed as new ones are added.
 
 ---
 
+- **Even project bootstrapped** — iOS receipt-splitting app; repo at github.com/EthanPlusPlus/even; ~/projects/even (sparse, no docs/), ~/canon/even worktree on docs branch, indexed in context-server
 - **Obsidian canon view** — HOME.md with Dataview queries (proposed-ideas, decisions, in-progress); wikilinks added across proposed-ideas → decisions; install Dataview plugin to activate
 - **Sukuna first run — consistency + observations resolved** — 8 consistency fixes applied; Decision 011 annotated with 012 reversals; 008 rewritten (pipeline closed, Sukuna covers observers, feedback loop deprioritised); VM_HOST env override fixed in prismo; open-questions.md stripped of resolved items; cross-machine portability constraint added
 - **Sukuna canon agent built (proposed-idea 009)** — single agent reads all ~/canon/, three sections: consistency pass, observations, directed/free-wheel thinking; agent def at scripts/sukuna.md, invocation script at scripts/sukuna; symlinked to ~/.claude/agents/; onboarding step added to add-vm-user.md; cross-machine portability constraint added to constraints.md
