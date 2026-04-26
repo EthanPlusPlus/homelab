@@ -8,7 +8,7 @@ type: project
 
 This applies to every change in every project — code, docs, config, infrastructure:
 
-0. **Session bootstrap** (first message only) — read `~/canon/homelab/docs/context/recent-changes.md` directly; run a warm-up before any task: ask one question about what the user wants to build, query MCP based on their answer, repeat until context is saturated (2–4 exchanges). One question at a time. Skip if intent is already unambiguous.
+0. **Session bootstrap** (first message only) — always start a session with "hi" or a greeting to trigger the bootstrap. Claude reads `~/canon/homelab/docs/context/recent-changes.md` directly, then runs a warm-up: one question about what you want to build, MCP query on the answer, repeat until context is saturated (2–4 exchanges). Skip warm-up if intent is already unambiguous.
 1. **Read shared memory** — system, workflow, mcp, shorthands (auto-loaded via symlinks)
 2. **Educate via MCP (Phase 1)** — before forming any opinion, query MCP on the topic and everything related. If already fetched this session, use what's in context. If MCP returns nothing and the topic plausibly has prior canon, fall back to a direct ~/canon/ read. If it's genuinely new territory, reason fresh.
 3. **Reason and form a solution**
