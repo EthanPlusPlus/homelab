@@ -9,6 +9,10 @@
 
 - Should the MCP server require authentication for production use?
 
+## Reliability (pre-failsafe)
+
+- What does "reliable enough" look like before failure mode docs are worth writing? Define the bar first.
+
 ## Deferred
 
 - When does Immich become worth revisiting?
