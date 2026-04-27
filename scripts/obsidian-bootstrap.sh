@@ -37,6 +37,14 @@ fi
 echo "--- checking out context-server docs branch"
 git -C "$VAULT/context-server" checkout context-server
 
+if [ -d "$VAULT/even/.git" ]; then
+  echo "--- even already cloned, pulling"
+  git -C "$VAULT/even" pull --ff-only
+else
+  echo "--- cloning even"
+  git clone https://github.com/EthanPlusPlus/even.git "$VAULT/even"
+fi
+
 # 2. Install sync script
 mkdir -p "$HOME/bin"
 cat > "$SYNC_SCRIPT" << 'SYNCEOF'
@@ -47,7 +55,7 @@ set -e
 VAULT="$HOME/obsidian-canon"
 LOG_PREFIX="[canon-sync $(date '+%H:%M:%S')]"
 
-for dir in homelab context-server; do
+for dir in homelab context-server even; do
   cd "$VAULT/$dir"
   git pull --ff-only
   git add -A
