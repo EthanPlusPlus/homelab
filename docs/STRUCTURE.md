@@ -17,7 +17,7 @@ Every doc should earn its place. If removing it would not hurt, it should not ex
 - `decisions/`, `runbooks/`, `architecture/`, `context/` — **indexed and trusted**
 - `drafts/` — **not indexed by default**; treated as non-canonical until distilled
 - `memory/` — **not indexed**; injected directly into Claude Code sessions via symlinks
-- `STRUCTURE.md` — indexed; shapes retrieval behavior
+- `STRUCTURE.md`, `open-questions.md`, `problem.md` — indexed top-level files; trusted
 
 ---
 
@@ -229,6 +229,26 @@ Belongs here:
 Does not belong here:
 - Resolved questions (move to relevant decision or remove)
 - Active tasks (→ `context/progress.md`)
+
+---
+
+### `problem.md` _(optional)_
+
+Purpose: Product north star — the problem this project exists to solve, in the project's own voice. Anchors downstream decisions by giving them a "why" to point back to.
+
+Belongs here:
+- The root problem being solved, with enough depth to distinguish it from surface symptoms
+- Why existing solutions fall short (if relevant)
+- Who is affected and how
+
+Does not belong here:
+- Solutions or approaches (→ `decisions/` or `proposed-ideas/`)
+- Current system state (→ `context/`)
+- Design intent (→ `architecture/`)
+
+Optional: a project without a clearly articulated north star should not fabricate one. Leave the file out until the framing is real.
+
+Reference shape: narrative opener followed by root-cause depth (e.g. 5-whys structure).
 
 ---
 
