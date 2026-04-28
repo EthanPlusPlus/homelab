@@ -13,6 +13,8 @@ else
     PROMPT="Run Sukuna. No direction provided — free run for the thinking section."
 fi
 
+cd ~/canon/homelab
+
 claude --agent sukuna \
     --permission-mode bypassPermissions \
     -p "$PROMPT"
