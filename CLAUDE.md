@@ -1,4 +1,4 @@
-# Prismo — Homelab Docs
+ # Prismo — Homelab Docs
 
 You are working in the Prismo homelab docs repo. Prismo is the name for the
 whole system: Proxmox host, Ubuntu Server VM, services, projects, and the
