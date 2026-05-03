@@ -11,6 +11,7 @@
 | context-server (API) | Ubuntu Server VM | http://localhost:8000 |
 | context-server (MCP) | Ubuntu Server VM | http://ubuntu-server.tail58b10c.ts.net:8001/mcp |
 | Code indexer (context-server) | Ubuntu Server VM | POST /index/code?project=<name> |
+| Flight Planner | Ubuntu Server VM | http://ubuntu-server.tail58b10c.ts.net:8080 |
 
 ## Planned
 | Ollama | Ubuntu Server VM | Blocked on RAM upgrade |

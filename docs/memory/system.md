@@ -17,8 +17,8 @@ The whole system — Proxmox host, VM, services, projects, docs, and workflow �
 
 - **Proxmox host** — bare metal on a 2017 iMac, IP 192.168.1.9
 - **Ubuntu Server VM** — Ubuntu 24.04, IP 192.168.100.10, Tailscale IP 100.92.226.121
-- **Code projects** — ~/projects/context-server, ~/projects/devcamp (sparse — no docs/)
-- **Knowledge** — ~/canon/homelab, ~/canon/context-server, ~/canon/exam-prep
+- **Code projects** — ~/projects/context-server, ~/projects/devcamp (sparse — no docs/), ~/projects/flight-planner (no git repo)
+- **Knowledge** — ~/canon/homelab, ~/canon/context-server, ~/canon/exam-prep, ~/canon/flight-planner
 
 ## Active Services
 
@@ -26,6 +26,7 @@ The whole system — Proxmox host, VM, services, projects, docs, and workflow �
 |---------|--------|
 | context-server API | http://localhost:8000 |
 | context-server MCP | http://localhost:8001/mcp |
+| Flight Planner | http://ubuntu-server.tail58b10c.ts.net:8080 |
 | Portainer | http://100.92.226.121:9000 |
 | Tailscale | ubuntu-server.tail58b10c.ts.net |
 
@@ -39,11 +40,13 @@ Two sibling directories separate code from knowledge:
 ~/projects/    ← code repos only (sparse-checkout — no docs/ present)
   context-server/
   devcamp/
+  flight-planner/  ← no git repo, copied directly
 
 ~/canon/       ← knowledge only (docs worktrees + knowledge bases)
   homelab/     ← primary clone of homelab repo (docs-only)
   context-server/  ← linked git worktree, docs/ only
   exam-prep/   ← study materials (no git repo)
+  flight-planner/  ← local canon only (no git repo)
 ```
 
 **Homelab** (`~/canon/homelab`) — docs-only repo. The knowledge base for all of Prismo.
