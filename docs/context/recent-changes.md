@@ -5,7 +5,7 @@ Oldest entries are removed as new ones are added.
 
 ---
 
-- **Flight Planner deployed + canon bootstrapped** — personal flight optimiser; ~/projects/flight-planner (no git repo, copied); systemd service on port 8080; canon at ~/canon/flight-planner/; docs + code indexed in context-server
+- **Flight Planner git repo set up** — repo at github.com/EthanPlusPlus/flight-planner (private); sparse checkout in ~/projects/flight-planner; docs worktree at ~/canon/flight-planner; hooks installed; indexed in context-server
 - **Even project bootstrapped** — iOS receipt-splitting app; repo at github.com/EthanPlusPlus/even; ~/projects/even (sparse, no docs/), ~/canon/even worktree on docs branch, indexed in context-server
 - **Obsidian canon view** — HOME.md with Dataview queries (proposed-ideas, decisions, in-progress); wikilinks added across proposed-ideas → decisions; install Dataview plugin to activate
 - **Sukuna first run — consistency + observations resolved** — 8 consistency fixes applied; Decision 011 annotated with 012 reversals; 008 rewritten (pipeline closed, Sukuna covers observers, feedback loop deprioritised); VM_HOST env override fixed in prismo; open-questions.md stripped of resolved items; cross-machine portability constraint added
