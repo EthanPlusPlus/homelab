@@ -100,19 +100,32 @@ These are not markdown files. They are structured payloads produced and consumed
 
 Produced by the Session Hydration System. Injected into runtime at session start.
 
+Context is stratified by priority — not all fields are equal. In large-context systems the problem is attention allocation, not token count. The runtime should weight earlier layers more heavily.
+
 ```json
 {
   "project": "even",
   "contributor": "ethan",
   "generated_at": "2026-05-12T10:00:00Z",
+  "core_operational_state": {
+    "active_workstreams": [],
+    "unresolved_tensions": [],
+    "current_focus": ""
+  },
   "active_doctrine": [],
-  "recent_changes": [],
-  "active_workstreams": [],
-  "unresolved_tensions": [],
-  "related_history": [],
-  "contributor_context": {}
+  "recent_context": {
+    "recent_changes": [],
+    "active_proposals": []
+  },
+  "historical_context": {
+    "related_history": [],
+    "contributor_context": {}
+  },
+  "expandable_context": []
 }
 ```
+
+**Priority order:** `core_operational_state` → `active_doctrine` → `recent_context` → `historical_context` → `expandable_context`. Runtimes should process and weight in this order. The expandable layer is fetched on demand, not included by default.
 
 ---
 
