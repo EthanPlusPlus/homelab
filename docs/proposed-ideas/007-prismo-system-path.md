@@ -1,7 +1,7 @@
 ---
 id: "007"
 title: prismo Available System-Wide
-status: Proposed — straightforward, do when convenient
+status: Closed — deferred; V2 will replace the prismo bash script with Layer 2 services
 ---
 
 # 007 — prismo Available System-Wide

@@ -1,13 +1,13 @@
 ---
 id: "001"
 title: Subagent Usage in Prismo
-status: Proposed — needs further unpacking
+status: Closed — patterns resolved or superseded; remaining questions deferred
 ---
 
 # 001 — Subagent Usage in Prismo
 
 ## Status
-Proposed — needs further unpacking
+Closed — 2026-05-12. Pattern 1 (Explore subagent) is in use and working. Pattern 2 (doc-update subagent) was deprioritised — overhead doesn't justify it at current scale. Pattern 3 (plan validation) was implemented as Hermes and reversed by Decision 012. Remaining open questions are empirical and don't warrant a proposed-idea. Under V2, subagent architecture will be revisited when the runtime abstraction layer exists.
 
 ## Background
 Prismo's founding principle is that Claude should be a reasoning engine, not a search engine.

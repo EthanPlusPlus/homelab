@@ -17,8 +17,8 @@ The whole system — Proxmox host, VM, services, projects, docs, and workflow �
 
 - **Proxmox host** — bare metal on a 2017 iMac, IP 192.168.1.9
 - **Ubuntu Server VM** — Ubuntu 24.04, IP 192.168.100.10, Tailscale IP 100.92.226.121
-- **Code projects** — ~/projects/context-server, ~/projects/devcamp (sparse — no docs/), ~/projects/flight-planner (no git repo)
-- **Knowledge** — ~/canon/homelab, ~/canon/context-server, ~/canon/exam-prep, ~/canon/flight-planner
+- **Code projects** — ~/projects/context-server, ~/projects/devcamp (sparse — no docs/), ~/projects/flight-planner, ~/projects/even (sparse — no docs/)
+- **Knowledge** — ~/canon/homelab, ~/canon/context-server, ~/canon/exam-prep, ~/canon/flight-planner, ~/canon/even
 
 ## Active Services
 

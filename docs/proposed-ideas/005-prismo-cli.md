@@ -8,7 +8,7 @@ status: Implemented — 2026-04-19
 
 ## Status
 
-Implemented — 2026-04-19. Script lives at `scripts/prismo` in the homelab repo.
+Implemented — 2026-04-19. Script lives at `scripts/prismo` in the homelab repo. Closed — under V2 the prismo bash script will be superseded by Layer 2 orchestration services; this proposed-idea is complete.
 
 ## Problem
 
