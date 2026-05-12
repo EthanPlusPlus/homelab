@@ -5,6 +5,7 @@ Oldest entries are removed as new ones are added.
 
 ---
 
+- **Prismo V2 masterplan written** — founding architecture doc at docs/architecture/v2-masterplan.md; 4-layer model (substrate/services/runtime/interfaces); models as swappable runtimes; cognitive continuity framing; team context (Shrey/Kyle); WhatsApp as nearest-term Layer 4
 - **Flight Planner git repo set up** — repo at github.com/EthanPlusPlus/flight-planner (private); sparse checkout in ~/projects/flight-planner; docs worktree at ~/canon/flight-planner; hooks installed; indexed in context-server
 - **Even project bootstrapped** — iOS receipt-splitting app; repo at github.com/EthanPlusPlus/even; ~/projects/even (sparse, no docs/), ~/canon/even worktree on docs branch, indexed in context-server
 - **Obsidian canon view** — HOME.md with Dataview queries (proposed-ideas, decisions, in-progress); wikilinks added across proposed-ideas → decisions; install Dataview plugin to activate
