@@ -5,6 +5,8 @@ Oldest entries are removed as new ones are added.
 
 ---
 
+- **workflow-state-service shipped** — operational working memory layer in context-server; Session/Workstream/SessionContext; ContextBundle core_operational_state now live; 6 new MCP tools; event log pre-positioned for future event-driven evolution
+- **ContextBundle fixed + status values normalised** — active_doctrine now returns all decisions via over-fetch+deduplicate; proposed-ideas status values normalised to lifecycle standard (proposed/experimental/closed/superseded); closed items no longer leak into active_proposals
 - **context-server v2 shipped + EmbeddingProvider abstraction** — frontmatter indexing, lifecycle-aware retrieval, /context /project-state /stale-items endpoints, 3 new MCP tools; model now config-driven via EMBEDDING_MODEL env var; 821 docs indexed
 - **Phase 0+1 complete — V2 canon foundation laid** — 7 stale decisions deleted, 3 proposed-ideas closed; v2-audit/ (4 docs), phase1/ contracts written (object model, capability contracts, lifecycle semantics, retrieval architecture, design notes); v2 masterplan + roadmap saved
 - **Prismo V2 masterplan written** — founding architecture doc at docs/architecture/v2-masterplan.md; 4-layer model (substrate/services/runtime/interfaces); models as swappable runtimes; cognitive continuity framing; team context (Shrey/Kyle); WhatsApp as nearest-term Layer 4
