@@ -1,7 +1,8 @@
 ---
 id: "002"
 title: Migrate from GitHub to Gitea
-status: Proposed — conditions not yet met
+status: proposed
+notes: conditions not yet met
 ---
 
 # 002 — Migrate from GitHub to Gitea

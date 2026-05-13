@@ -1,7 +1,8 @@
 ---
 id: "006"
 title: Mobile Gateway to Prismo
-status: Proposed — approach not yet decided
+status: proposed
+notes: approach not yet decided
 ---
 
 # 006 — Mobile Gateway to Prismo

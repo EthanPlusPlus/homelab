@@ -1,7 +1,8 @@
 ---
 id: "001"
 title: Subagent Usage in Prismo
-status: Closed — patterns resolved or superseded; remaining questions deferred
+status: closed
+notes: patterns resolved or superseded; remaining questions deferred
 ---
 
 # 001 — Subagent Usage in Prismo

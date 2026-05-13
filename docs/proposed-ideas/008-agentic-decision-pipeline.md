@@ -1,7 +1,8 @@
 ---
 id: "008"
 title: Agentic Decision Pipeline and Self-Learning System
-status: Partially closed — see notes per section
+status: proposed
+notes: partially closed — see notes per section
 ---
 
 # 008 — Agentic Decision Pipeline and Self-Learning System

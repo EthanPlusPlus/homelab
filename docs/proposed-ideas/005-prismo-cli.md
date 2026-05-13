@@ -1,7 +1,8 @@
 ---
 id: "005"
 title: Prismo CLI / Automation Script
-status: Implemented — 2026-04-19
+status: closed
+notes: implemented 2026-04-19
 ---
 
 # 005 — Prismo CLI / Automation Script

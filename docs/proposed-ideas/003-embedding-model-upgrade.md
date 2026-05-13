@@ -1,7 +1,8 @@
 ---
 id: "003"
 title: Embedding Model Upgrade
-status: Proposed — deferred until triggered
+status: proposed
+notes: deferred until triggered
 ---
 
 # 003 — Embedding Model Upgrade
