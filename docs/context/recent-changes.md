@@ -5,6 +5,7 @@ Oldest entries are removed as new ones are added.
 
 ---
 
+- **operational brief engine built — Phase 2 complete** — SynthesisProvider abstraction (mirrors EmbeddingProvider); runtime/ module with AnthropicSynthesisProvider + LocalSynthesisProvider stub; GET /brief + generate_brief MCP tool; Layer 2 has no Anthropic coupling; pending: .env ANTHROPIC_API_KEY to activate
 - **workflow-state-service shipped** — operational working memory layer in context-server; Session/Workstream/SessionContext; ContextBundle core_operational_state now live; 6 new MCP tools; event log pre-positioned for future event-driven evolution
 - **ContextBundle fixed + status values normalised** — active_doctrine now returns all decisions via over-fetch+deduplicate; proposed-ideas status values normalised to lifecycle standard (proposed/experimental/closed/superseded); closed items no longer leak into active_proposals
 - **context-server v2 shipped + EmbeddingProvider abstraction** — frontmatter indexing, lifecycle-aware retrieval, /context /project-state /stale-items endpoints, 3 new MCP tools; model now config-driven via EMBEDDING_MODEL env var; 821 docs indexed
