@@ -9,7 +9,11 @@ Connected as `context-server` at:
 - **On VM:** http://localhost:8001/mcp
 - **Remote (Tailscale):** http://ubuntu-server.tail58b10c.ts.net:8001/mcp
 
-Tools: `search_docs`, `get_doc_section`, `list_related_decisions`, `search_code`, `get_symbol`, `find_references`, `get_file_summary`, `get_related_symbols`
+Tools:
+- **Docs:** `search_docs`, `get_doc_section`, `list_related_decisions`
+- **Operational state (V2):** `get_context`, `get_project_state`, `get_stale_items`, `generate_brief`
+- **Workflow state (V2):** `start_session`, `end_session`, `update_focus`, `create_workstream`, `update_workstream`, `get_workflow_state`
+- **Code:** `search_code`, `get_symbol`, `find_references`, `get_file_summary`, `get_related_symbols`
 
 Use `doc_type=<project-name>` to scope queries to a specific project (e.g., `homelab`, `context-server`, `exam-prep`). The context-server indexes every `~/canon/<X>/` as `doc_type=X`.
 

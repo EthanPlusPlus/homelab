@@ -20,5 +20,5 @@
 
 | Service | Reason |
 |---------|--------|
-| Pi-hole | DNS fragility risk — see decision 004 |
+| Pi-hole | DNS fragility risk — deferred until DNS resilience plan is in place |
 | Immich | Lower priority than AI layer — revisit after retrieval system established |

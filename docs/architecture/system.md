@@ -22,11 +22,15 @@ Two sibling directories separate code from knowledge:
 ~/projects/          ← code repos only (sparse — no docs/)
   context-server/
   devcamp/
+  flight-planner/
+  even/
 
 ~/canon/             ← knowledge only (docs worktrees + knowledge bases)
   homelab/           ← primary clone of homelab repo (docs-only)
   context-server/    ← linked git worktree from context-server repo (docs/ only)
   exam-prep/         ← study materials (no git repo)
+  flight-planner/    ← linked git worktree from flight-planner repo (docs/ only)
+  even/              ← linked git worktree from even repo (docs/ only)
 ```
 
 ## Repos
@@ -36,6 +40,8 @@ Two sibling directories separate code from knowledge:
 | homelab | `~/canon/homelab/` | Prismo's own docs — decisions, runbooks, architecture, context |
 | context-server | `~/projects/context-server/` (code) + `~/canon/context-server/` (docs) | The AI context retrieval service |
 | devcamp | `~/projects/devcamp/` | Active development project |
+| flight-planner | `~/projects/flight-planner/` (code) + `~/canon/flight-planner/` (docs) | Personal flight optimiser |
+| even | `~/projects/even/` (code) + `~/canon/even/` (docs) | iOS receipt-splitting app |
 
 ## Working Model
 

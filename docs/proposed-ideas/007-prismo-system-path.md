@@ -1,8 +1,8 @@
 ---
 id: "007"
 title: prismo Available System-Wide
-status: closed
-notes: deferred; V2 will replace the prismo bash script with Layer 2 services
+status: archived
+notes: archived — superseded by V2 Layer 2 orchestration direction (prismo bash script to be replaced by services)
 ---
 
 # 007 — prismo Available System-Wide

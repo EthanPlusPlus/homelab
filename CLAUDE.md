@@ -24,10 +24,6 @@ Always retrieve context via MCP before reasoning or planning.
 
 ## Workflow
 
-1. Retrieve context from MCP
-2. Check `docs/context/` — progress.md, recent-changes.md, constraints.md
-3. Propose a plan — wait for approval before touching anything
-4. Execute the approved plan
-5. Update `docs/context/` and any affected docs
-6. Re-index: `curl -X POST http://localhost:8000/index`
-7. Commit and push
+The full session workflow lives in `docs/memory/workflow.md` (auto-loaded as shared memory).
+That is the authoritative version — includes session bootstrap (step 0), canon discipline
+Phases 1 and 2, and the parallel-session protocol. Defer to it.
