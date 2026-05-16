@@ -136,7 +136,7 @@ To add the MCP server (run from this repo directory):
 
 ## Workflow
 
-0. Start sessions with "hi" to trigger session bootstrap
+0. Session bootstrap runs on the first user message — no trigger needed
 1. Retrieve context from MCP
 2. Check docs/context/ — progress.md, recent-changes.md, constraints.md
 3. Propose a plan — wait for approval before touching anything
@@ -229,12 +229,20 @@ claude mcp add context-server --transport http \
 This is per-machine and per-repo-directory — it must be run once on each
 machine where you'll work on this project.
 
-### 8. Update homelab docs
+### 8. Update homelab docs (the Prismo system canon)
 
-- Add the new project to `~/canon/homelab/docs/architecture/` if it affects infrastructure
-- Add the new service to the service inventory in `~/canon/homelab/docs/context/`
+Reminder: `~/canon/homelab/` is the de facto Prismo system canon (see `memory/system.md`).
+System-wide things go here. Component-internal things go in the project's own canon.
+
+- Add the new project to `~/canon/homelab/docs/architecture/system.md` (repos table + directory tree)
+- Add the new service to the service inventory in `~/canon/homelab/docs/context/services.md` if it exposes one
 - Update `new-machine-setup.md` to include the new repo's sparse-checkout dirs
 - Re-index and push homelab
+
+What stays in the project's own canon (NOT homelab):
+- Implementation decisions about how that project works internally
+- Project-specific runbooks
+- Project-specific architecture beyond "it exists and lives at X"
 
 ---
 

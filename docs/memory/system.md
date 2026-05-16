@@ -49,10 +49,17 @@ Two sibling directories separate code from knowledge:
   flight-planner/  ← local canon only (no git repo)
 ```
 
-**Homelab** (`~/canon/homelab`) — docs-only repo. The knowledge base for all of Prismo.
+**Homelab** (`~/canon/homelab`) — docs-only repo. The de facto **Prismo system canon**: it owns cross-cutting governance (V2 masterplan/roadmap, architectural laws, lifecycle decisions, shared memory, prismo CLI) AND the literal homelab infrastructure (hardware, Proxmox/VM setup, services). The repo name is historical — Prismo emerged out of this project. The eventual rename to `~/canon/prismo/` is deferred to a forcing function (web UI / new contributor onboarding).
+
+**Component canons** (`~/canon/<name>/`) — own implementation-level decisions for that component (e.g. `context-server/decisions/008` for lifecycle-aware-retrieval implementation, but the Three Laws governing it live in `homelab/decisions/017`).
+
 **Code projects** (`~/projects/<name>`) — code only, no docs/ in working tree. Docs live as linked worktrees in `~/canon/<name>/`.
 
-The homelab repo documents homelab-level concerns only. Project-specific docs live in `~/canon/<project-name>/docs/`.
+### Where do new decisions go?
+
+- **Cross-cutting / system-wide** → `~/canon/homelab/docs/decisions/`. Examples: V2 governance (013–019), shared memory model (010), session bootstrap (012, 016), capability contracts.
+- **Component-specific implementation** → `~/canon/<component>/docs/decisions/`. Examples: context-server stack choice, MCP transport, code indexer design.
+- **When in doubt:** if the decision affects multiple components or how Prismo-the-system works, it's homelab. If it only affects one component's internals, it's component-local.
 
 Every project repo is self-contained — each carries its own STRUCTURE.md, CLAUDE.md, and docs/context/.
 

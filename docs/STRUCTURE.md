@@ -12,6 +12,28 @@ Every doc should earn its place. If removing it would not hurt, it should not ex
 
 ---
 
+## What this repo is
+
+`~/canon/homelab/` is the **Prismo system canon** by convention (see `memory/system.md`).
+The repo name is historical — Prismo emerged out of the homelab project.
+
+It carries two things at once:
+
+1. **Prismo system-wide governance** — V2 masterplan/roadmap, architectural laws,
+   cross-cutting decisions (013–019), shared session memory, the prismo CLI script.
+2. **Homelab-as-a-component specifics** — hardware specs, Proxmox/Ubuntu VM setup
+   runbooks, service inventory, networking constraints.
+
+The structure below applies to both. Decisions affecting Prismo-the-system live here.
+Decisions affecting a single component's internals (e.g. how context-server implements
+lifecycle-aware retrieval) live in that component's canon at `~/canon/<component>/`.
+
+The eventual rename to `~/canon/prismo/` is deferred to when there's a forcing function
+(web UI exposing project structure, new contributor onboarding). Until then the rule
+above keeps things from getting more tangled.
+
+---
+
 ## Indexing Boundaries
 
 - `decisions/`, `runbooks/`, `architecture/`, `context/` — **indexed and trusted**
