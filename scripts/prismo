@@ -484,6 +484,151 @@ cmd_status() {
   fi
 }
 
+# ── stale (Decision 019 — lifecycle loop) ─────────────────────────────────────
+
+cmd_stale() {
+  local subcmd="${1:-list}"
+  shift 2>/dev/null || true
+
+  case "$subcmd" in
+    list|ls|"")
+      check_vm
+      local project="${1:-}"
+      local url="${CONTEXT_API}/stale-items"
+      [[ -n "$project" ]] && url="${url}?project=${project}"
+      echo ""
+      curl -sf "$url" | python3 -c "
+import sys, json
+data = json.load(sys.stdin)
+items = data.get('items', [])
+if not items:
+    print('  ✓ No unacknowledged stale items.')
+    sys.exit(0)
+print(f'  {len(items)} stale items:')
+print()
+for it in items:
+    md = it.get('metadata', {})
+    rule = it.get('rule', '?')
+    iid = it['id']
+    title = md.get('title') or md.get('heading', '')
+    proj = md.get('doc_type', '?')
+    print(f'  [{rule}]  {proj}  {title or iid[:60]}')
+    print(f'             id: {iid}')
+print()
+print('  Ack: prismo stale ack <id> [--resolution <r>] [--note \"...\"]')
+"
+      ;;
+    ack)
+      check_vm
+      local item_id="${1:-}"
+      shift 2>/dev/null || true
+      [[ -n "$item_id" ]] || die "Usage: prismo stale ack <item-id> [--resolution <r>] [--note '...']"
+      local resolution="pending"
+      local note=""
+      local defer=14
+      while [[ $# -gt 0 ]]; do
+        case "$1" in
+          --resolution|-r) resolution="$2"; shift 2 ;;
+          --note|-n) note="$2"; shift 2 ;;
+          --defer|-d) defer="$2"; shift 2 ;;
+          *) die "Unknown flag: $1" ;;
+        esac
+      done
+      local payload
+      payload=$(python3 -c "
+import json
+print(json.dumps({
+  'item_id': '$item_id',
+  'contributor_id': 'ethan',
+  'resolution': '$resolution',
+  'resolution_note': '''$note''',
+  'defer_days': $defer,
+}))
+")
+      curl -sf -X POST "${CONTEXT_API}/workflow/stale/ack" \
+        -H 'Content-Type: application/json' \
+        -d "$payload" | python3 -m json.tool && ok "Acknowledged: $item_id"
+      ;;
+    acks)
+      check_vm
+      curl -sf "${CONTEXT_API}/workflow/stale/acks" | python3 -m json.tool
+      ;;
+    *)
+      die "Unknown stale subcommand: $subcmd  (try: list, ack, acks)"
+      ;;
+  esac
+}
+
+# ── brief (Decision 016, 018 — operational brief via service) ─────────────────
+
+cmd_brief() {
+  local project="${1:-homelab}"
+  check_vm
+  echo ""
+  curl -sf "${CONTEXT_API}/brief?project=${project}" | python3 -c "
+import sys, json
+data = json.load(sys.stdin)
+print(f'  {data.get(\"project\", \"?\")}  ({data.get(\"depth\", \"standard\")})')
+print(f'  generated: {data.get(\"generated_at\", \"?\")}')
+print()
+print(data.get('brief', '(no brief returned)'))
+print()
+prov = data.get('provenance', {})
+if prov:
+    print(f'  ── synthesized via {prov.get(\"generated_by\", \"?\")}')
+    print(f'  ── sources: {len(prov.get(\"source_ids\", []))} canonical records')
+"
+}
+
+# ── capture (Decision 017 minimal Layer 4 — contribution capture) ─────────────
+
+cmd_capture() {
+  local text="${*:-}"
+  [[ -n "$text" ]] || die "Usage: prismo capture \"this matters because ...\""
+
+  local project=""
+  local cwd
+  cwd=$(pwd)
+  # Infer project from CWD if under ~/canon/<X>/ or ~/projects/<X>/
+  if [[ "$cwd" == "${HOME}/canon/"* ]]; then
+    project=$(echo "$cwd" | sed "s|${HOME}/canon/||" | cut -d/ -f1)
+  elif [[ "$cwd" == "${HOME}/projects/"* ]]; then
+    project=$(echo "$cwd" | sed "s|${HOME}/projects/||" | cut -d/ -f1)
+  fi
+
+  if [[ -z "$project" ]]; then
+    project="homelab"
+    warn "No project inferred from CWD — defaulting to homelab"
+  fi
+
+  local drafts_dir="${HOME}/canon/${project}/docs/drafts"
+  [[ -d "$drafts_dir" ]] || die "Drafts dir not found: $drafts_dir"
+
+  local ts
+  ts=$(date -u +%Y-%m-%dT%H%M%SZ)
+  local file="${drafts_dir}/capture-${ts}.md"
+
+  cat > "$file" << EOF
+---
+type: signal-candidate
+captured_at: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+captured_by: ethan
+project: ${project}
+status: pending-review
+---
+
+# Signal capture — ${ts}
+
+${text}
+
+---
+
+_Captured via \`prismo capture\`. Review and either elevate to canon (decision/proposal) or delete._
+EOF
+  ok "Captured → $file"
+  info "Review when convenient: \$EDITOR $file"
+}
+
 # ── help ──────────────────────────────────────────────────────────────────────
 
 cmd_help() {
@@ -494,13 +639,19 @@ cmd_help() {
   echo -e "  ${BOLD}new-project${NC} <name> <repo-url>   Add a new project end-to-end"
   echo -e "  ${BOLD}index${NC} [<project>]               Re-index docs (or code for a project)"
   echo -e "  ${BOLD}status${NC}                          Check VM connectivity and hook health"
+  echo -e "  ${BOLD}stale${NC} [list|ack|acks]           Lifecycle inbox — Decision 019"
+  echo -e "  ${BOLD}brief${NC} [<project>]               Generate operational brief — Decisions 016, 018"
+  echo -e "  ${BOLD}capture${NC} \"<text>\"                 Capture a signal candidate into drafts/"
   echo ""
   echo "Examples:"
   echo "  prismo new-machine"
   echo "  prismo new-project myapp git@github.com:you/myapp.git"
   echo "  prismo index"
-  echo "  prismo index myapp"
   echo "  prismo status"
+  echo "  prismo stale"
+  echo "  prismo stale ack homelab/proposed-ideas/002.md --resolution resolved"
+  echo "  prismo brief homelab"
+  echo "  prismo capture \"the brief endpoint needs caching\""
   echo ""
   echo "Bootstrap a new machine (two commands):"
   echo "  git clone git@github.com:EthanPlusPlus/homelab.git ~/canon/homelab"
@@ -517,6 +668,9 @@ case "$CMD" in
   new-project)    cmd_new_project "$@" ;;
   index)          cmd_index "$@" ;;
   status)         cmd_status ;;
+  stale)          cmd_stale "$@" ;;
+  brief)          cmd_brief "$@" ;;
+  capture)        cmd_capture "$@" ;;
   help|--help|-h) cmd_help ;;
   *) die "Unknown command: $CMD  (run 'prismo help')" ;;
 esac
