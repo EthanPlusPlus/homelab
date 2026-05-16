@@ -625,9 +625,10 @@ except Exception:
       fi
 
       # Fetch ContextBundle and unacknowledged stale items
-      local bundle stale
+      local bundle stale captures
       bundle=$(curl -sf --max-time 10 "${CONTEXT_API}/context?project=${project}&contributor=${contributor}&depth=standard" 2>/dev/null)
       stale=$(curl -sf --max-time 5 "${CONTEXT_API}/stale-items?project=${project}" 2>/dev/null)
+      captures=$(curl -sf --max-time 5 "${CONTEXT_API}/workflow/captures?project=${project}&status=pending-review" 2>/dev/null)
       echo ""
       echo "[PRISMO SESSION] session=${sid} project=${project} contributor=${contributor}"
       if [[ -n "$stale" ]]; then
@@ -642,6 +643,17 @@ for it in d.get('items', [])[:3]:
     md = it.get('metadata', {})
     print(f\"  [{it.get('rule')}] {md.get('path','?')} (updated {md.get('updated_at','?')})\")" 2>/dev/null
         fi
+      fi
+      if [[ -n "$captures" ]]; then
+        echo "$captures" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+caps = d.get('captures', [])
+if caps:
+    print(f'[V2 CAPTURES] {len(caps)} pending review — triage via: prismo capture list')
+    for c in caps[:3]:
+        text = c.get('text', '').replace(chr(10), ' ')[:120]
+        print(f\"  [{c['id']}] {text}\")" 2>/dev/null
       fi
       if [[ -n "$bundle" ]]; then
         echo "$bundle" | python3 -c "
