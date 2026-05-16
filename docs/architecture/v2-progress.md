@@ -110,7 +110,8 @@ architectural pass (2026-05-16). Phase 3 cannot start until the two-week soak co
 
 Everything below turns a written rule into infrastructure:
 
-- ✅ **Service Rule check** (Decision 017) — `_check_service_rule_compliance` runs at FastAPI startup, parses HTTP Endpoint Mapping table, fails app startup on undocumented routes
+- ✅ **Service Rule check — HTTP side** (Decision 017) — `_check_service_rule_compliance` runs at FastAPI startup, parses HTTP Endpoint Mapping table, fails app startup on undocumented routes
+- ✅ **Service Rule check — MCP side** (Decision 017, shipped 2026-05-16) — `context_mcp/main.py` AST-parses MCP tool definitions, extracts `client.<method>(f"{API_BASE}/...")` calls, fetches `/openapi.json` from `API_BASE` with retry, set-diffs, fails MCP startup on any tool wrapping a nonexistent HTTP route. Closes the symmetric gap (HTTP-side ensures every route is documented; MCP-side ensures every adapter wraps a real route). Caught a real latent bug on first run: `get_doc_section` MCP tool wrapped `GET /get/doc` which was contract-documented but never implemented; fixed by implementing the route. 28 api routes, 21 MCP tools, both checks green.
 - ✅ **Session ensure hook** (Decisions 014, 016) — UserPromptSubmit hook calls `prismo session ensure`, which on new-session creation closes orphan sessions, seeds `current_focus` from stdin (the prompt), and emits a `[V2 HYDRATED CONTEXT]` block surfacing active_doctrine, active_proposals, recent_changes, unresolved_tensions, and unacknowledged stale items. Runtime starts hydrated whether the operator remembers or not.
 - ✅ **SessionEnd hook** — calls `prismo session end` when Claude exits
 - ✅ **Doctrine-service gate downgraded** (Decision 019 revised) — from arbitrary two-week soak to signal-conditional (first real ack OR confirmed-impossible signal)
@@ -118,20 +119,18 @@ Everything below turns a written rule into infrastructure:
 
 ### Remaining Phase 2.5 work
 
-- ⏳ **Soak** — signal-conditional per [[../decisions/019-lifecycle-loop-closure-pattern|Decision 019]] (revised 2026-05-16). Phase 3 starts when the loop has closed once on a real stale item, OR when two weeks confirm the loop cannot generate signal at current canon shape.
+- ✅ **Soak gate closed** (2026-05-16) — replaced by test fixtures (`tests/test_stale_rules.py`). The "wait for real signal" gate was a substitute for not having a test harness; with `evaluate_staleness` extracted as a pure function and 12 tests covering all rules + full closure pattern simulation, the loop is verified deterministically. Thresholds also tuned to iteration cadence (proposed 90d → 14d, experimental 60d → 7d). See [[../decisions/019-lifecycle-loop-closure-pattern|Decision 019 annotation 2026-05-16]]. Phase 3 unblocked.
 - ✅ HTTP contract documentation backfill — shipped 2026-05-16
 - ✅ Decision 018 retrofit on `/brief` callers — CLI surfaces provenance; future web UI inherits the contract
 - ✅ **Service Rule structural enforcement** — shipped 2026-05-16. `api/main.py` `_check_service_rule_compliance` runs at startup; undocumented routes fail-to-start. Turns Decision 017 into infrastructure.
 
 ---
 
-## Phase 3 — Layer 2 maintenance intelligence ⏳ gated on Phase 2.5
+## Phase 3 — Layer 2 maintenance intelligence ⏳ scoped 2026-05-16, build pending
 
-Revised scope (Decisions 013, 017): trio collapses to two services.
+Revised scope (Decisions 013, 017, 020): trio collapses to two services.
 
-- **doctrine-service** — Law 1 territory. Lifecycle, supersession graph, metadata reconciliation,
-  source-hash drift detection (per Decision 018). No LLM calls. Starts as a module inside
-  context-server; splits when boundaries get loud.
+- **doctrine-service** — Law 1 territory. Scoping locked by [[../decisions/020-doctrine-service-structural-coherence-engine|Decision 020]]: structural coherence engine, owns staleness + supersession-minimal + metadata reconciliation + provenance integrity + structural topology. Lives at top-level `doctrine/` (peer to `api/`, `workflow/`). Core test: self-evident vs arguable. Produces measurements, never judgments. Module-first; split when scaling/ownership/runtime diverges.
 - **synthesis-service** — Law 2 territory. Onboarding, continuity reports, contradiction analysis,
   organizational narration. Inherits Decision 018 provenance discipline from day one.
 - **"Sukuna v2" as a service is dropped.** "Sukuna" survives as the scheduled-maintenance brand

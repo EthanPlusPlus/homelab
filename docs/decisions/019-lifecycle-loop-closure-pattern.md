@@ -126,3 +126,41 @@ defines.
 - **This is the first concrete instance** of "Layer 4 = interaction surface, not browser"
   in the codebase, and sets precedent for the minimal Layer 4 slice (see v2-progress.md
   Phase 5 notes).
+
+---
+
+## Annotation 2026-05-16 — Gate satisfied via tests, not soak
+
+The "two-week soak" gate was a substitute for not having a test harness. With test
+fixtures (`tests/test_stale_rules.py`) the closure pattern (detect → surface → ack
+→ propagate) is verified deterministically and on demand — no waiting on production
+data to age into the rules.
+
+**Why the soak was vestigial in practice.** At single-contributor + active Sukuna/Prismo
+maintenance + rapid iteration, the steady state is zero stale signal. The soak was
+implicitly waiting for a real item to surface so the human-judgment step could be
+exercised once. That event may never occur passively. The longer it doesn't happen, the
+less the soak is observing anything — it's just postponing Phase 3.
+
+**What changed.**
+
+- **Thresholds reduced** to match iteration cadence: proposed 90d → 14d, experimental
+  60d → 7d. Months-long surfacing is incompatible with rapid-iteration work; weeks-long
+  is the right scale.
+- **Test fixtures added** (`tests/test_stale_rules.py`) covering all three rules,
+  borderline cases, ack suppression, dedup, and the full closure pattern simulation.
+  The `evaluate_staleness` function in `api/main.py` was extracted as a pure function
+  to make this possible.
+- **Gate closed.** Mechanism verified (manual run + endpoint contracts + tests).
+  Judgment step verified deterministically via `test_full_closure_pattern_simulation`.
+  Real-signal observation now happens in production with doctrine-service as the home,
+  not in a pre-Phase-3 soak.
+
+**Lesson worth keeping**: production-state-dependent gates are a code smell. Behavior
+verification belongs in tests; soaks belong in observability, not in critical paths.
+Future decisions that propose a "wait N days and see" gate should first ask whether
+a test fixture would satisfy the same epistemic need.
+
+**Phase 3 unblocked.** doctrine-service inherits `/stale-items` and `/workflow/stale/ack`
+as primary contracts; its first job is no longer "backfill metadata" (metadata is fine)
+but "own the lifecycle loop as a first-class service capability." Scoping decision to follow.
