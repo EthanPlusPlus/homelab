@@ -1,10 +1,13 @@
 # Decision 012 — Session bootstrap and inline canon discipline
 
 ## Status
-Adopted
+Adopted — bootstrap portion superseded by [[016-session-hydration-replaces-warmup|Decision 016]]; inline Phase 2 portion still active
 
 ## Supersedes
 Decision 011 — Hermes: triggered cross-project canon discipline
+
+## Superseded by (partial)
+[[016-session-hydration-replaces-warmup|Decision 016]] — the warm-up ritual portion of this decision is superseded by hydrated session start via `get_context`. The Phase 2 inline MCP discipline remains in force unchanged.
 
 ## Context
 

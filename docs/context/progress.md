@@ -31,8 +31,7 @@ _(add a one-liner when you start a session — clear it when you're done)_
 
 ## In Progress
 
-- **Dev (devakmistry) VM onboarding** — account created (sudo + docker groups), SSH key installed,
-  homelab cloned at ~/canon/homelab; memory symlinks and MCP setup still pending; run add-vm-user.md step 5+ to complete
+_(none)_
 
 ## Next
 

@@ -1,49 +1,37 @@
 ---
 id: "008"
-title: Agentic Decision Pipeline and Self-Learning System
-status: proposed
-notes: partially closed — see notes per section
+title: Structured Decision Pipeline
+status: closed
+notes: closed — premise disproven by Hermes (011) and superseded by inline Phase 2 (012)
 ---
 
-# 008 — Agentic Decision Pipeline and Self-Learning System
+# 008 — Structured Decision Pipeline
 
-## 1. Structured Decision Pipeline — Closed
+## Status
 
-The original idea: replace self-policing Phase 2 with a pipeline of dedicated agents
-(Proposer, Validator, Devil's Advocate, Scribe). [[011-hermes-cross-project-discipline|Hermes (Decision 011)]] was the attempt at
-the Validator role.
+Closed. Premise disproven in practice.
 
-**Closed.** Hermes proved the premise wrong — subagents start cold, re-derive context the
-main agent already has, and add token cost without adding insight. Inline Phase 2 MCP queries
-([[012-session-bootstrap-inline-discipline|Decision 012]]) serve the validation need more cheaply. No further investment here.
+## Original Idea
 
----
+Replace self-policing Phase 2 with a pipeline of dedicated agents: Proposer, Validator,
+Devil's Advocate, Scribe. [[011-hermes-cross-project-discipline|Hermes (Decision 011)]] was
+the attempt at the Validator role.
 
-## 2. Persistent Observing Agents — Partially implemented
+## Why Closed
 
-Three agent types were envisioned:
+Hermes proved the premise wrong:
 
-- **Canon scanner** — reads canon periodically, identifies staleness and gaps → **implemented as [[009-maid-canon-standardizer|Sukuna (009)]]**
-- **Non-use agent** — continues working between sessions, synthesising and cross-referencing → **implemented as [[009-maid-canon-standardizer|Sukuna]] section 3**
-- **Interaction observer** — watches session logs or summaries, extracts decisions/insights that should be in canon but aren't, proposes them for canonisation → **open**
+- Subagents start cold with no conversation context, re-deriving what the main agent already has
+- Every proposal paid cold-start cost plus a full review pass, even for small suggestions
+- Token usage increased rather than decreased — the opposite of the intended efficiency gain
 
-The Interaction observer is genuinely useful but requires a mechanism for session log access.
-Not blocked, just not yet scoped.
+Inline Phase 2 MCP queries ([[012-session-bootstrap-inline-discipline|Decision 012]]) serve
+the validation need more cheaply. No further investment here.
 
----
+## Related splits
 
-## 3. Self-Learning Feedback Loop — Deprioritised
+The original 008 proposed three programs. Sections 2 and 3 are now tracked separately:
 
-Agents that write back to canon autonomously with a quality-assessment gate. Roughly: a
-Scribe that captures session outcomes + a reviewer agent before changes land.
-
-Not a bad idea, but not a priority. The drafts-only constraint (Decision 003) and Sukuna's
-review cycle serve this need at current scale. Revisit if Sukuna's output volume grows enough
-to make manual review a bottleneck.
-
----
-
-## Open
-
-- Interaction observer: what does session log access look like in Claude Code? Worth scoping
-  when the Sukuna review cadence is established.
+- **Persistent observing agents** — split into [[009-maid-canon-standardizer|009 (Sukuna)]] for
+  canon scanning and the still-open [[010-interaction-observer|010 — Interaction Observer]].
+- **Self-learning feedback loop** — split into [[011-self-learning-feedback-loop|011]] (deprioritised).
