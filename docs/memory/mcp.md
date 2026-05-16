@@ -13,7 +13,10 @@ Tools:
 - **Docs:** `search_docs`, `get_doc_section`, `list_related_decisions`
 - **Operational state (V2):** `get_context`, `get_project_state`, `get_stale_items`, `generate_brief`
 - **Workflow state (V2):** `start_session`, `end_session`, `update_focus`, `create_workstream`, `update_workstream`, `get_workflow_state`
+- **Lifecycle loop (V2.5):** `acknowledge_stale`, `list_stale_acks`
 - **Code:** `search_code`, `get_symbol`, `find_references`, `get_file_summary`, `get_related_symbols`
+
+`search_docs` defaults to `record_type=canonical` (Decision 018). Pass `record_type=synthesized` or `record_type=any` to include model-generated content.
 
 Use `doc_type=<project-name>` to scope queries to a specific project (e.g., `homelab`, `context-server`, `exam-prep`). The context-server indexes every `~/canon/<X>/` as `doc_type=X`.
 
