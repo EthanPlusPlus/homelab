@@ -569,10 +569,27 @@ cmd_session() {
         return 0
       fi
 
-      # Read stdin if available (hook passes prompt); use as focus seed
+      # Read stdin if available (hook passes prompt); use as focus seed.
+      # Claude Code's UserPromptSubmit hook sends a JSON envelope on stdin
+      # ({session_id, transcript_path, cwd, prompt, ...}). Parse out .prompt;
+      # fall back to raw text for non-Claude invocations (e.g. plain echo).
       local focus_seed=""
       if [[ ! -t 0 ]]; then
-        focus_seed=$(head -c 500 2>/dev/null | tr '\n' ' ' | sed 's/  */ /g' | head -c 200)
+        local raw
+        raw=$(cat 2>/dev/null)
+        if [[ -n "$raw" ]]; then
+          focus_seed=$(printf '%s' "$raw" | python3 -c "
+import sys, json
+data = sys.stdin.read()
+try:
+    obj = json.loads(data)
+    text = obj.get('prompt') or obj.get('user_prompt') or ''
+except Exception:
+    text = data
+text = ' '.join(text.split())
+print(text[:200])
+" 2>/dev/null)
+        fi
       fi
 
       # Close orphan active sessions for this contributor+project
