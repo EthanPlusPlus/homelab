@@ -76,9 +76,18 @@ has staleness enforcement as a responsibility. Phase 3 cannot start until the lo
 demonstrated closed at small scale. A doctrine-service built on top of an open loop is
 ornamental, not operational.
 
-This makes loop closure a hard gate: build the minimal CLI + cron + acknowledgment table,
-operate it for at least two weeks, observe that acknowledgment behavior is sustainable, then
-begin Phase 3.
+This makes loop closure a hard gate. The gate is **signal-conditional**, not time-conditional:
+
+- Start Phase 3 when the loop has actually surfaced at least one real stale item *and* an
+  acknowledgment has been applied through the live pattern (detect → surface → ack → propagate).
+- OR — if after two operational weeks the loop has surfaced nothing because canon metadata
+  cannot generate signal (e.g., missing `updated_at` on most docs), conclude the loop is
+  built-but-unobservable-at-scale. In that case, start Phase 3 — doctrine-service's first job
+  is to backfill the metadata that makes the loop testable.
+
+The earlier "two-week soak" framing was arbitrary and assumed signal would emerge at our scale.
+At a contributor count of one and a slow change rate, that assumption is wrong. Gating on
+"have we actually closed the loop once?" is the real test.
 
 ## Rationale
 

@@ -333,8 +333,9 @@ The authoritative transport. Adapters (MCP, CLI) wrap these.
 | Capability | HTTP Endpoint | Module |
 |-----------|---------------|--------|
 | `retrieve` | `GET /search/docs` | `api/main.py` |
-| `retrieve` (code) | `GET /search/code` | `api/main.py` |
+| `retrieveCode` | `GET /search/code` | `api/main.py` |
 | `getSection` | `GET /get/doc` | `api/main.py` |
+| `getRecentChanges` | `GET /recent-changes` | `api/main.py` |
 | `getSymbol` | `GET /symbol` | `api/main.py` |
 | `findReferences` | `GET /references` | `api/main.py` |
 | `relatedSymbols` | `GET /related_symbols` | `api/main.py` |

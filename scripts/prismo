@@ -484,6 +484,115 @@ cmd_status() {
   fi
 }
 
+# ── session (Decision 014 + 016 — workflow-state-service) ─────────────────────
+
+SESSION_FILE="${HOME}/.prismo-active-session"
+
+_infer_project() {
+  local cwd="${1:-$(pwd)}"
+  if [[ "$cwd" == "${HOME}/canon/"* ]]; then
+    echo "$cwd" | sed "s|${HOME}/canon/||" | cut -d/ -f1
+  elif [[ "$cwd" == "${HOME}/projects/"* ]]; then
+    echo "$cwd" | sed "s|${HOME}/projects/||" | cut -d/ -f1
+  else
+    echo "homelab"
+  fi
+}
+
+_session_is_active() {
+  local sid="$1"
+  [[ -n "$sid" ]] || return 1
+  local status
+  status=$(curl -sf --max-time 3 "${CONTEXT_API}/workflow/session/${sid}" 2>/dev/null \
+    | python3 -c "import sys,json; print(json.load(sys.stdin).get('session',{}).get('status',''))" 2>/dev/null)
+  [[ "$status" == "active" ]]
+}
+
+cmd_session() {
+  local sub="${1:-current}"
+  shift 2>/dev/null || true
+
+  case "$sub" in
+    start)
+      local project="${1:-$(_infer_project)}"
+      local contributor="${2:-ethan}"
+      check_vm
+      local resp
+      resp=$(curl -sf -X POST "${CONTEXT_API}/workflow/session/start" \
+        -H 'Content-Type: application/json' \
+        -d "{\"contributor_id\":\"${contributor}\",\"project\":\"${project}\"}")
+      local sid
+      sid=$(echo "$resp" | python3 -c "import sys,json; print(json.load(sys.stdin)['session_id'])")
+      echo "$sid" > "$SESSION_FILE"
+      ok "Session started: $sid (project=$project, contributor=$contributor)"
+      ;;
+    end)
+      [[ -f "$SESSION_FILE" ]] || die "No active session file at $SESSION_FILE"
+      local sid
+      sid=$(cat "$SESSION_FILE")
+      check_vm
+      curl -sf -X POST "${CONTEXT_API}/workflow/session/${sid}/end" >/dev/null \
+        && ok "Session ended: $sid" \
+        || warn "Server-side end failed (session may already be ended)"
+      rm -f "$SESSION_FILE"
+      ;;
+    current|status)
+      if [[ -f "$SESSION_FILE" ]]; then
+        local sid
+        sid=$(cat "$SESSION_FILE")
+        check_vm
+        local info
+        info=$(curl -sf "${CONTEXT_API}/workflow/session/${sid}" 2>/dev/null)
+        if [[ -n "$info" ]]; then
+          echo "$info" | python3 -m json.tool
+        else
+          warn "Session id $sid not found on server"
+        fi
+      else
+        warn "No active session ($SESSION_FILE missing)"
+        info "Start one: prismo session start [project] [contributor]"
+      fi
+      ;;
+    ensure)
+      # Idempotent: starts a session if none exists or stored session is no longer active.
+      # Used by UserPromptSubmit hook. Silent on success, noisy on creation.
+      local project="${1:-$(_infer_project)}"
+      local contributor="${2:-ethan}"
+      local sid=""
+      [[ -f "$SESSION_FILE" ]] && sid=$(cat "$SESSION_FILE" 2>/dev/null)
+      if _session_is_active "$sid"; then
+        return 0  # silent — session is fine
+      fi
+      # Need to start a new session
+      local resp
+      resp=$(curl -sf --max-time 5 -X POST "${CONTEXT_API}/workflow/session/start" \
+        -H 'Content-Type: application/json' \
+        -d "{\"contributor_id\":\"${contributor}\",\"project\":\"${project}\"}" 2>/dev/null)
+      [[ -n "$resp" ]] || return 0  # silently fail if service unreachable; don't block prompts
+      sid=$(echo "$resp" | python3 -c "import sys,json; print(json.load(sys.stdin)['session_id'])" 2>/dev/null)
+      [[ -n "$sid" ]] || return 0
+      echo "$sid" > "$SESSION_FILE"
+      echo "[PRISMO SESSION] Auto-started workflow-state-service session ${sid} (project=${project})"
+      ;;
+    focus)
+      local focus_text="${*:-}"
+      [[ -n "$focus_text" ]] || die "Usage: prismo session focus \"<what you're working on>\""
+      [[ -f "$SESSION_FILE" ]] || die "No active session — run: prismo session start"
+      local sid
+      sid=$(cat "$SESSION_FILE")
+      check_vm
+      curl -sf -X PATCH "${CONTEXT_API}/workflow/context/${sid}" \
+        -H 'Content-Type: application/json' \
+        -d "{\"current_focus\":\"${focus_text}\"}" >/dev/null \
+        && ok "Focus updated: $focus_text" \
+        || die "Failed to update focus"
+      ;;
+    *)
+      die "Unknown session subcommand: $sub (try: start, end, current, ensure, focus)"
+      ;;
+  esac
+}
+
 # ── stale (Decision 019 — lifecycle loop) ─────────────────────────────────────
 
 cmd_stale() {
@@ -639,6 +748,7 @@ cmd_help() {
   echo -e "  ${BOLD}new-project${NC} <name> <repo-url>   Add a new project end-to-end"
   echo -e "  ${BOLD}index${NC} [<project>]               Re-index docs (or code for a project)"
   echo -e "  ${BOLD}status${NC}                          Check VM connectivity and hook health"
+  echo -e "  ${BOLD}session${NC} [start|end|current|focus] Workflow-state-service — Decisions 014, 016"
   echo -e "  ${BOLD}stale${NC} [list|ack|acks]           Lifecycle inbox — Decision 019"
   echo -e "  ${BOLD}brief${NC} [<project>]               Generate operational brief — Decisions 016, 018"
   echo -e "  ${BOLD}capture${NC} \"<text>\"                 Capture a signal candidate into drafts/"
@@ -668,6 +778,7 @@ case "$CMD" in
   new-project)    cmd_new_project "$@" ;;
   index)          cmd_index "$@" ;;
   status)         cmd_status ;;
+  session)        cmd_session "$@" ;;
   stale)          cmd_stale "$@" ;;
   brief)          cmd_brief "$@" ;;
   capture)        cmd_capture "$@" ;;

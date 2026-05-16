@@ -106,11 +106,10 @@ architectural pass (2026-05-16). Phase 3 cannot start until the two-week soak co
 
 ### Remaining Phase 2.5 work
 
-- ⏳ Two-week soak — observe loop behavior, sustainability of acknowledgment pattern
-- ⏳ HTTP contract documentation backfill for workflow-state-service (Service Rule debt
-  from Phase 2 — endpoints exist but are not in `capability-contracts.md`)
-- ⏳ Decision 018 retrofit: existing `/brief` callers must surface provenance to humans
-  (currently CLI does; future web UI must too)
+- ⏳ **Soak** — signal-conditional per [[../decisions/019-lifecycle-loop-closure-pattern|Decision 019]] (revised 2026-05-16). Phase 3 starts when the loop has closed once on a real stale item, OR when two weeks confirm the loop cannot generate signal at current canon shape.
+- ✅ HTTP contract documentation backfill — shipped 2026-05-16
+- ✅ Decision 018 retrofit on `/brief` callers — CLI surfaces provenance; future web UI inherits the contract
+- ✅ **Service Rule structural enforcement** — shipped 2026-05-16. `api/main.py` `_check_service_rule_compliance` runs at startup; undocumented routes fail-to-start. Turns Decision 017 into infrastructure.
 
 ---
 
