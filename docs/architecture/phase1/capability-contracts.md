@@ -18,9 +18,11 @@ Semantic search over canon and code.
 retrieve(
   query: string,
   options: {
-    project?: string,        // scope to a specific project
+    project?: string,        // scope to a specific project (doc_type)
     category?: string,       // scope to a doc category (decisions, architecture, etc.)
     lifecycle?: string[],    // filter by status: ["active", "proposed"]
+    record_type?: "canonical" | "synthesized" | "operational" | "any",
+                             // default "canonical" per Decision 018
     top_k?: number,
     include_metadata?: boolean
   }
@@ -28,8 +30,8 @@ retrieve(
 ```
 
 **Provider requirement:** embedding model + vector store
-**Current implementation:** context-server MCP (ChromaDB + sentence-transformers)
-**V2 implementation:** context-server v2 with metadata-aware filtering
+**Current implementation:** `/search/docs` (ChromaDB + sentence-transformers)
+**Decision 018 enforcement:** `record_type` defaults to `canonical`. Synthesized content is opt-in; never surfaced as authoritative.
 
 ---
 
@@ -136,19 +138,38 @@ hydrateSession(
 
 ### generateOperationalBrief
 
-Produce a human-readable summary of organizational state for a project.
+Produce a human-readable summary of organizational state for a project. Output carries provenance per [[../../decisions/018-synthesis-provenance-and-recursion-prevention|Decision 018]].
 
 ```typescript
 generateOperationalBrief(
   project: string,
   options: {
-    audience?: "ethan" | "shrey" | "kyle" | "new-contributor"
+    contributor?: string,
+    depth?: "minimal" | "standard" | "full"
   }
-) → OperationalBrief
+) → {
+  project: string,
+  contributor: string,
+  generated_at: string,
+  brief: string,
+  depth: string,
+  provenance: {
+    record_type: "synthesized",
+    generated_at: string,         // ISO 8601 UTC
+    generated_by: string,         // "<ProviderClass>:<model-id>"
+    task: "operational-brief",
+    source_ids: string[],         // canonical record ids consumed
+    source_hashes: string[],      // sha256[:16] of each source at synthesis time
+    reviewed: false,
+    reviewed_at: null,
+    reviewed_by: null
+  }
+}
 ```
 
-**Provider requirement:** context-server v2 (retrieval) + language model (synthesis)
+**Provider requirement:** context-server (retrieval) + SynthesisProvider (Layer 3)
 **Hybrid capability:** retrieval is structural; prose generation uses a model.
+**Current implementation:** `GET /brief` — calls `get_context` for structural assembly, then `SynthesisProvider.synthesize` for prose.
 
 ---
 
@@ -205,13 +226,138 @@ Identify canon documents that may be outdated.
 
 ```typescript
 detectStaleness(
-  docs: CanonDoc[],
-  rules: StalenessRule[]
+  project?: string,
+  options: {
+    include_acknowledged?: boolean   // default false; suppresses items acked per Decision 019
+  }
 ) → StaleItem[]
 ```
 
 **Provider requirement:** doctrine-service (rule-based — no model required for basic detection)
 **Model-assisted for nuanced cases** (e.g., "is this decision still consistent with V2 direction?")
+**Current implementation:** `/stale-items` endpoint on context-server. Suppresses items present in `stale_acknowledgments` whose `reviewed_through` is in the future.
+
+---
+
+### acknowledgeStale
+
+Acknowledge a stale canon item per Decision 019 (lifecycle loop closure). Removes the item from `detectStaleness` output until `reviewed_through` expires.
+
+```typescript
+acknowledgeStale(
+  item_id: string,
+  options: {
+    contributor_id?: string,
+    resolution?: "pending" | "resolved" | "deferred" | "dismissed" | "archived",
+    resolution_note?: string,
+    defer_days?: number          // ignored for terminal resolutions
+  }
+) → AcknowledgmentReceipt
+```
+
+**Provider requirement:** workflow-state-service (deterministic; no model required)
+**Terminal resolutions** (`resolved` / `dismissed` / `archived`) suppress for ~10 years. Non-terminal (`pending` / `deferred`) defer by `defer_days`, default 14.
+
+---
+
+### startSession / endSession / updateFocus
+
+Operational session lifecycle. Per [[../../decisions/014-workflow-state-service-architecture|Decision 014]].
+
+```typescript
+startSession(
+  contributor_id: string,
+  project: string
+) → { session_id, contributor_id, project, started_at }
+
+endSession(session_id: string)
+  → { session_id, status }
+
+updateFocus(
+  session_id: string,
+  current_focus: string
+) → { session_id, updated }
+```
+
+**Provider requirement:** workflow-state-service (deterministic)
+**Feeds:** `ContextBundle.core_operational_state.current_focus`
+
+---
+
+### createWorkstream / updateWorkstream / getWorkflowState
+
+Workstream lifecycle and aggregate operational state for a project.
+
+```typescript
+createWorkstream(
+  title: string,
+  project: string,
+  contributor_id: string
+) → { workstream_id, title, project }
+
+updateWorkstream(
+  workstream_id: string,
+  options: { title?, status? }   // status: active | paused | closed
+) → { workstream_id, updated }
+
+getWorkflowState(project: string)
+  → {
+      active_sessions: Session[],
+      active_workstreams: Workstream[],
+      current_focus: string
+    }
+```
+
+**Provider requirement:** workflow-state-service (deterministic)
+**Feeds:** `ContextBundle.core_operational_state`
+
+---
+
+## Service Rule (Decision 017)
+
+Every Layer 2 capability MUST ship with:
+
+1. **Canonical HTTP/API contract** — the authoritative interface (this document).
+2. **Typed request/response schema.**
+3. **Capability-contract documentation** in this file before any adapter ships.
+4. Runtime adapters (MCP, CLI, web) MAY exist but MUST be thin wrappers only — no logic absent from the HTTP contract.
+
+A capability shipped MCP-first with no HTTP contract or no entry here is **Service Rule debt** and must be paid down.
+
+---
+
+## HTTP Endpoint Mapping
+
+The authoritative transport. Adapters (MCP, CLI) wrap these.
+
+| Capability | HTTP Endpoint | Module |
+|-----------|---------------|--------|
+| `retrieve` | `GET /search/docs` | `api/main.py` |
+| `retrieve` (code) | `GET /search/code` | `api/main.py` |
+| `getSection` | `GET /get/doc` | `api/main.py` |
+| `getSymbol` | `GET /symbol` | `api/main.py` |
+| `findReferences` | `GET /references` | `api/main.py` |
+| `relatedSymbols` | `GET /related_symbols` | `api/main.py` |
+| `fileSummary` | `GET /file/summary` | `api/main.py` |
+| `hydrateSession` | `GET /context` | `api/main.py` |
+| `projectSnapshot` | `GET /project-state` | `api/main.py` |
+| `detectStaleness` | `GET /stale-items` | `api/main.py` |
+| `generateOperationalBrief` | `GET /brief` | `api/main.py` |
+| `startSession` | `POST /workflow/session/start` | `workflow/router.py` |
+| `endSession` | `POST /workflow/session/{id}/end` | `workflow/router.py` |
+| `getSession` | `GET /workflow/session/{id}` | `workflow/router.py` |
+| `getContributor` | `GET /workflow/contributor/{id}` | `workflow/router.py` |
+| `createWorkstream` | `POST /workflow/workstream` | `workflow/router.py` |
+| `updateWorkstream` | `PATCH /workflow/workstream/{id}` | `workflow/router.py` |
+| `updateFocus` | `PATCH /workflow/context/{session_id}` | `workflow/router.py` |
+| `getWorkflowState` | `GET /workflow/state/{project}` | `workflow/router.py` |
+| `acknowledgeStale` | `POST /workflow/stale/ack` | `workflow/router.py` |
+| `listStaleAcks` | `GET /workflow/stale/acks` | `workflow/router.py` |
+| `triggerIndex` | `POST /index` | `api/main.py` |
+| `triggerCodeIndex` | `POST /index/code` | `api/main.py` |
+| `health` | `GET /health` | `api/main.py` |
+
+Capabilities not yet in this table: `summarize`, `synthesize`, `codegen`, `plan`, `captureSignal`, `detectContradictions` — Phase 3+ work.
 
 ---
 
