@@ -555,24 +555,100 @@ cmd_session() {
       ;;
     ensure)
       # Idempotent: starts a session if none exists or stored session is no longer active.
-      # Used by UserPromptSubmit hook. Silent on success, noisy on creation.
+      # On NEW session creation, also:
+      #  - reads stdin (UserPromptSubmit hook passes prompt) to seed current_focus
+      #  - fetches ContextBundle via get_context and emits it as hydrated context
+      #  - closes any orphan active sessions for same project+contributor
+      # On EXISTING session: silent.
+      # Used by UserPromptSubmit hook. Never blocks prompts on service failure.
       local project="${1:-$(_infer_project)}"
       local contributor="${2:-ethan}"
       local sid=""
       [[ -f "$SESSION_FILE" ]] && sid=$(cat "$SESSION_FILE" 2>/dev/null)
       if _session_is_active "$sid"; then
-        return 0  # silent — session is fine
+        return 0
       fi
-      # Need to start a new session
+
+      # Read stdin if available (hook passes prompt); use as focus seed
+      local focus_seed=""
+      if [[ ! -t 0 ]]; then
+        focus_seed=$(head -c 500 2>/dev/null | tr '\n' ' ' | sed 's/  */ /g' | head -c 200)
+      fi
+
+      # Close orphan active sessions for this contributor+project
+      curl -sf --max-time 3 "${CONTEXT_API}/workflow/state/${project}" 2>/dev/null \
+        | python3 -c "
+import sys, json
+try:
+    d = json.load(sys.stdin)
+    for s in d.get('active_sessions', []):
+        if s.get('contributor_id') == '${contributor}':
+            print(s['id'])
+except Exception:
+    pass" 2>/dev/null | while read -r orphan_id; do
+        [[ -n "$orphan_id" ]] && curl -sf --max-time 3 -X POST "${CONTEXT_API}/workflow/session/${orphan_id}/end" >/dev/null 2>&1
+      done
+
+      # Start new session
       local resp
       resp=$(curl -sf --max-time 5 -X POST "${CONTEXT_API}/workflow/session/start" \
         -H 'Content-Type: application/json' \
         -d "{\"contributor_id\":\"${contributor}\",\"project\":\"${project}\"}" 2>/dev/null)
-      [[ -n "$resp" ]] || return 0  # silently fail if service unreachable; don't block prompts
+      [[ -n "$resp" ]] || return 0
       sid=$(echo "$resp" | python3 -c "import sys,json; print(json.load(sys.stdin)['session_id'])" 2>/dev/null)
       [[ -n "$sid" ]] || return 0
       echo "$sid" > "$SESSION_FILE"
-      echo "[PRISMO SESSION] Auto-started workflow-state-service session ${sid} (project=${project})"
+
+      # Seed focus from prompt if available
+      if [[ -n "$focus_seed" ]]; then
+        curl -sf --max-time 3 -X PATCH "${CONTEXT_API}/workflow/context/${sid}" \
+          -H 'Content-Type: application/json' \
+          -d "$(python3 -c "import json; print(json.dumps({'current_focus': '''${focus_seed//\'/\\\'}'''}))")" \
+          >/dev/null 2>&1
+      fi
+
+      # Fetch ContextBundle and emit a compact hydrated-state summary
+      local bundle
+      bundle=$(curl -sf --max-time 10 "${CONTEXT_API}/context?project=${project}&contributor=${contributor}&depth=standard" 2>/dev/null)
+      echo ""
+      echo "[PRISMO SESSION] session=${sid} project=${project} contributor=${contributor}"
+      if [[ -n "$bundle" ]]; then
+        echo "$bundle" | python3 -c "
+import sys, json
+try:
+    b = json.load(sys.stdin)
+    ops = b.get('core_operational_state', {})
+    print('[V2 HYDRATED CONTEXT]')
+    print(f\"  current_focus: {ops.get('current_focus') or '(none)'}\")
+    ws = ops.get('active_workstreams', [])
+    print(f\"  active_workstreams: {len(ws)}\")
+    for w in ws[:3]:
+        print(f\"    - {w.get('title','?')} ({w.get('contributor_id','?')}, {w.get('status','?')})\")
+    doctrine = b.get('active_doctrine', [])
+    print(f\"  active_doctrine: {len(doctrine)} canonical records\")
+    for d in doctrine[:5]:
+        md = d.get('metadata', {})
+        print(f\"    - {md.get('path','?')}\")
+    proposals = b.get('recent_context', {}).get('active_proposals', [])
+    print(f\"  active_proposals: {len(proposals)}\")
+    tensions = ops.get('unresolved_tensions', [])
+    if tensions:
+        print(f\"  unresolved_tensions: {len(tensions)}\")
+        for t in tensions[:2]:
+            md = t.get('metadata', {})
+            print(f\"    - {md.get('path','?')}\")
+    rc = b.get('recent_context', {}).get('recent_changes', '')
+    if rc:
+        first_entries = [l for l in rc.splitlines() if l.startswith('- **')][:3]
+        if first_entries:
+            print('  recent_changes (top 3):')
+            for line in first_entries:
+                title = line.split('**')[1] if '**' in line else line[2:80]
+                print(f\"    - {title}\")
+except Exception as e:
+    print(f'(bundle parse error: {e})')
+" 2>/dev/null
+      fi
       ;;
     focus)
       local focus_text="${*:-}"
