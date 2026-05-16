@@ -779,53 +779,131 @@ if prov:
 "
 }
 
-# ── capture (Decision 017 minimal Layer 4 — contribution capture) ─────────────
+# ── capture (Decision 018 — operational state, not canon) ────────────────────
 
 cmd_capture() {
-  local text="${*:-}"
-  [[ -n "$text" ]] || die "Usage: prismo capture \"this matters because ...\""
-
-  local project=""
-  local cwd
-  cwd=$(pwd)
-  # Infer project from CWD if under ~/canon/<X>/ or ~/projects/<X>/
-  if [[ "$cwd" == "${HOME}/canon/"* ]]; then
-    project=$(echo "$cwd" | sed "s|${HOME}/canon/||" | cut -d/ -f1)
-  elif [[ "$cwd" == "${HOME}/projects/"* ]]; then
-    project=$(echo "$cwd" | sed "s|${HOME}/projects/||" | cut -d/ -f1)
-  fi
-
-  if [[ -z "$project" ]]; then
-    project="homelab"
-    warn "No project inferred from CWD — defaulting to homelab"
-  fi
-
-  local drafts_dir="${HOME}/canon/${project}/docs/drafts"
-  [[ -d "$drafts_dir" ]] || die "Drafts dir not found: $drafts_dir"
-
-  local ts
-  ts=$(date -u +%Y-%m-%dT%H%M%SZ)
-  local file="${drafts_dir}/capture-${ts}.md"
-
-  cat > "$file" << EOF
+  local sub="${1:-}"
+  case "$sub" in
+    list|ls)
+      shift
+      local project=""
+      [[ "$#" -gt 0 && "$1" != --* ]] && { project="$1"; shift; }
+      check_vm
+      local url="${CONTEXT_API}/workflow/captures?status=pending-review"
+      [[ -n "$project" ]] && url="${url}&project=${project}"
+      curl -sf "$url" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+caps = d.get('captures', [])
+if not caps:
+    print('  ✓ No pending captures.')
+    sys.exit(0)
+print(f'  {len(caps)} pending captures:')
+for c in caps:
+    print(f\"  [{c['id']}]  {c['project']}  ({c['captured_at'][:16]})\")
+    print(f\"           {c['text'][:120]}\")
+    print()"
+      ;;
+    promote)
+      shift
+      local cid="${1:-}"
+      [[ -n "$cid" ]] || die "Usage: prismo capture promote <capture_id>"
+      check_vm
+      # Fetch the capture
+      local cap
+      cap=$(curl -sf "${CONTEXT_API}/workflow/captures?status=pending-review" \
+        | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+for c in d.get('captures', []):
+    if c['id'] == '$cid':
+        print(json.dumps(c))
+        break")
+      [[ -n "$cap" ]] || die "Capture $cid not found in pending-review"
+      local project text captured_at
+      project=$(echo "$cap" | python3 -c "import sys,json; print(json.load(sys.stdin)['project'])")
+      text=$(echo "$cap" | python3 -c "import sys,json; print(json.load(sys.stdin)['text'])")
+      captured_at=$(echo "$cap" | python3 -c "import sys,json; print(json.load(sys.stdin)['captured_at'])")
+      local drafts_dir="${HOME}/canon/${project}/docs/drafts"
+      [[ -d "$drafts_dir" ]] || die "Drafts dir not found: $drafts_dir"
+      local ts file
+      ts=$(echo "$captured_at" | tr -d ':-' | cut -c1-15)
+      file="${drafts_dir}/capture-${ts}.md"
+      cat > "$file" << EOF
 ---
 type: signal-candidate
-captured_at: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+captured_at: ${captured_at}
 captured_by: ethan
 project: ${project}
 status: pending-review
+capture_id: ${cid}
 ---
 
-# Signal capture — ${ts}
+# Signal capture — ${cid}
 
 ${text}
 
 ---
 
-_Captured via \`prismo capture\`. Review and either elevate to canon (decision/proposal) or delete._
+_Promoted from workflow-state-service capture ${cid}. Review and either elevate to
+canon (decision/proposal) or delete._
 EOF
-  ok "Captured → $file"
-  info "Review when convenient: \$EDITOR $file"
+      curl -sf -X PATCH "${CONTEXT_API}/workflow/capture/${cid}" \
+        -H 'Content-Type: application/json' \
+        -d "{\"status\":\"promoted\",\"promoted_to_path\":\"$(basename "$file")\"}" >/dev/null
+      ok "Promoted ${cid} → ${file}"
+      ;;
+    dismiss)
+      shift
+      local cid="${1:-}"
+      [[ -n "$cid" ]] || die "Usage: prismo capture dismiss <capture_id>"
+      check_vm
+      curl -sf -X PATCH "${CONTEXT_API}/workflow/capture/${cid}" \
+        -H 'Content-Type: application/json' \
+        -d '{"status":"dismissed"}' >/dev/null && ok "Dismissed: $cid"
+      ;;
+    "")
+      die "Usage: prismo capture \"<text>\"  |  prismo capture list  |  prismo capture promote <id>"
+      ;;
+    *)
+      # Default: treat all args as capture text
+      local text="${*:-}"
+      [[ -n "$text" ]] || die "Usage: prismo capture \"this matters because ...\""
+      check_vm
+
+      local project=""
+      local cwd
+      cwd=$(pwd)
+      if [[ "$cwd" == "${HOME}/canon/"* ]]; then
+        project=$(echo "$cwd" | sed "s|${HOME}/canon/||" | cut -d/ -f1)
+      elif [[ "$cwd" == "${HOME}/projects/"* ]]; then
+        project=$(echo "$cwd" | sed "s|${HOME}/projects/||" | cut -d/ -f1)
+      fi
+      [[ -z "$project" ]] && project="homelab"
+
+      local session_id=""
+      [[ -f "$SESSION_FILE" ]] && session_id=$(cat "$SESSION_FILE")
+
+      local body
+      body=$(python3 -c "
+import json
+print(json.dumps({
+  'text': '''${text//\'/\\\'}''',
+  'project': '$project',
+  'contributor_id': 'ethan',
+  'session_id': '$session_id' or None,
+  'source': 'manual',
+}))")
+      local resp
+      resp=$(curl -sf -X POST "${CONTEXT_API}/workflow/capture" \
+        -H 'Content-Type: application/json' \
+        -d "$body")
+      local cid
+      cid=$(echo "$resp" | python3 -c "import sys,json; print(json.load(sys.stdin).get('capture_id','?'))")
+      ok "Captured ${cid} (project=${project}, session=${session_id:-none})"
+      info "List pending: prismo capture list"
+      ;;
+  esac
 }
 
 # ── help ──────────────────────────────────────────────────────────────────────

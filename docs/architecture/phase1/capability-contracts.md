@@ -175,29 +175,49 @@ generateOperationalBrief(
 
 ### captureSignal
 
-Extract structured canon candidates from conversational input.
+Capture a conversational signal as operational state (not canon). Per Decision 018,
+captures are operational signals not canonical truth — they live in workflow-state-service
+until explicitly promoted to canon `drafts/`.
 
 ```typescript
 captureSignal(
-  input: string,
-  context: {
-    project: string,
-    contributor: string,
-    session_id: string
+  text: string,
+  project: string,
+  options: {
+    contributor_id?: string,
+    session_id?: string,
+    source?: "session" | "cron" | "manual"
   }
-) → SignalCandidate[]
-
-// SignalCandidate:
-{
-  type: "decision" | "proposal" | "tension" | "action",
-  content: string,
-  confidence: number,
-  suggested_title: string
+) → {
+  capture_id: string,
+  project: string,
+  session_id: string | null,
+  captured_at: string,
+  status: "pending-review"
 }
 ```
 
-**Provider requirement:** language model
-**Human review required before any candidate becomes canon.** This capability drafts; humans approve.
+**Provider requirement:** workflow-state-service (deterministic; no model required for v1).
+Promotion to `drafts/` happens via `prismo capture promote <id>` (writes file, updates status).
+**Human review required before any candidate becomes canon.**
+
+A future v2 may use a language model to extract structured fields (decision/proposal/tension)
+from raw text — but at v1 the contract is just "store the text + provenance for review."
+
+---
+
+### listCaptures
+
+List pending or processed captures.
+
+```typescript
+listCaptures(
+  project?: string,
+  status: "pending-review" | "promoted" | "dismissed" = "pending-review"
+) → Capture[]
+```
+
+**Provider requirement:** workflow-state-service (deterministic)
 
 ---
 
@@ -354,6 +374,9 @@ The authoritative transport. Adapters (MCP, CLI) wrap these.
 | `getWorkflowState` | `GET /workflow/state/{project}` | `workflow/router.py` |
 | `acknowledgeStale` | `POST /workflow/stale/ack` | `workflow/router.py` |
 | `listStaleAcks` | `GET /workflow/stale/acks` | `workflow/router.py` |
+| `captureSignal` | `POST /workflow/capture` | `workflow/router.py` |
+| `listCaptures` | `GET /workflow/captures` | `workflow/router.py` |
+| `updateCapture` | `PATCH /workflow/capture/{id}` | `workflow/router.py` |
 | `triggerIndex` | `POST /index` | `api/main.py` |
 | `triggerCodeIndex` | `POST /index/code` | `api/main.py` |
 | `health` | `GET /health` | `api/main.py` |
