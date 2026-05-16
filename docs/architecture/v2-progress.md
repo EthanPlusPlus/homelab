@@ -102,7 +102,7 @@ architectural pass (2026-05-16). Phase 3 cannot start until the two-week soak co
 - ✅ MCP tools: `acknowledge_stale`, `list_stale_acks`
 - ✅ `prismo stale` / `prismo stale ack` / `prismo stale acks` CLI
 - ✅ `prismo brief <project>` CLI — fetches `/brief`, displays prose + provenance footer
-- ✅ `prismo capture "<text>"` CLI — writes signal candidate to project `drafts/`
+- ✅ `prismo capture "<text>"` CLI — POSTs to `/workflow/capture`; lives in workflow-state-service as `pending-review` operational state per Decision 018, NOT canon. Promotion to `drafts/` is explicit via `prismo capture promote <id>`. MCP tools: `capture_signal`, `list_captures`.
 - ✅ `prismo session start/end/current/ensure/focus` CLI — wraps workflow-state-service
 - ✅ Cron installed: daily 0800 UTC, `prismo stale` → `~/.prismo-stale.log`
 
