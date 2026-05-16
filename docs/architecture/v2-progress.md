@@ -91,18 +91,30 @@ architectural pass (2026-05-16). Phase 3 cannot start until the two-week soak co
 
 ### Implementation (shipped 2026-05-16)
 
-- ✅ `record_type` ChromaDB metadata field — indexer defaults all canon files to `canonical`
+- ✅ `record_type` ChromaDB metadata field — indexer defaults canon files to `canonical`, `drafts/` to `draft`
 - ✅ `/search/docs` filters by `record_type` (default `canonical`, `any` opt-in)
 - ✅ `/context`, `/project-state`, `/brief` hard-filter `active_doctrine` to canonical
 - ✅ `/brief` emits provenance block (`generated_by`, `source_ids`, `source_hashes`, review state)
 - ✅ `stale_acknowledgments` table in workflow-state-service
 - ✅ `POST /workflow/stale/ack` + `GET /workflow/stale/acks`
 - ✅ `/stale-items` filters acknowledged items (until `reviewed_through` expires)
+- ✅ Indexer derives `updated_at` from git last-commit date (with mtime fallback) — closed the circular dep where staleness rules couldn't fire without frontmatter discipline
 - ✅ MCP tools: `acknowledge_stale`, `list_stale_acks`
 - ✅ `prismo stale` / `prismo stale ack` / `prismo stale acks` CLI
 - ✅ `prismo brief <project>` CLI — fetches `/brief`, displays prose + provenance footer
 - ✅ `prismo capture "<text>"` CLI — writes signal candidate to project `drafts/`
+- ✅ `prismo session start/end/current/ensure/focus` CLI — wraps workflow-state-service
 - ✅ Cron installed: daily 0800 UTC, `prismo stale` → `~/.prismo-stale.log`
+
+### Structural enforcement layer (shipped 2026-05-16)
+
+Everything below turns a written rule into infrastructure:
+
+- ✅ **Service Rule check** (Decision 017) — `_check_service_rule_compliance` runs at FastAPI startup, parses HTTP Endpoint Mapping table, fails app startup on undocumented routes
+- ✅ **Session ensure hook** (Decisions 014, 016) — UserPromptSubmit hook calls `prismo session ensure`, which on new-session creation closes orphan sessions, seeds `current_focus` from stdin (the prompt), and emits a `[V2 HYDRATED CONTEXT]` block surfacing active_doctrine, active_proposals, recent_changes, unresolved_tensions, and unacknowledged stale items. Runtime starts hydrated whether the operator remembers or not.
+- ✅ **SessionEnd hook** — calls `prismo session end` when Claude exits
+- ✅ **Doctrine-service gate downgraded** (Decision 019 revised) — from arbitrary two-week soak to signal-conditional (first real ack OR confirmed-impossible signal)
+- ✅ **`updated_at` derivation** — makes the staleness loop structurally able to fire without per-doc frontmatter discipline
 
 ### Remaining Phase 2.5 work
 
