@@ -75,10 +75,10 @@ Outcome: stable internal semantics before implementation expansion.
 
 ---
 
-## Phase 2.5 — Architectural governance + lifecycle closure ⏳ in flight
+## Phase 2.5 — Architectural governance + lifecycle closure ✅ shipped (soak in progress)
 
 Inserted between Phase 2 and Phase 3 after the Sukuna 2026-05-15 review and ChatGPT
-architectural pass (2026-05-16). Phase 3 cannot start until this completes.
+architectural pass (2026-05-16). Phase 3 cannot start until the two-week soak completes.
 
 ### Governance (adopted as decisions)
 
@@ -89,20 +89,28 @@ architectural pass (2026-05-16). Phase 3 cannot start until this completes.
 - [[../decisions/018-synthesis-provenance-and-recursion-prevention|Decision 018]] — Provenance metadata on all synthesis; `record_type` separation; permanent exclusion from `active_doctrine`
 - [[../decisions/019-lifecycle-loop-closure-pattern|Decision 019]] — Detect → surface → acknowledge → propagate, with acknowledgment schema
 
-### Operational work (not yet shipped)
+### Implementation (shipped 2026-05-16)
 
-- `prismo stale` CLI subcommand
-- Cron job calling `get_stale_items`
-- Acknowledgment table in workflow-state-service
-- HTTP contract documentation backfill for workflow-state-service (Service Rule debt from Phase 2)
-- `record_type` ChromaDB metadata field + retrieval-surface filtering (Decision 018)
-- Provenance backfill on `/brief` endpoint
+- ✅ `record_type` ChromaDB metadata field — indexer defaults all canon files to `canonical`
+- ✅ `/search/docs` filters by `record_type` (default `canonical`, `any` opt-in)
+- ✅ `/context`, `/project-state`, `/brief` hard-filter `active_doctrine` to canonical
+- ✅ `/brief` emits provenance block (`generated_by`, `source_ids`, `source_hashes`, review state)
+- ✅ `stale_acknowledgments` table in workflow-state-service
+- ✅ `POST /workflow/stale/ack` + `GET /workflow/stale/acks`
+- ✅ `/stale-items` filters acknowledged items (until `reviewed_through` expires)
+- ✅ MCP tools: `acknowledge_stale`, `list_stale_acks`
+- ✅ `prismo stale` / `prismo stale ack` / `prismo stale acks` CLI
+- ✅ `prismo brief <project>` CLI — fetches `/brief`, displays prose + provenance footer
+- ✅ `prismo capture "<text>"` CLI — writes signal candidate to project `drafts/`
+- ✅ Cron installed: daily 0800 UTC, `prismo stale` → `~/.prismo-stale.log`
 
-### Two-week soak
+### Remaining Phase 2.5 work
 
-Decision 019 requires the lifecycle loop to operate at small scale for at least two weeks
-before Phase 3 begins. This validates the loop closure pattern empirically before doctrine-service
-is built on top of it.
+- ⏳ Two-week soak — observe loop behavior, sustainability of acknowledgment pattern
+- ⏳ HTTP contract documentation backfill for workflow-state-service (Service Rule debt
+  from Phase 2 — endpoints exist but are not in `capability-contracts.md`)
+- ⏳ Decision 018 retrofit: existing `/brief` callers must surface provenance to humans
+  (currently CLI does; future web UI must too)
 
 ---
 
