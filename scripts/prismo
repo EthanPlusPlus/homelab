@@ -826,48 +826,23 @@ for c in caps:
       local cid="${1:-}"
       [[ -n "$cid" ]] || die "Usage: prismo capture promote <capture_id>"
       check_vm
-      # Fetch the capture
-      local cap
-      cap=$(curl -sf "${CONTEXT_API}/workflow/captures?status=pending-review" \
-        | python3 -c "
-import sys, json
-d = json.load(sys.stdin)
-for c in d.get('captures', []):
-    if c['id'] == '$cid':
-        print(json.dumps(c))
-        break")
-      [[ -n "$cap" ]] || die "Capture $cid not found in pending-review"
-      local project text captured_at
-      project=$(echo "$cap" | python3 -c "import sys,json; print(json.load(sys.stdin)['project'])")
-      text=$(echo "$cap" | python3 -c "import sys,json; print(json.load(sys.stdin)['text'])")
-      captured_at=$(echo "$cap" | python3 -c "import sys,json; print(json.load(sys.stdin)['captured_at'])")
+      # Ask the service to generate the promotion artifact (Law 3 — service owns
+      # the artifact-generation logic; this CLI is a thin filesystem adapter).
+      local resp
+      resp=$(curl -sf -X POST "${CONTEXT_API}/workflow/capture/${cid}/promote" 2>&1) \
+        || die "Promote endpoint failed: $resp"
+      local project filename content
+      project=$(echo "$resp" | python3 -c "import sys,json; print(json.load(sys.stdin)['project'])")
+      filename=$(echo "$resp" | python3 -c "import sys,json; print(json.load(sys.stdin)['filename'])")
+      content=$(echo "$resp" | python3 -c "import sys,json; print(json.load(sys.stdin)['content'])")
       local drafts_dir="${HOME}/canon/${project}/docs/drafts"
       [[ -d "$drafts_dir" ]] || die "Drafts dir not found: $drafts_dir"
-      local ts file
-      ts=$(echo "$captured_at" | tr -d ':-' | cut -c1-15)
-      file="${drafts_dir}/capture-${ts}.md"
-      cat > "$file" << EOF
----
-type: signal-candidate
-captured_at: ${captured_at}
-captured_by: ethan
-project: ${project}
-status: pending-review
-capture_id: ${cid}
----
-
-# Signal capture — ${cid}
-
-${text}
-
----
-
-_Promoted from workflow-state-service capture ${cid}. Review and either elevate to
-canon (decision/proposal) or delete._
-EOF
+      local file="${drafts_dir}/${filename}"
+      printf '%s' "$content" > "$file"
+      # Record where it landed so the workflow-state-service can link back.
       curl -sf -X PATCH "${CONTEXT_API}/workflow/capture/${cid}" \
         -H 'Content-Type: application/json' \
-        -d "{\"status\":\"promoted\",\"promoted_to_path\":\"$(basename "$file")\"}" >/dev/null
+        -d "{\"status\":\"promoted\",\"promoted_to_path\":\"${filename}\"}" >/dev/null
       ok "Promoted ${cid} → ${file}"
       ;;
     dismiss)

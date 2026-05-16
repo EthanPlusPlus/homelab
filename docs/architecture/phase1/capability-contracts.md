@@ -377,6 +377,7 @@ The authoritative transport. Adapters (MCP, CLI) wrap these.
 | `captureSignal` | `POST /workflow/capture` | `workflow/router.py` |
 | `listCaptures` | `GET /workflow/captures` | `workflow/router.py` |
 | `updateCapture` | `PATCH /workflow/capture/{id}` | `workflow/router.py` |
+| `promoteCapture` | `POST /workflow/capture/{id}/promote` | `workflow/router.py` |
 | `triggerIndex` | `POST /index` | `api/main.py` |
 | `triggerCodeIndex` | `POST /index/code` | `api/main.py` |
 | `health` | `GET /health` | `api/main.py` |
