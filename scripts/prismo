@@ -910,6 +910,219 @@ print(json.dumps({
   esac
 }
 
+# ── review (Decision 021 — human-judgment boundary) ───────────────────────────
+
+cmd_review() {
+  local sub="${1:-list}"
+  case "$sub" in
+    list|ls|"")
+      shift 2>/dev/null || true
+      local project=""
+      local status="pending"
+      while [[ $# -gt 0 ]]; do
+        case "$1" in
+          --project|-p) project="$2"; shift 2 ;;
+          --status|-s)  status="$2"; shift 2 ;;
+          *) die "Unknown flag: $1" ;;
+        esac
+      done
+      check_vm
+      local url="${CONTEXT_API}/review/queue?status=${status}"
+      [[ -n "$project" ]] && url="${url}&project=${project}"
+      curl -sf "$url" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+items = d.get('items', [])
+if not items:
+    print(f'  ✓ No {d[\"status_filter\"]} ReviewItems.')
+    sys.exit(0)
+print(f'  {len(items)} {d[\"status_filter\"]} ReviewItem(s):')
+print()
+for it in items:
+    p = it['proposal']
+    print(f'  [{it[\"id\"]}]  {p[\"artifact_type\"]:<18} confidence={it[\"confidence\"]:.2f}')
+    print(f'    {p[\"suggested_destination\"] or \"(no destination)\"}')
+    print(f'    rationale: {it[\"rationale\"][:120]}{\"...\" if len(it[\"rationale\"])>120 else \"\"}')
+    src = it.get('sources', {})
+    if src.get('capture_ids'):
+        print(f'    sources: captures={src[\"capture_ids\"]}')
+    print()
+print('  prismo review show <id>       — full proposal')
+print('  prismo review approve <id>    — write canon + commit + reindex')
+print('  prismo review reject <id> -r <reason> [-n \"note\"]')
+print('  prismo review edit <id>       — open in \$EDITOR')
+"
+      ;;
+    show)
+      shift
+      local item_id="${1:-}"
+      [[ -n "$item_id" ]] || die "Usage: prismo review show <id>"
+      check_vm
+      curl -sf "${CONTEXT_API}/review/queue/${item_id}" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+p = d['proposal']
+print(f'─── {d[\"id\"]} ─── {p[\"artifact_type\"]} — confidence {d[\"confidence\"]:.2f} ───')
+print(f'project:  {d[\"project\"]}')
+print(f'status:   {d[\"status\"]}')
+print(f'created:  {d[\"created_at\"]}')
+print(f'dest:     {p[\"suggested_destination\"]}')
+print(f'model:    {d[\"model_used\"]} | prompt: {d[\"prompt_template_id\"]}')
+print()
+print('SOURCES:')
+print(json.dumps(d['sources'], indent=2))
+print()
+print('FRONTMATTER:')
+print(json.dumps(p.get('frontmatter', {}), indent=2))
+print()
+print('AFFECTED EXISTING DOCS:', p.get('affected_existing_docs') or '(none)')
+print()
+print('RATIONALE:')
+print(d['rationale'])
+print()
+print('═══ PROPOSAL CONTENT ═══')
+print(p['content'])
+print('═══ END ═══')
+"
+      ;;
+    approve|a)
+      shift
+      local item_id="${1:-}"
+      [[ -n "$item_id" ]] || die "Usage: prismo review approve <id>"
+      check_vm
+
+      # Approve transitions state + returns payload; we write the file locally
+      # since /canon is read-only in the api container (Law 3 — adapter writes).
+      local resp project dest content target_path canon_root
+      resp=$(curl -sf -X POST "${CONTEXT_API}/review/queue/${item_id}/approve" \
+        -H 'Content-Type: application/json' -d '{"decided_by":"ethan"}' 2>&1) \
+        || die "Approve endpoint failed: $resp"
+
+      project=$(echo "$resp" | python3 -c "import sys,json; print(json.load(sys.stdin)['project'])")
+      dest=$(echo "$resp"    | python3 -c "import sys,json; print(json.load(sys.stdin)['proposal']['suggested_destination'])")
+      content=$(echo "$resp" | python3 -c "import sys,json; print(json.load(sys.stdin)['proposal']['content'])")
+
+      [[ -n "$dest" ]] || die "Approved item has empty suggested_destination — manual placement required"
+      canon_root="${HOME}/canon/${project}"
+      [[ -d "$canon_root" ]] || die "Canon repo not found: $canon_root"
+      target_path="${canon_root}/docs/${dest}"
+
+      if [[ -e "$target_path" ]]; then
+        echo -e "${YELLOW}!${NC} Target exists: $target_path"
+        read -r -p "  Overwrite? [y/N] " ans
+        [[ "$ans" =~ ^[Yy]$ ]] || die "Aborted (file exists)"
+      fi
+
+      mkdir -p "$(dirname "$target_path")"
+      printf '%s' "$content" > "$target_path"
+      ok "Wrote ${target_path}"
+
+      (cd "$canon_root" && git pull --ff-only >/dev/null 2>&1 || true) || true
+      (cd "$canon_root" \
+        && git add "docs/${dest}" \
+        && git commit -m "${item_id}: ${dest} (approved via prismo review)
+
+Approved ReviewItem ${item_id} from synthesis-service.
+" \
+        && git push) || die "git commit/push failed in $canon_root"
+      ok "Committed + pushed in $canon_root"
+
+      curl -sf -X POST "${CONTEXT_API}/index" >/dev/null && ok "Re-indexed"
+      ;;
+    reject|r)
+      shift
+      local item_id="${1:-}"
+      shift 2>/dev/null || true
+      [[ -n "$item_id" ]] || die "Usage: prismo review reject <id> -r <reason> [-n 'note']"
+      local reason="" note=""
+      while [[ $# -gt 0 ]]; do
+        case "$1" in
+          --reason|-r) reason="$2"; shift 2 ;;
+          --note|-n)   note="$2"; shift 2 ;;
+          *) die "Unknown flag: $1" ;;
+        esac
+      done
+      [[ -n "$reason" ]] || die "Reason required. Use one of: redundant, too-weak, already-represented, incorrect-interpretation, wrong-artifact-type, too-speculative, not-durable, other"
+      check_vm
+      local payload
+      payload=$(python3 -c "
+import json
+print(json.dumps({
+  'decided_by': 'ethan',
+  'rejection_reason': '$reason',
+  'rejection_note': '''$note''' or None,
+}))")
+      curl -sf -X POST "${CONTEXT_API}/review/queue/${item_id}/reject" \
+        -H 'Content-Type: application/json' -d "$payload" >/dev/null \
+        && ok "Rejected ${item_id} (${reason})"
+      ;;
+    edit|e)
+      shift
+      local item_id="${1:-}"
+      [[ -n "$item_id" ]] || die "Usage: prismo review edit <id>"
+      check_vm
+      local editor="${EDITOR:-vi}"
+      local tmpf
+      tmpf=$(mktemp --suffix=.md)
+      curl -sf "${CONTEXT_API}/review/queue/${item_id}" \
+        | python3 -c "import sys,json; print(json.load(sys.stdin)['proposal']['content'])" > "$tmpf"
+      local before_hash
+      before_hash=$(md5sum "$tmpf" | awk '{print $1}')
+      "$editor" "$tmpf"
+      local after_hash
+      after_hash=$(md5sum "$tmpf" | awk '{print $1}')
+      if [[ "$before_hash" == "$after_hash" ]]; then
+        rm -f "$tmpf"
+        die "No changes made — aborting (use 'prismo review approve' if you accept as-is)"
+      fi
+
+      # Submit edit → returns the now-edited-approved proposal payload
+      local edited_payload resp project dest content target_path canon_root
+      edited_payload=$(python3 -c "
+import json
+with open('$tmpf') as f: content = f.read()
+print(json.dumps({'decided_by': 'ethan', 'content': content}))")
+      resp=$(curl -sf -X POST "${CONTEXT_API}/review/queue/${item_id}/edit" \
+        -H 'Content-Type: application/json' -d "$edited_payload" 2>&1) \
+        || { rm -f "$tmpf"; die "Edit endpoint failed: $resp"; }
+      rm -f "$tmpf"
+
+      # Same write-commit-reindex pattern as approve
+      project=$(echo "$resp" | python3 -c "import sys,json; print(json.load(sys.stdin)['project'])")
+      dest=$(echo "$resp"    | python3 -c "import sys,json; print(json.load(sys.stdin)['proposal']['suggested_destination'])")
+      content=$(echo "$resp" | python3 -c "import sys,json; print(json.load(sys.stdin)['proposal']['content'])")
+
+      [[ -n "$dest" ]] || die "Edited item has empty suggested_destination — manual placement required"
+      canon_root="${HOME}/canon/${project}"
+      [[ -d "$canon_root" ]] || die "Canon repo not found: $canon_root"
+      target_path="${canon_root}/docs/${dest}"
+
+      if [[ -e "$target_path" ]]; then
+        echo -e "${YELLOW}!${NC} Target exists: $target_path"
+        read -r -p "  Overwrite? [y/N] " ans
+        [[ "$ans" =~ ^[Yy]$ ]] || die "Aborted (file exists)"
+      fi
+
+      mkdir -p "$(dirname "$target_path")"
+      printf '%s' "$content" > "$target_path"
+      ok "Wrote (edited) ${target_path}"
+      (cd "$canon_root" && git pull --ff-only >/dev/null 2>&1 || true) || true
+      (cd "$canon_root" \
+        && git add "docs/${dest}" \
+        && git commit -m "${item_id}: ${dest} (edited + approved via prismo review)
+
+Edited and approved ReviewItem ${item_id} from synthesis-service.
+" \
+        && git push) || die "git commit/push failed in $canon_root"
+      ok "Committed + pushed in $canon_root"
+      curl -sf -X POST "${CONTEXT_API}/index" >/dev/null && ok "Re-indexed"
+      ;;
+    *)
+      die "Unknown review subcommand: $sub  (try: list, show, approve, reject, edit)"
+      ;;
+  esac
+}
+
 # ── help ──────────────────────────────────────────────────────────────────────
 
 cmd_help() {
@@ -923,7 +1136,8 @@ cmd_help() {
   echo -e "  ${BOLD}session${NC} [start|end|current|focus] Workflow-state-service — Decisions 014, 016"
   echo -e "  ${BOLD}stale${NC} [list|ack|acks]           Lifecycle inbox — Decision 019"
   echo -e "  ${BOLD}brief${NC} [<project>]               Generate operational brief — Decisions 016, 018"
-  echo -e "  ${BOLD}capture${NC} \"<text>\"                 Capture a signal candidate into drafts/"
+  echo -e "  ${BOLD}capture${NC} \"<text>\"                 Capture a signal candidate (operational state, Decision 018)"
+  echo -e "  ${BOLD}review${NC}  [list|show|approve|reject|edit]  Human-judgment boundary inbox — Decision 021"
   echo ""
   echo "Examples:"
   echo "  prismo new-machine"
@@ -934,6 +1148,11 @@ cmd_help() {
   echo "  prismo stale ack homelab/proposed-ideas/002.md --resolution resolved"
   echo "  prismo brief homelab"
   echo "  prismo capture \"the brief endpoint needs caching\""
+  echo "  prismo review                          # list pending"
+  echo "  prismo review show rv_abc123"
+  echo "  prismo review approve rv_abc123        # writes canon + commits + reindexes"
+  echo "  prismo review reject rv_abc123 -r too-weak -n \"needs more evidence\""
+  echo "  prismo review edit rv_abc123           # opens \$EDITOR, then writes + commits"
   echo ""
   echo "Bootstrap a new machine (two commands):"
   echo "  git clone git@github.com:EthanPlusPlus/homelab.git ~/canon/homelab"
@@ -954,6 +1173,7 @@ case "$CMD" in
   stale)          cmd_stale "$@" ;;
   brief)          cmd_brief "$@" ;;
   capture)        cmd_capture "$@" ;;
+  review)         cmd_review "$@" ;;
   help|--help|-h) cmd_help ;;
   *) die "Unknown command: $CMD  (run 'prismo help')" ;;
 esac
