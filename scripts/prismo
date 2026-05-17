@@ -910,6 +910,74 @@ print(json.dumps({
   esac
 }
 
+# ── synth (Decision 021 — invoke synthesis-service) ───────────────────────────
+
+cmd_synth() {
+  local sub="${1:-run}"
+  case "$sub" in
+    run|"")
+      shift 2>/dev/null || true
+      local project="homelab"
+      local dry_run="false"
+      local max_emit=""
+      local capture_ids=""
+      while [[ $# -gt 0 ]]; do
+        case "$1" in
+          --project|-p) project="$2"; shift 2 ;;
+          --dry-run|-n) dry_run="true"; shift ;;
+          --max-emit)   max_emit="$2"; shift 2 ;;
+          --capture-ids|-c) capture_ids="$2"; shift 2 ;;
+          *) die "Unknown flag: $1" ;;
+        esac
+      done
+      check_vm
+      local payload
+      payload=$(python3 -c "
+import json
+body = {'project': '$project', 'dry_run': '$dry_run' == 'true'}
+me = '$max_emit'
+if me: body['max_emit'] = int(me)
+ci = '$capture_ids'
+if ci: body['capture_ids'] = [x.strip() for x in ci.split(',') if x.strip()]
+print(json.dumps(body))")
+      curl -sf -X POST "${CONTEXT_API}/synthesis/run" \
+        -H 'Content-Type: application/json' \
+        -d "$payload" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+mode = '[dry-run] ' if d.get('dry_run') else ''
+print(f'')
+print(f'  ── synthesis run {d[\"run_id\"]} ({mode}project={d[\"project\"]}) ──')
+print(f'    captures considered: {d[\"captures_considered\"]}')
+print(f'    emitted: {d[\"emitted\"]}    skipped: {d[\"skipped\"]}')
+bp = d.get('backpressure', {})
+if not bp.get('passed', True):
+    print(f'    BACKPRESSURE: queue full ({bp.get(\"pending\")}/{bp.get(\"max\")}) — review the queue first')
+if d['review_item_ids']:
+    print(f'    new ReviewItems:')
+    for rid in d['review_item_ids']:
+        print(f'      {rid}')
+if d['gate_failures']:
+    print(f'    gate failures:')
+    for f in d['gate_failures']:
+        cap = f.get('capture_id') or '-'
+        gate = f.get('gate', '?')
+        reason = f.get('reason', '?')
+        extras = []
+        for k in ('confidence', 'threshold', 'similarity', 'max', 'pending'):
+            if k in f: extras.append(f'{k}={f[k]}')
+        suffix = (' (' + ', '.join(extras) + ')') if extras else ''
+        print(f'      [{cap}] {gate}: {reason}{suffix}')
+print(f'')
+print(f'  Use: prismo review   — triage what landed')
+"
+      ;;
+    *)
+      die "Unknown synth subcommand: $sub  (try: run, run --dry-run, run --project <p>)"
+      ;;
+  esac
+}
+
 # ── metrics (observation-week empirical surface) ──────────────────────────────
 
 cmd_metrics() {
@@ -1198,6 +1266,7 @@ cmd_help() {
   echo -e "  ${BOLD}brief${NC} [<project>]               Generate operational brief — Decisions 016, 018"
   echo -e "  ${BOLD}capture${NC} \"<text>\"                 Capture a signal candidate (operational state, Decision 018)"
   echo -e "  ${BOLD}review${NC}  [list|show|approve|reject|edit]  Human-judgment boundary inbox — Decision 021"
+  echo -e "  ${BOLD}synth${NC}   run [--dry-run] [--project <p>]  Trigger synthesis-service over pending captures"
   echo -e "  ${BOLD}metrics${NC} [--project <p>] [--since <days>]   Observation-week empirical dashboard"
   echo ""
   echo "Examples:"
@@ -1235,6 +1304,7 @@ case "$CMD" in
   brief)          cmd_brief "$@" ;;
   capture)        cmd_capture "$@" ;;
   review)         cmd_review "$@" ;;
+  synth)          cmd_synth "$@" ;;
   metrics)        cmd_metrics "$@" ;;
   help|--help|-h) cmd_help ;;
   *) die "Unknown command: $CMD  (run 'prismo help')" ;;
