@@ -1,16 +1,31 @@
 ---
 id: "012"
 title: Drafts as adapter ritual — promote returns payload, not file
-status: proposed
+status: superseded
+superseded_by: decisions/021-reviewitems-as-judgment-boundary.md
 record_type: canonical
-notes: V2-native smell caught 2026-05-16; not blocked, design before build
+notes: superseded by Decision 021 on 2026-05-17 — drafts disappear entirely under the new model
 ---
 
 # 012 — Drafts as adapter ritual
 
 ## Status
 
-Proposed. Not blocked. Design before implementation.
+**Superseded 2026-05-17 by [[../decisions/021-reviewitems-as-judgment-boundary|Decision 021]].**
+
+Reason: this proposal tried to fix the drafts flow by changing the promote
+endpoint contract (return payload not file). Decision 021 eliminates the
+drafts step entirely — captures become internal signals consumed by
+synthesis-service, and the human-facing work unit becomes a ReviewItem in a
+service-backed queue. The promote-step refactor is moot because the promote
+step itself disappears.
+
+The diagnosis in this proposal (filesystem-coupled, bifurcated state,
+conflates lifecycle and artifact) remains valid and is referenced by
+Decision 021. The proposed remedy was too small.
+
+Kept as historical record of the V2 smell that triggered the larger
+architectural realization.
 
 ## Origin
 

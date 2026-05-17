@@ -251,3 +251,30 @@ to keep it pure.
 - 997091ae — open question: orchestrator-vs-runtime layering
 - ff0335a0 — production-state-dependent gates are a code smell
 - 30230ded — reviewed_at deferred until scale justifies
+
+---
+
+## Annotation 2026-05-17 — Build resequenced by Decision 021
+
+[[021-reviewitems-as-judgment-boundary|Decision 021]] reframes Prismo's
+center of gravity as human judgment boundaries and identifies synthesis-service
++ a review-queue as the next build. doctrine-service Day-1 capabilities are
+**resequenced**, not rescoped — every responsibility this decision assigned
+to doctrine-service remains valid.
+
+The new sequencing:
+
+1. ReviewItem contract + endpoints (workflow-state-service)
+2. Minimal synthesis-service with quality gate
+3. `prismo review` CLI surface
+4. Observation week
+5. doctrine-service Day-1 capabilities (this decision)
+
+Why: until synthesis-service exists, doctrine-service's value (structural
+integrity validation, lifecycle enforcement, supersession graph) has no
+upstream loop that benefits from it operationally. Pre-approval is synthesis
++ human judgment; post-approval is doctrine. Both are real; only the order
+changes.
+
+This decision's scope, capabilities, out-of-scope list, directionality
+invariant, and tests-required precedent all remain authoritative.

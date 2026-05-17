@@ -126,11 +126,30 @@ Everything below turns a written rule into infrastructure:
 
 ---
 
-## Phase 3 — Layer 2 maintenance intelligence ⏳ scoped 2026-05-16, build pending
+## Phase 3 — Layer 2 maintenance intelligence ⏳ resequenced 2026-05-17
 
-Revised scope (Decisions 013, 017, 020): trio collapses to two services.
+Revised scope (Decisions 013, 017, 020, **021**): trio collapses to two services,
+and the build order flips per [[../decisions/021-reviewitems-as-judgment-boundary|Decision 021]].
 
-- **doctrine-service** — Law 1 territory. Scoping locked by [[../decisions/020-doctrine-service-structural-coherence-engine|Decision 020]]: structural coherence engine, owns staleness + supersession-minimal + metadata reconciliation + provenance integrity + structural topology. Lives at top-level `doctrine/` (peer to `api/`, `workflow/`). Core test: self-evident vs arguable. Produces measurements, never judgments. Module-first; split when scaling/ownership/runtime diverges.
+**Build order (current):**
+
+1. **ReviewItem contract + endpoints** in workflow-state-service — the universal Layer 4 integration primitive per Decision 021. Schema + 7 endpoints + capability-contracts.md update + tests.
+2. **synthesis-service (minimal)** — one synthesis pattern: recent captures + recent context → high-confidence proposed canon change → ReviewItem. Quality gate (confidence threshold + dedup + backpressure + single-conceptual-change) non-negotiable from day one. Top-level `synthesis/`.
+3. **`prismo review` CLI** — terminal TUI for approve/reject/edit. CLI first, NOT web UI (ontology validation needed before UI investment).
+4. **Observation week** — track emission rate, approval rate, rejection reasons, edit frequency, time-to-decision, dedup. Empirical tuning of synthesis-service quality gate.
+5. **doctrine-service Day-1 capabilities** per [[../decisions/020-doctrine-service-structural-coherence-engine|Decision 020]] — resequenced as the post-approval guardrail. All Decision 020 scope remains authoritative; only order changes.
+
+**Deferred (build after the above lands):**
+- Sukuna refactor as synthesis-service consumer
+- Web UI ReviewItem dashboard
+- WhatsApp / mobile / ambient adapters
+- Auto-approval tiers, per-contributor profile-based synthesis tuning
+- Auth on review endpoints (when non-workstation surfaces are imminent)
+
+**Retired:**
+- [[../proposed-ideas/012-drafts-as-adapter-ritual|Proposed-idea 012]] — superseded by Decision 021
+- `prismo capture promote` — deprecated, will be removed once synthesis-service lives
+- `drafts/` folder — legacy, no new files land there
 - **synthesis-service** — Law 2 territory. Onboarding, continuity reports, contradiction analysis,
   organizational narration. Inherits Decision 018 provenance discipline from day one.
 - **"Sukuna v2" as a service is dropped.** "Sukuna" survives as the scheduled-maintenance brand
