@@ -910,6 +910,66 @@ print(json.dumps({
   esac
 }
 
+# ── metrics (observation-week empirical surface) ──────────────────────────────
+
+cmd_metrics() {
+  local project=""
+  local since=7
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project|-p) project="$2"; shift 2 ;;
+      --since|--days|-d) since="$2"; shift 2 ;;
+      *) die "Unknown flag: $1" ;;
+    esac
+  done
+  check_vm
+  local url="${CONTEXT_API}/workflow/metrics?since_days=${since}"
+  [[ -n "$project" ]] && url="${url}&project=${project}"
+  curl -sf "$url" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+rv = d['review_items']
+cap = d['captures']
+def fmt(v, suffix=''):
+    return f'{v}{suffix}' if v is not None else '—'
+def pct(v):
+    return f'{v*100:.1f}%' if v is not None else '—'
+
+print(f'')
+print(f'  ── ReviewItems ({rv[\"window_days\"]}d window) ──')
+print(f'    total: {rv[\"total\"]}    pending: {rv[\"pending\"]}    decided: {rv[\"decided_total\"]}')
+print(f'    approval rate: {pct(rv[\"approval_rate\"])}    edit rate of approvals: {pct(rv[\"edit_rate\"])}')
+if rv['status_distribution']:
+    print(f'    status: ' + ', '.join(f'{k}={v}' for k, v in sorted(rv['status_distribution'].items())))
+if rv['rejection_reason_distribution']:
+    print(f'    rejections by reason: ' + ', '.join(f'{k}={v}' for k, v in sorted(rv['rejection_reason_distribution'].items())))
+mc = rv['mean_confidence_by_outcome']
+if any(mc.values()):
+    parts = []
+    for k in ('approved', 'edited-approved', 'rejected'):
+        if mc.get(k) is not None:
+            parts.append(f'{k}={mc[k]:.2f}')
+    if parts:
+        print(f'    mean confidence: ' + ', '.join(parts))
+ttd = rv['time_to_decision_seconds']
+if ttd['count'] > 0:
+    def hms(s):
+        if s is None: return '—'
+        h, rem = divmod(s, 3600); m, sec = divmod(rem, 60)
+        if h >= 1: return f'{h:.0f}h{m:.0f}m'
+        if m >= 1: return f'{m:.0f}m{sec:.0f}s'
+        return f'{sec:.0f}s'
+    print(f'    time-to-decision: p50={hms(ttd[\"p50\"])}, p90={hms(ttd[\"p90\"])}, max={hms(ttd[\"max\"])} (n={ttd[\"count\"]})')
+print(f'')
+print(f'  ── Captures ({cap[\"window_days\"]}d window) ──')
+print(f'    total: {cap[\"total\"]}    pending: {cap[\"pending_review\"]}    promoted: {cap[\"promoted\"]}    dismissed: {cap[\"dismissed\"]}')
+print(f'    promotion rate: {pct(cap[\"promotion_rate\"])}')
+print(f'')
+print(f'  Filters: project={d[\"project\"] or \"(all)\"}, since={rv[\"window_days\"]}d')
+print(f'  Use --project <name> or --since <days> to narrow.')
+"
+}
+
 # ── review (Decision 021 — human-judgment boundary) ───────────────────────────
 
 cmd_review() {
@@ -1138,6 +1198,7 @@ cmd_help() {
   echo -e "  ${BOLD}brief${NC} [<project>]               Generate operational brief — Decisions 016, 018"
   echo -e "  ${BOLD}capture${NC} \"<text>\"                 Capture a signal candidate (operational state, Decision 018)"
   echo -e "  ${BOLD}review${NC}  [list|show|approve|reject|edit]  Human-judgment boundary inbox — Decision 021"
+  echo -e "  ${BOLD}metrics${NC} [--project <p>] [--since <days>]   Observation-week empirical dashboard"
   echo ""
   echo "Examples:"
   echo "  prismo new-machine"
@@ -1174,6 +1235,7 @@ case "$CMD" in
   brief)          cmd_brief "$@" ;;
   capture)        cmd_capture "$@" ;;
   review)         cmd_review "$@" ;;
+  metrics)        cmd_metrics "$@" ;;
   help|--help|-h) cmd_help ;;
   *) die "Unknown command: $CMD  (run 'prismo help')" ;;
 esac
