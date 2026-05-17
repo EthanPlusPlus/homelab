@@ -378,6 +378,13 @@ The authoritative transport. Adapters (MCP, CLI) wrap these.
 | `listCaptures` | `GET /workflow/captures` | `workflow/router.py` |
 | `updateCapture` | `PATCH /workflow/capture/{id}` | `workflow/router.py` |
 | `promoteCapture` | `POST /workflow/capture/{id}/promote` | `workflow/router.py` |
+| `listReviewQueue` | `GET /review/queue` | `workflow/review.py` |
+| `getReviewItem` | `GET /review/queue/{id}` | `workflow/review.py` |
+| `createReviewItem` | `POST /review/queue` | `workflow/review.py` |
+| `approveReviewItem` | `POST /review/queue/{id}/approve` | `workflow/review.py` |
+| `rejectReviewItem` | `POST /review/queue/{id}/reject` | `workflow/review.py` |
+| `editReviewItem` | `POST /review/queue/{id}/edit` | `workflow/review.py` |
+| `patchReviewItem` | `PATCH /review/queue/{id}` | `workflow/review.py` |
 | `triggerIndex` | `POST /index` | `api/main.py` |
 | `triggerCodeIndex` | `POST /index/code` | `api/main.py` |
 | `health` | `GET /health` | `api/main.py` |
