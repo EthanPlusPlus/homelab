@@ -15,9 +15,9 @@ Tools:
 - **Workflow state (V2):** `start_session`, `end_session`, `update_focus`, `create_workstream`, `update_workstream`, `get_workflow_state`
 - **Lifecycle loop (V2.5):** `acknowledge_stale`, `list_stale_acks`
 - **Signal capture (V2.5):** `capture_signal`, `list_captures`
-- **Review queue (Decision 021):** HTTP-only at present (`/review/queue`, `/review/queue/{id}/approve|reject|edit`); MCP wrappers not yet shipped — Sukuna flagged 2026-05-17 as a Layer 4 universality gap
-- **Synthesis (Decision 021):** HTTP-only at present (`/synthesis/run`); MCP wrapper not yet shipped
-- **Workflow metrics:** HTTP-only at present (`/workflow/metrics`); MCP wrapper not yet shipped
+- **Review queue (Decision 021):** `list_review_queue`, `get_review_item`, `approve_review_item`, `reject_review_item`, `edit_review_item`
+- **Synthesis (Decision 021):** `run_synthesis`
+- **Workflow metrics:** `workflow_metrics`
 - **Code:** `search_code`, `get_symbol`, `find_references`, `get_file_summary`, `get_related_symbols`
 
 `search_docs` defaults to `record_type=canonical` (Decision 018). Pass `record_type=synthesized` or `record_type=any` to include model-generated content.
