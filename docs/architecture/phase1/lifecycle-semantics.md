@@ -2,7 +2,7 @@
 
 Defines the valid states for canon objects and the rules governing transitions between them. The purpose is to prevent canon entropy — the accumulation of outdated, ambiguous, or never-resolved content that pollutes retrieval.
 
-The key insight: the problem is not having the right states. It is enforcing transitions. These rules give Sukuna v2 and the doctrine-service the criteria to detect when transitions are needed.
+The key insight: the problem is not having the right states. It is enforcing transitions. These rules give doctrine-service ([[../../decisions/020-doctrine-service-structural-coherence-engine|Decision 020]]) the criteria to detect when transitions are needed.
 
 ---
 
@@ -92,7 +92,7 @@ closed      → (terminal — no further transitions)
 
 ## Staleness Detection Rules
 
-These are the criteria Sukuna v2 and the doctrine-service use to flag objects for human review.
+These are the criteria doctrine-service ([[../../decisions/020-doctrine-service-structural-coherence-engine|Decision 020]]) uses to flag objects for human review.
 
 | State | Staleness Trigger |
 |-------|------------------|
@@ -113,7 +113,7 @@ When a decision supersedes another:
 1. New decision must list `supersedes: "<id>"` in frontmatter
 2. Old decision must be updated: `superseded_by: "<id>"` and `status: superseded`
 3. Both records are preserved — the chain is navigable
-4. Sukuna v2 validates chain integrity on every run
+4. doctrine-service validates chain integrity (supersession integrity is a Day-1 capability per [[../../decisions/020-doctrine-service-structural-coherence-engine|Decision 020]])
 
 Example chain: `009 → 011 → 012` (each supersedes the previous; all preserved)
 

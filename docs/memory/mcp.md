@@ -15,6 +15,9 @@ Tools:
 - **Workflow state (V2):** `start_session`, `end_session`, `update_focus`, `create_workstream`, `update_workstream`, `get_workflow_state`
 - **Lifecycle loop (V2.5):** `acknowledge_stale`, `list_stale_acks`
 - **Signal capture (V2.5):** `capture_signal`, `list_captures`
+- **Review queue (Decision 021):** HTTP-only at present (`/review/queue`, `/review/queue/{id}/approve|reject|edit`); MCP wrappers not yet shipped — Sukuna flagged 2026-05-17 as a Layer 4 universality gap
+- **Synthesis (Decision 021):** HTTP-only at present (`/synthesis/run`); MCP wrapper not yet shipped
+- **Workflow metrics:** HTTP-only at present (`/workflow/metrics`); MCP wrapper not yet shipped
 - **Code:** `search_code`, `get_symbol`, `find_references`, `get_file_summary`, `get_related_symbols`
 
 `search_docs` defaults to `record_type=canonical` (Decision 018). Pass `record_type=synthesized` or `record_type=any` to include model-generated content.
@@ -32,7 +35,7 @@ On existing sessions it is silent. The hook is silent on context-server downtime
 
 ### Capture discipline
 
-Claude is responsible for `capture_signal` — the user driving the conversation can't realistically transcribe it. When you notice durable signal in a session (architectural insight, inconsistency, decision waiting to happen, tension surfaced), call `capture_signal(text=..., project=..., session_id=...)`. Captures live in workflow-state-service as `pending-review` operational state, not canon. Reviewer triages later via `prismo capture list` and `prismo capture promote <id>`.
+Claude is responsible for `capture_signal` — the user driving the conversation can't realistically transcribe it. When you notice durable signal in a session (architectural insight, inconsistency, decision waiting to happen, tension surfaced), call `capture_signal(text=..., project=..., session_id=...)`. Captures live in workflow-state-service as `pending-review` operational state, not canon. Per [[../decisions/021-reviewitems-as-judgment-boundary|Decision 021]], captures are now consumed by synthesis-service which emits ReviewItems to a human-approval queue (`prismo review`). The legacy `prismo capture promote` path is deprecated and will be removed once synthesis-service is the sole capture consumer.
 
 Use `doc_type=<project-name>` to scope queries to a specific project (e.g., `homelab`, `context-server`, `exam-prep`). The context-server indexes every `~/canon/<X>/` as `doc_type=X`.
 

@@ -75,7 +75,7 @@ Outcome: stable internal semantics before implementation expansion.
 
 ---
 
-## Phase 2.5 — Architectural governance + lifecycle closure ✅ shipped (soak in progress)
+## Phase 2.5 — Architectural governance + lifecycle closure ✅ complete (soak gate closed 2026-05-16 via test fixtures — [[../decisions/019-lifecycle-loop-closure-pattern|Decision 019 annotation]])
 
 Inserted between Phase 2 and Phase 3 after the Sukuna 2026-05-15 review and ChatGPT
 architectural pass (2026-05-16). Phase 3 cannot start until the two-week soak completes.
@@ -102,7 +102,7 @@ architectural pass (2026-05-16). Phase 3 cannot start until the two-week soak co
 - ✅ MCP tools: `acknowledge_stale`, `list_stale_acks`
 - ✅ `prismo stale` / `prismo stale ack` / `prismo stale acks` CLI
 - ✅ `prismo brief <project>` CLI — fetches `/brief`, displays prose + provenance footer
-- ✅ `prismo capture "<text>"` CLI — POSTs to `/workflow/capture`; lives in workflow-state-service as `pending-review` operational state per Decision 018, NOT canon. Promotion to `drafts/` is explicit via `prismo capture promote <id>`. MCP tools: `capture_signal`, `list_captures`.
+- ✅ `prismo capture "<text>"` CLI — POSTs to `/workflow/capture`; lives in workflow-state-service as `pending-review` operational state per Decision 018, NOT canon. Per [[../decisions/021-reviewitems-as-judgment-boundary|Decision 021]] (2026-05-17), captures are now consumed by synthesis-service which emits ReviewItems to the review-queue; the legacy `prismo capture promote` path is deprecated. MCP tools: `capture_signal`, `list_captures`.
 - ✅ `prismo session start/end/current/ensure/focus` CLI — wraps workflow-state-service
 - ✅ Cron installed: daily 0800 UTC, `prismo stale` → `~/.prismo-stale.log`
 
@@ -148,12 +148,11 @@ and the build order flips per [[../decisions/021-reviewitems-as-judgment-boundar
 
 **Retired:**
 - [[../proposed-ideas/012-drafts-as-adapter-ritual|Proposed-idea 012]] — superseded by Decision 021
-- `prismo capture promote` — deprecated, will be removed once synthesis-service lives
+- `prismo capture promote` — deprecated; will be removed once synthesis-service is the sole capture consumer
 - `drafts/` folder — legacy, no new files land there
-- **synthesis-service** — Law 2 territory. Onboarding, continuity reports, contradiction analysis,
-  organizational narration. Inherits Decision 018 provenance discipline from day one.
-- **"Sukuna v2" as a service is dropped.** "Sukuna" survives as the scheduled-maintenance brand
-  (nightly pass, weekly audit) invoking doctrine-service + synthesis-service.
+- **"Sukuna v2" as a separate Layer 2 service** — dropped. Per Decision 021, Sukuna becomes a synthesis-service consumer (scheduled passes that emit ReviewItems), not a separate service. doctrine-service inherits the metadata-reconciliation responsibilities previously assigned to Sukuna v2.
+
+(Sukuna's 2026-05-17 audit caught a botched edit here: synthesis-service was incorrectly listed under Retired even though it is the thing that shipped as Phase 3 step 2 above. Corrected 2026-05-17.)
 
 ---
 
@@ -183,7 +182,7 @@ is already Layer 4 in the abstraction the masterplan defines.
 Minimal Layer 4 slice now planned in parallel with Phase 3:
 
 - `prismo brief <project>` — OperationalBrief viewer (CLI)
-- `prismo capture "this matters"` — contribution capture (CLI, writes to a SignalCandidate draft)
+- `prismo capture "this matters"` — contribution capture (CLI, POSTs to `/workflow/capture`; consumed by synthesis-service per [[../decisions/021-reviewitems-as-judgment-boundary|Decision 021]])
 - `prismo stale` / `prismo stale ack <id>` — lifecycle inbox (Phase 2.5)
 
 Web UI deferred until non-CLI contributors actually need access (Shrey/Kyle). At that point,

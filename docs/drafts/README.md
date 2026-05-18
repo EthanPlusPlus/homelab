@@ -1,5 +1,9 @@
-# Drafts
+# Drafts (legacy — Decision 021)
 
-Staging area for knowledge extracted from conversations, pending review and promotion to canonical docs.
+Frozen folder per [[../decisions/021-reviewitems-as-judgment-boundary|Decision 021]].
+**No new files land here.** Historical drafts and captures preserved as-is,
+excluded from retrieval (`record_type=draft`).
 
-Files here are unreviewed and should not be treated as authoritative.
+New pre-approval content lives as ReviewItems in workflow-state-service
+(`/review/queue`, surfaced via `prismo review`). Approved ReviewItems are
+written directly into canonical folders by the approve endpoint.

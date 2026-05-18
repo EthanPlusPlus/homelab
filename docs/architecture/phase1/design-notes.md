@@ -29,7 +29,7 @@ Implications for engineering:
 - Design the doctrine-service with an extensible query interface, not a fixed set of endpoints
 - The relationship graph is the most important internal data structure — invest in it
 - Staleness and contradiction detection will accumulate rules over time; make the rule system pluggable
-- Sukuna v2 is the primary consumer; design the API contract with Sukuna's needs in mind
+- synthesis-service and doctrine-service are the primary consumers (Decisions 020, 021); design the API contract with their needs in mind
 
 ---
 

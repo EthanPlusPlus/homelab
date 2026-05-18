@@ -170,27 +170,15 @@ Drift between the two is meaningful and worth tracking.
 
 ---
 
-### `drafts/`
+### `drafts/` (legacy — Decision 021)
 
-Purpose: Temporary human review layer for proposed knowledge changes.
+Frozen as historical record. **No new files land here.** Pre-approval content now lives
+in workflow-state-service as ReviewItems; approved ReviewItems are written directly
+into canonical folders by the approve endpoint. See [[decisions/021-reviewitems-as-judgment-boundary|Decision 021]]
+and `architecture/phase1/capability-contracts.md` (ReviewItem endpoints).
 
-Belongs here:
-- AI-generated session summaries
-- Proposed updates to canonical docs
-- Extracted decisions or runbook candidates not yet reviewed
-
-Does not belong here:
-- Random notes or ideas
-- Anything intended as permanent record
-- Final knowledge (promote and distill it instead)
-
-Lifecycle:
-```
-drafts/ → human review → distilled into canonical docs → drafts entry archived or deleted
-```
-
-Key rule: Nothing in `drafts/` is trusted. Everything in canonical folders is.
-Drafts are not indexed by default.
+Drafts already present (capture-*.md, sukuna-*.md) remain as-is and are excluded
+from indexed retrieval (`record_type=draft`).
 
 ---
 

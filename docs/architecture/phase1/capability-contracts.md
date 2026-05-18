@@ -176,8 +176,9 @@ generateOperationalBrief(
 ### captureSignal
 
 Capture a conversational signal as operational state (not canon). Per Decision 018,
-captures are operational signals not canonical truth — they live in workflow-state-service
-until explicitly promoted to canon `drafts/`.
+captures live in workflow-state-service. Per [[../../decisions/021-reviewitems-as-judgment-boundary|Decision 021]],
+captures are then consumed by synthesis-service as raw material for ReviewItem emission.
+The legacy promote-to-drafts path is deprecated.
 
 ```typescript
 captureSignal(
@@ -198,7 +199,10 @@ captureSignal(
 ```
 
 **Provider requirement:** workflow-state-service (deterministic; no model required for v1).
-Promotion to `drafts/` happens via `prismo capture promote <id>` (writes file, updates status).
+Per [[../../decisions/021-reviewitems-as-judgment-boundary|Decision 021]], captures are
+consumed by synthesis-service which emits ReviewItems to the human-approval queue.
+The legacy `prismo capture promote` path is deprecated and will be removed once
+synthesis-service is the sole capture consumer.
 **Human review required before any candidate becomes canon.**
 
 A future v2 may use a language model to extract structured fields (decision/proposal/tension)
@@ -214,6 +218,10 @@ List pending or processed captures.
 listCaptures(
   project?: string,
   status: "pending-review" | "promoted" | "dismissed" = "pending-review"
+  // "promoted" is retained for backwards compatibility with the legacy
+  // promote-to-drafts flow (Decision 018). Per Decision 021, the live model
+  // transitions promoted-via-ReviewItem-approval at the same status value,
+  // with promoted_to_path set to the canon destination.
 ) → Capture[]
 ```
 
@@ -236,7 +244,7 @@ detectContradictions(
 ```
 
 **Provider requirement:** language model + structured comparison
-**Primary consumer:** Sukuna v2
+**Primary consumer:** synthesis-service (per [[../../decisions/021-reviewitems-as-judgment-boundary|Decision 021]] — Sukuna v2 as a separate service was dropped; Sukuna survives as a synthesis-service consumer/scheduler)
 
 ---
 
@@ -391,7 +399,7 @@ The authoritative transport. Adapters (MCP, CLI) wrap these.
 | `triggerCodeIndex` | `POST /index/code` | `api/main.py` |
 | `health` | `GET /health` | `api/main.py` |
 
-Capabilities not yet in this table: `summarize`, `synthesize`, `codegen`, `plan`, `captureSignal`, `detectContradictions` — Phase 3+ work.
+Capabilities not yet in this table: `summarize`, `synthesize`, `codegen`, `plan`, `detectContradictions` — Phase 3+ work.
 
 ---
 
@@ -407,8 +415,8 @@ Capabilities not yet in this table: `summarize`, `synthesize`, `codegen`, `plan`
 
 ## Routing Implications
 
-| Capability | Ethan (CLI/IDE) | Shrey/Kyle (Web) | Sukuna |
-|------------|-----------------|------------------|--------|
+| Capability | Ethan (CLI/IDE) | Shrey/Kyle (Web) | synthesis-service |
+|------------|-----------------|------------------|-------------------|
 | retrieve | context-server v2 | context-server v2 | context-server v2 |
 | codegen | Claude / coding model | N/A | N/A |
 | summarize | any capable model | local model | local model |
@@ -416,3 +424,5 @@ Capabilities not yet in this table: `summarize`, `synthesize`, `codegen`, `plan`
 | hydrateSession | context-server v2 | context-server v2 | N/A |
 | captureSignal | any model | local model | any model |
 | detectContradictions | N/A | N/A | local model |
+
+(Column header updated 2026-05-17 per Decision 021 — Sukuna v2 as a separate service was dropped; the column reflects what synthesis-service consumes.)

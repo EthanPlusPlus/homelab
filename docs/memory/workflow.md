@@ -26,7 +26,7 @@ Everything in this system is iterable — code, docs, infrastructure, and these 
 ## Key Constraints
 
 - Claude Code executes, but does not decide alone — the person in this session approves all plans
-- Canonical docs are the only trusted knowledge source — drafts are not indexed
+- Canonical docs are the only trusted knowledge source. Per [[../decisions/021-reviewitems-as-judgment-boundary|Decision 021]], `drafts/` is legacy; new canon enters via approved ReviewItems (`prismo review`), not via drafts
 - Do not modify docs outside the relevant project's docs folder
 - After any doc changes, re-index: `curl -X POST http://localhost:8000/index`
 - Full constraints live in ~/canon/homelab/docs/context/constraints.md — read them

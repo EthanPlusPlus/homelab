@@ -192,4 +192,4 @@ Tracks an active unit of work.
 2. Status field is always required — no status-less canon objects in V2
 3. `type` field is required — enables cross-object retrieval filtering
 4. `project` field is required — enables project-scoped queries
-5. Frontmatter must be valid YAML — enforce in Sukuna v2's metadata reconciliation pass
+5. Frontmatter must be valid YAML — enforce in doctrine-service's metadata reconciliation ([[../../decisions/020-doctrine-service-structural-coherence-engine|Decision 020]] Day-1 capability 3)
