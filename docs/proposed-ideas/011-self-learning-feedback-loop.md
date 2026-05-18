@@ -35,3 +35,14 @@ bottleneck is premature.
 
 If Sukuna's output volume grows enough that manual review of every draft becomes a real
 bottleneck — and the bottleneck is review attention, not draft quality — reconsider.
+
+## Update 2026-05-17 — subsumed by Decision 021
+
+[[../decisions/021-reviewitems-as-judgment-boundary|Decision 021]] explicitly defers
+auto-approval tiers ("review tiers / auto-approval" in the not-day-one list) to
+post-observation-week refinement. That is the same conclusion this proposed-idea
+reached: defer until a real bottleneck materializes. The trigger above is now
+operationally measurable via `prismo metrics` (approval rate, time-to-decision,
+backpressure events). When/if the observation week reveals the bottleneck, this
+proposal's framing folds into the synthesis-service refinement work; no new
+proposed-idea needed.

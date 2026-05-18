@@ -35,3 +35,15 @@ The original 008 proposed three programs. Sections 2 and 3 are now tracked separ
 - **Persistent observing agents** — split into [[009-maid-canon-standardizer|009 (Sukuna)]] for
   canon scanning and the still-open [[010-interaction-observer|010 — Interaction Observer]].
 - **Self-learning feedback loop** — split into [[011-self-learning-feedback-loop|011]] (deprioritised).
+
+## Update 2026-05-17 — pattern continuity in Decision 021
+
+The original 008 idea was a pipeline of dedicated agents that triage raw input into
+structured proposals with human review. The pipeline-of-subagents implementation was
+disproven by Hermes, but the underlying pattern landed in
+[[../decisions/021-reviewitems-as-judgment-boundary|Decision 021]] in a different
+shape: synthesis-service consumes captures, emits ReviewItems, humans approve/reject/
+edit. No subagents, no per-proposal cold start, but the capture → triage → human-
+review → canon arc is present. This proposed-idea remains closed (the implementation
+it described was disproven); Decision 021 supersedes the underlying intent without
+re-opening it.

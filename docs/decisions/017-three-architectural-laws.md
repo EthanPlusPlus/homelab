@@ -139,3 +139,14 @@ honored on paper and violated in code; this decision closes that gap.
   the services are built.
 - Whether `EmbeddingProvider` and `SynthesisProvider` unify into a single `RuntimeProvider`
   abstraction. Still deferred to Phase 4 per [[015-synthesis-provider-abstraction|Decision 015]].
+
+---
+
+## Annotation 2026-05-17 — "Sukuna v2" framing dropped
+
+The Phase 3 trio reference above ("doctrine-service, synthesis-service, Sukuna v2")
+reflects scope at the time this decision was adopted. Per
+[[021-reviewitems-as-judgment-boundary|Decision 021]], the "Sukuna v2 as a separate
+Layer 2 service" framing was dropped. The Three Laws and the Layer 2 Service Rule
+remain unchanged; only the service-count framing of Phase 3 changed (trio → two:
+doctrine-service for Law 1, synthesis-service for Law 2).

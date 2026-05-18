@@ -55,3 +55,20 @@ Adopt `v2-masterplan.md` and `v2-roadmap.md` as the governing architecture for P
 - Whether Layer 2 should live under `~/canon/prismo-v2/` rather than `~/canon/homelab/`
 - Whether `RuntimeProvider` should unify the SynthesisProvider and EmbeddingProvider abstractions
   ([[015-synthesis-provider-abstraction|see 015]])
+
+---
+
+## Annotation 2026-05-17 — "Sukuna v2" framing dropped
+
+The Phase 3 trio listed above ("doctrine-service, synthesis-service, Sukuna v2,
+continuity systems") was the scope at adoption time. Per
+[[021-reviewitems-as-judgment-boundary|Decision 021]], the "Sukuna v2 as a separate
+Layer 2 service" framing was dropped. Sukuna survives as a synthesis-service
+consumer (scheduled passes that emit ReviewItems), not as its own service.
+doctrine-service inherits the metadata-reconciliation responsibilities previously
+attached to Sukuna v2.
+
+The open question "should the Phase 3 trio be collapsed?" (Sukuna 2026-05-15) is
+now answered: yes, to two services (doctrine + synthesis), not three. This
+annotation preserves the historical scope for reference; the implementation moved
+forward differently.
