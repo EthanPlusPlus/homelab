@@ -988,44 +988,40 @@ cmd_prior_art() {
   local description="${*:-}"
   local project="homelab"
   local no_emit="false"
-  local propose="false"
+  local full="false"
   local args=()
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project|-p) project="$2"; shift 2 ;;
       --no-emit)    no_emit="true"; shift ;;
-      --propose)    propose="true"; shift ;;
+      --full)       full="true"; shift ;;
       *) args+=("$1"); shift ;;
     esac
   done
   description="${args[*]:-}"
-  [[ -n "$description" ]] || die "Usage: prismo prior-art \"description\" [--propose] [--no-emit]"
+  [[ -n "$description" ]] || die "Usage: prismo prior-art \"description\" [--full] [--no-emit]"
   check_vm
 
   local emit_bool
   [[ "$no_emit" == "true" ]] && emit_bool="False" || emit_bool="True"
-
-  _run_analyze() {
-    local atype="$1" ctx="$2"
-    local payload
-    payload=$(python3 -c "
+  local payload
+  payload=$(python3 -c "
 import json, sys
 print(json.dumps({
   'project': '$project',
-  'analysis_type': '$atype',
+  'analysis_type': 'prior_art',
   'description': sys.argv[1],
-  'context': sys.argv[2],
   'emit_review_item': $emit_bool,
-}))" "$description" "$ctx")
-    curl -s --max-time 120 -X POST "${CONTEXT_API}/synthesis/analyze" \
-      -H 'Content-Type: application/json' \
-      -d "$payload"
-  }
+}))" "$description")
 
-  _print_result() {
-    python3 -c "
+  echo ""
+  echo "  Researching prior art... (this may take 30-60s)"
+  echo ""
+
+  curl -s --max-time 120 -X POST "${CONTEXT_API}/synthesis/analyze" \
+    -H 'Content-Type: application/json' \
+    -d "$payload" | python3 -c "
 import sys, json
-label = sys.argv[1]
 raw = sys.stdin.read()
 if not raw.strip():
     print('  error: no response from server (check container logs)', file=sys.stderr)
@@ -1034,7 +1030,8 @@ d = json.loads(raw)
 if 'detail' in d and 'recommendation' not in d:
     print(f'  error: {d[\"detail\"]}', file=sys.stderr)
     sys.exit(1)
-print(f'  ── {label} ──')
+full = sys.argv[1] == 'true'
+print(f'  ── prior-art analysis ──')
 print(f'  recommendation: {d.get(\"recommendation\", \"?\")}')
 print(f'  rationale:      {d.get(\"recommendation_rationale\", \"?\")}')
 print(f'  confidence:     {d.get(\"confidence\", 0):.2f}')
@@ -1043,43 +1040,30 @@ if sources:
     print(f'  sources ({len(sources)}):')
     for s in sources[:5]:
         print(f'    - {s}')
+    if len(sources) > 5:
+        print(f'    ... and {len(sources) - 5} more')
 rv = d.get('review_item_id')
 if rv:
     print(f'')
     print(f'  ReviewItem: {rv}')
     print(f'  Use: prismo review show {rv}')
-preview = d.get('findings_preview', '')
-if preview:
-    print(f'')
-    print(f'  findings preview:')
-    for line in preview.splitlines()[:8]:
-        print(f'    {line}')
 print(f'')
-# emit findings to stdout for piping to next step
-import os
-if os.environ.get('_PRISMO_CAPTURE_FINDINGS'):
-    print('__FINDINGS__:' + d.get('findings_preview', ''), file=sys.stderr)
-" "$1"
-  }
-
-  echo ""
-  echo "  Researching prior art... (this may take 30-60s)"
-  echo ""
-  local prior_art_json
-  prior_art_json=$(_run_analyze "prior_art" "")
-  echo "$prior_art_json" | _print_result "prior-art analysis"
-
-  if [[ "$propose" == "true" ]]; then
-    local findings_preview
-    findings_preview=$(echo "$prior_art_json" | python3 -c "
-import sys, json
-d = json.loads(sys.stdin.read())
-print(d.get('findings_preview', ''))
-" 2>/dev/null)
-    echo "  Drafting proposal from findings... (this may take 30-60s)"
-    echo ""
-    _run_analyze "proposal" "$findings_preview" | _print_result "proposal"
-  fi
+if full:
+    findings = d.get('findings', '')
+    if findings:
+        print('  ── findings ──')
+        print('')
+        for line in findings.splitlines():
+            print(f'  {line}')
+        print('')
+else:
+    preview = d.get('findings_preview', '')
+    if preview:
+        print(f'  findings preview (--full for complete):')
+        for line in preview.splitlines()[:6]:
+            print(f'    {line}')
+        print('')
+" "$full"
 }
 
 # ── metrics (observation-week empirical surface) ──────────────────────────────
@@ -1371,7 +1355,7 @@ cmd_help() {
   echo -e "  ${BOLD}capture${NC} \"<text>\"                 Capture a signal candidate (operational state, Decision 018)"
   echo -e "  ${BOLD}review${NC}  [list|show|approve|reject|edit]  Human-judgment boundary inbox — Decision 021"
   echo -e "  ${BOLD}synth${NC}      run [--dry-run] [--project <p>]  Trigger synthesis-service over pending captures"
-  echo -e "  ${BOLD}prior-art${NC} \"<desc>\" [--propose] [--no-emit]  Research prior art; --propose drafts a proposal from findings"
+  echo -e "  ${BOLD}prior-art${NC} \"<desc>\" [--full] [--no-emit]     Research prior art; --full prints complete findings"
   echo -e "  ${BOLD}metrics${NC}   [--project <p>] [--since <days>]  Observation-week empirical dashboard"
   echo ""
   echo "Examples:"
