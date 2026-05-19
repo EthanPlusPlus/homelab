@@ -988,36 +988,44 @@ cmd_prior_art() {
   local description="${*:-}"
   local project="homelab"
   local no_emit="false"
-  # Allow --project and --no-emit flags before or after description
+  local propose="false"
   local args=()
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project|-p) project="$2"; shift 2 ;;
       --no-emit)    no_emit="true"; shift ;;
+      --propose)    propose="true"; shift ;;
       *) args+=("$1"); shift ;;
     esac
   done
   description="${args[*]:-}"
-  [[ -n "$description" ]] || die "Usage: prismo prior-art \"description of what you're building\""
+  [[ -n "$description" ]] || die "Usage: prismo prior-art \"description\" [--propose] [--no-emit]"
   check_vm
-  local emit
-  [[ "$no_emit" == "true" ]] && emit="false" || emit="true"
-  local payload
+
   local emit_bool
-  [[ "$emit" == "true" ]] && emit_bool="True" || emit_bool="False"
-  payload=$(python3 -c "import json; print(json.dumps({
-    'project': '$project',
-    'analysis_type': 'prior_art',
-    'description': '''${description//\'/\\\'}''',
-    'emit_review_item': $emit_bool,
-  }))")
-  echo ""
-  echo "  Researching prior art... (this may take 30-60s)"
-  echo ""
-  curl -s --max-time 120 -X POST "${CONTEXT_API}/synthesis/analyze" \
-    -H 'Content-Type: application/json' \
-    -d "$payload" | python3 -c "
+  [[ "$no_emit" == "true" ]] && emit_bool="False" || emit_bool="True"
+
+  _run_analyze() {
+    local atype="$1" ctx="$2"
+    local payload
+    payload=$(python3 -c "
+import json, sys
+print(json.dumps({
+  'project': '$project',
+  'analysis_type': '$atype',
+  'description': sys.argv[1],
+  'context': sys.argv[2],
+  'emit_review_item': $emit_bool,
+}))" "$description" "$ctx")
+    curl -s --max-time 120 -X POST "${CONTEXT_API}/synthesis/analyze" \
+      -H 'Content-Type: application/json' \
+      -d "$payload"
+  }
+
+  _print_result() {
+    python3 -c "
 import sys, json
+label = sys.argv[1]
 raw = sys.stdin.read()
 if not raw.strip():
     print('  error: no response from server (check container logs)', file=sys.stderr)
@@ -1026,7 +1034,7 @@ d = json.loads(raw)
 if 'detail' in d and 'recommendation' not in d:
     print(f'  error: {d[\"detail\"]}', file=sys.stderr)
     sys.exit(1)
-print(f'  ── prior-art analysis ──')
+print(f'  ── {label} ──')
 print(f'  recommendation: {d.get(\"recommendation\", \"?\")}')
 print(f'  rationale:      {d.get(\"recommendation_rationale\", \"?\")}')
 print(f'  confidence:     {d.get(\"confidence\", 0):.2f}')
@@ -1047,7 +1055,31 @@ if preview:
     for line in preview.splitlines()[:8]:
         print(f'    {line}')
 print(f'')
-"
+# emit findings to stdout for piping to next step
+import os
+if os.environ.get('_PRISMO_CAPTURE_FINDINGS'):
+    print('__FINDINGS__:' + d.get('findings_preview', ''), file=sys.stderr)
+" "$1"
+  }
+
+  echo ""
+  echo "  Researching prior art... (this may take 30-60s)"
+  echo ""
+  local prior_art_json
+  prior_art_json=$(_run_analyze "prior_art" "")
+  echo "$prior_art_json" | _print_result "prior-art analysis"
+
+  if [[ "$propose" == "true" ]]; then
+    local findings_preview
+    findings_preview=$(echo "$prior_art_json" | python3 -c "
+import sys, json
+d = json.loads(sys.stdin.read())
+print(d.get('findings_preview', ''))
+" 2>/dev/null)
+    echo "  Drafting proposal from findings... (this may take 30-60s)"
+    echo ""
+    _run_analyze "proposal" "$findings_preview" | _print_result "proposal"
+  fi
 }
 
 # ── metrics (observation-week empirical surface) ──────────────────────────────
@@ -1339,7 +1371,7 @@ cmd_help() {
   echo -e "  ${BOLD}capture${NC} \"<text>\"                 Capture a signal candidate (operational state, Decision 018)"
   echo -e "  ${BOLD}review${NC}  [list|show|approve|reject|edit]  Human-judgment boundary inbox — Decision 021"
   echo -e "  ${BOLD}synth${NC}      run [--dry-run] [--project <p>]  Trigger synthesis-service over pending captures"
-  echo -e "  ${BOLD}prior-art${NC} \"<description>\" [--no-emit]       Research prior art (Decision 023)"
+  echo -e "  ${BOLD}prior-art${NC} \"<desc>\" [--propose] [--no-emit]  Research prior art; --propose drafts a proposal from findings"
   echo -e "  ${BOLD}metrics${NC}   [--project <p>] [--since <days>]  Observation-week empirical dashboard"
   echo ""
   echo "Examples:"
