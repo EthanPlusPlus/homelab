@@ -1003,20 +1003,29 @@ cmd_prior_art() {
   local emit
   [[ "$no_emit" == "true" ]] && emit="false" || emit="true"
   local payload
+  local emit_bool
+  [[ "$emit" == "true" ]] && emit_bool="True" || emit_bool="False"
   payload=$(python3 -c "import json; print(json.dumps({
     'project': '$project',
     'analysis_type': 'prior_art',
     'description': '''${description//\'/\\\'}''',
-    'emit_review_item': $emit == 'true'
+    'emit_review_item': $emit_bool,
   }))")
   echo ""
   echo "  Researching prior art... (this may take 30-60s)"
   echo ""
-  curl -sf --max-time 120 -X POST "${CONTEXT_API}/synthesis/analyze" \
+  curl -s --max-time 120 -X POST "${CONTEXT_API}/synthesis/analyze" \
     -H 'Content-Type: application/json' \
     -d "$payload" | python3 -c "
 import sys, json
-d = json.load(sys.stdin)
+raw = sys.stdin.read()
+if not raw.strip():
+    print('  error: no response from server (check container logs)', file=sys.stderr)
+    sys.exit(1)
+d = json.loads(raw)
+if 'detail' in d and 'recommendation' not in d:
+    print(f'  error: {d[\"detail\"]}', file=sys.stderr)
+    sys.exit(1)
 print(f'  ── prior-art analysis ──')
 print(f'  recommendation: {d.get(\"recommendation\", \"?\")}')
 print(f'  rationale:      {d.get(\"recommendation_rationale\", \"?\")}')
