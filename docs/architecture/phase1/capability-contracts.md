@@ -395,6 +395,7 @@ The authoritative transport. Adapters (MCP, CLI) wrap these.
 | `patchReviewItem` | `PATCH /review/queue/{id}` | `workflow/review.py` |
 | `workflowMetrics` | `GET /workflow/metrics` | `workflow/metrics.py` |
 | `runSynthesis` | `POST /synthesis/run` | `synthesis/router.py` |
+| `analyzeInterpretive` | `POST /synthesis/analyze` | `synthesis/router.py` |
 | `triggerIndex` | `POST /index` | `api/main.py` |
 | `triggerCodeIndex` | `POST /index/code` | `api/main.py` |
 | `health` | `GET /health` | `api/main.py` |
