@@ -456,11 +456,15 @@ This replaces reliance on behavioral prompt rituals.
 
 ---
 
-#### Sukuna v2
+#### Sukuna
 
-Expanded canon maintenance agent.
+> **Annotation 2026-05-19:** The "Sukuna v2" framing (separate Layer 2 service) was dropped.
+> Sukuna remains a Claude agent (scripts/sukuna) that writes drafts/ for human review. Its
+> eventual refactor is tracked in [[../proposed-ideas/013-sukuna-as-synthesis-consumer|Proposed-idea 013]]:
+> Sukuna becomes a synthesis-service consumer, emitting ReviewItems instead of markdown reports.
+> The responsibilities listed below remain valid as the intended scope; the implementation path changed.
 
-Responsibilities:
+Canon maintenance agent. Responsibilities:
 
 * drift detection
 * stale proposal surfacing

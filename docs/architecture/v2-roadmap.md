@@ -681,17 +681,22 @@ It does not replace organizational authority.
 
 ---
 
-# Initiative 2.5 — Sukuna v2
+# Initiative 2.5 — Sukuna
+
+> **Annotation 2026-05-19:** The "Sukuna v2 as separate Layer 2 service" framing was dropped.
+> Sukuna's refactor path is now: synthesis-service consumer (emits ReviewItems instead of
+> markdown drafts). See [[../proposed-ideas/013-sukuna-as-synthesis-consumer|Proposed-idea 013]].
+> The responsibilities and constraints below remain valid; the implementation path changed.
 
 # Purpose
 
 Transform Sukuna from:
 
-* Claude agent prototype
+* Claude agent writing markdown drafts to `drafts/`
 
 into:
 
-* a Layer 2 maintenance intelligence system.
+* a synthesis-service consumer that emits ReviewItems per finding.
 
 ---
 
@@ -1332,7 +1337,7 @@ That is the durable mission.
 
 * doctrine-service
 * synthesis-service
-* Sukuna v2
+* Sukuna refactor (→ synthesis-service consumer, per proposed-idea 013)
 * continuity systems
 
 ---
