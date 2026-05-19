@@ -586,6 +586,10 @@ try:
     text = obj.get('prompt') or obj.get('user_prompt') or ''
 except Exception:
     text = data
+text = text.strip()
+# Skip system-injected content (task notifications, XML tags, etc.)
+if text.startswith('<'):
+    text = ''
 text = ' '.join(text.split())
 print(text[:200])
 " 2>/dev/null)
