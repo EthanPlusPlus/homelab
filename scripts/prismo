@@ -982,6 +982,65 @@ print(f'  Use: prismo review   — triage what landed')
   esac
 }
 
+# ── prior-art (Decision 023 — interpretive augmentation) ─────────────────────
+
+cmd_prior_art() {
+  local description="${*:-}"
+  local project="homelab"
+  local no_emit="false"
+  # Allow --project and --no-emit flags before or after description
+  local args=()
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project|-p) project="$2"; shift 2 ;;
+      --no-emit)    no_emit="true"; shift ;;
+      *) args+=("$1"); shift ;;
+    esac
+  done
+  description="${args[*]:-}"
+  [[ -n "$description" ]] || die "Usage: prismo prior-art \"description of what you're building\""
+  check_vm
+  local emit
+  [[ "$no_emit" == "true" ]] && emit="false" || emit="true"
+  local payload
+  payload=$(python3 -c "import json; print(json.dumps({
+    'project': '$project',
+    'analysis_type': 'prior_art',
+    'description': '''${description//\'/\\\'}''',
+    'emit_review_item': $emit == 'true'
+  }))")
+  echo ""
+  echo "  Researching prior art... (this may take 30-60s)"
+  echo ""
+  curl -sf --max-time 120 -X POST "${CONTEXT_API}/synthesis/analyze" \
+    -H 'Content-Type: application/json' \
+    -d "$payload" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+print(f'  ── prior-art analysis ──')
+print(f'  recommendation: {d.get(\"recommendation\", \"?\")}')
+print(f'  rationale:      {d.get(\"recommendation_rationale\", \"?\")}')
+print(f'  confidence:     {d.get(\"confidence\", 0):.2f}')
+sources = d.get('sources', [])
+if sources:
+    print(f'  sources ({len(sources)}):')
+    for s in sources[:5]:
+        print(f'    - {s}')
+rv = d.get('review_item_id')
+if rv:
+    print(f'')
+    print(f'  ReviewItem: {rv}')
+    print(f'  Use: prismo review show {rv}')
+preview = d.get('findings_preview', '')
+if preview:
+    print(f'')
+    print(f'  findings preview:')
+    for line in preview.splitlines()[:8]:
+        print(f'    {line}')
+print(f'')
+"
+}
+
 # ── metrics (observation-week empirical surface) ──────────────────────────────
 
 cmd_metrics() {
@@ -1270,8 +1329,9 @@ cmd_help() {
   echo -e "  ${BOLD}brief${NC} [<project>]               Generate operational brief — Decisions 016, 018"
   echo -e "  ${BOLD}capture${NC} \"<text>\"                 Capture a signal candidate (operational state, Decision 018)"
   echo -e "  ${BOLD}review${NC}  [list|show|approve|reject|edit]  Human-judgment boundary inbox — Decision 021"
-  echo -e "  ${BOLD}synth${NC}   run [--dry-run] [--project <p>]  Trigger synthesis-service over pending captures"
-  echo -e "  ${BOLD}metrics${NC} [--project <p>] [--since <days>]   Observation-week empirical dashboard"
+  echo -e "  ${BOLD}synth${NC}      run [--dry-run] [--project <p>]  Trigger synthesis-service over pending captures"
+  echo -e "  ${BOLD}prior-art${NC} \"<description>\" [--no-emit]       Research prior art (Decision 023)"
+  echo -e "  ${BOLD}metrics${NC}   [--project <p>] [--since <days>]  Observation-week empirical dashboard"
   echo ""
   echo "Examples:"
   echo "  prismo new-machine"
@@ -1309,6 +1369,7 @@ case "$CMD" in
   capture)        cmd_capture "$@" ;;
   review)         cmd_review "$@" ;;
   synth)          cmd_synth "$@" ;;
+  prior-art)      cmd_prior_art "$@" ;;
   metrics)        cmd_metrics "$@" ;;
   help|--help|-h) cmd_help ;;
   *) die "Unknown command: $CMD  (run 'prismo help')" ;;
