@@ -1,8 +1,8 @@
 ---
 id: "014"
 title: External Signal Provider — Prior Art and Ecosystem Awareness
-status: proposed
-notes: emerged from observation-week session 2026-05-19; defer until internal synthesis loop is stable
+status: superseded
+notes: superseded by Decision 023 (2026-05-19) — interpretive augmentation adopted as synthesis-service Class 2 capability; /synthesis/analyze is the implementation contract
 ---
 
 ## Idea
