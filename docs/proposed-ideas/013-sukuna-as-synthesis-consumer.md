@@ -3,7 +3,7 @@ id: "013"
 title: Sukuna as a synthesis-service consumer (emit ReviewItems, not drafts)
 status: proposed
 record_type: canonical
-notes: Sukuna 2026-05-17 self-identified this. Defer until doctrine-service Day-1 lands.
+notes: Sukuna 2026-05-17 self-identified this. Defer until synthesis quality gates are calibrated via observation-week data (primary blocker) and doctrine-service Day-1 ships (secondary).
 ---
 
 # 013 — Sukuna as a synthesis-service consumer

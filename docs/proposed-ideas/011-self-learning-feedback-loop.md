@@ -22,7 +22,7 @@ a Scribe captures session outcomes; a reviewer agent gates changes before they l
 
 ## Why Deprioritised
 
-The drafts-only constraint ([[003-knowledge-base-source-of-truth|Decision 003]]) and
+The filesystem-for-durable-truth principle ([[../decisions/021-reviewitems-as-judgment-boundary|Decision 021]]) and
 [[009-maid-canon-standardizer|Sukuna]]'s review cycle serve this need at current scale.
 Autonomous canon writes — even gated — invert the V2 principle that humans retain canon
 authority (see [[v2-masterplan|V2 Masterplan]] Principle 4).

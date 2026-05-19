@@ -360,6 +360,38 @@ Decision 021 says synthesis-service is the next build, and doctrine-service
 sequences after as the post-approval guardrail. Both decisions stay active;
 Decision 021 only changes the build *order*, not the scope of doctrine-service.
 
+## Annotation 2026-05-19 — synthesis modes + artifact_type governance
+
+**Three synthesis modes (future architecture direction):**
+
+The synthesis-service capability described here (internal signals → ReviewItems) is Mode 1 of
+three modes that are emerging:
+
+| Mode         | Input                                  | Output                                        |
+| ------------ | -------------------------------------- | --------------------------------------------- |
+| 1. Internal  | captures + canon + sessions            | proposed canon changes, tensions, insights    |
+| 2. External  | web + GitHub + papers + open-source    | prior-art reports, ecosystem maps, build-vs-buy |
+| 3. Comparative | internal canon + external landscape  | "this area is solved", "this is genuinely novel" |
+
+Modes 2 and 3 are unbuilt. Mode 2 is tracked in
+[[../proposed-ideas/014-external-synthesis-prior-art|Proposed-idea 014]]. Mode 3 depends on
+Mode 2 being stable. Do not build Modes 2 or 3 until Mode 1 quality gates are calibrated via
+observation week.
+
+**artifact_type is a closed set — extensions require governance:**
+
+The `artifact_type` field in the ReviewItem contract is closed:
+`"decision | proposed-idea | runbook-update | annotation | recent-changes-entry"`.
+
+Any new artifact type (e.g. `prior-art-report`) requires:
+1. Updating this decision (or a superseding decision) to document the new type
+2. Updating review CLI rendering to handle the new type
+3. Updating any preflight validators that enumerate valid types
+
+New types should NOT be added casually inside proposed-ideas. Each addition is a schema change.
+
+---
+
 ## Related captures
 
 - `e7f51070` — memory-vs-interpretation framing (this decision operationalizes it)

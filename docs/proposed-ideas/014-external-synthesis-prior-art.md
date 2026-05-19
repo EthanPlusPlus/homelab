@@ -1,19 +1,23 @@
 ---
 id: "014"
-title: External Synthesis — Prior Art and Ecosystem Awareness
+title: External Signal Provider — Prior Art and Ecosystem Awareness
 status: proposed
 notes: emerged from observation-week session 2026-05-19; defer until internal synthesis loop is stable
 ---
 
 ## Idea
 
-Extend synthesis-service with a second capability: **external synthesis**. Where internal synthesis
-operates over captures + canon to propose ReviewItems, external synthesis operates over the open
-web, GitHub, papers, and tooling ecosystems to produce prior-art reports and build-vs-buy
-recommendations.
+Add an **external signal provider** to Prismo's synthesis pipeline. Where internal synthesis
+consumes captures + canon to propose ReviewItems, an external signal provider fetches structured
+research from the open web, GitHub, papers, and tooling ecosystems — and emits that research as
+a signal into synthesis-service, which then produces a ReviewItem.
 
-This is not a manual checklist or lifecycle gate. It is an opportunistic synthesis pattern that
-fires when synthesis detects a "new capability being scoped" signal in captures or sessions.
+This is architecturally an input adapter (same role as captures), not a synthesis capability.
+Naming it "external synthesis" would scope it into synthesis-service's logic; it belongs
+as its own provider that *feeds* synthesis-service.
+
+This is not a manual checklist or lifecycle gate. It is an opportunistic pattern that fires when
+synthesis detects a "new capability being scoped" signal in captures or sessions.
 
 ## Background
 
@@ -31,29 +35,37 @@ already emerged, what is commoditized, what is genuinely novel here.
 
 ## The 3-mode synthesis model
 
-This proposed-idea introduces the second of three synthesis modes:
+This proposed-idea introduces the second of three synthesis modes. The 3-mode model is also
+annotated on [[../decisions/021-reviewitems-as-judgment-boundary|Decision 021]] (authoritative):
 
-| Mode         | Input                              | Output                                      |
-| ------------ | ---------------------------------- | ------------------------------------------- |
-| Internal     | captures + canon + sessions        | proposed canon changes, tensions, insights  |
-| External     | web + GitHub + papers + tools      | prior-art reports, ecosystem maps, build-vs-buy |
-| Comparative  | internal canon + external landscape | "this area is solved", "this is genuinely novel" |
+| Mode           | Input                               | Output                                          |
+| -------------- | ----------------------------------- | ----------------------------------------------- |
+| 1. Internal    | captures + canon + sessions         | proposed canon changes, tensions, insights      |
+| 2. External    | web + GitHub + papers + tools       | prior-art reports, ecosystem maps, build-vs-buy |
+| 3. Comparative | internal canon + external landscape | "this area is solved", "this is genuinely novel" |
 
-Comparative synthesis (mode 3) is the long-term goal but depends on both modes 1 and 2 being
-stable first.
+This proposed-idea is Mode 2. Mode 3 depends on both Modes 1 and 2 being stable first.
 
 ## Trigger pattern
 
-External synthesis should activate when synthesis detects:
+The external signal provider should activate when synthesis detects:
 - a capture describing a new capability being scoped
 - a proposed-idea moving toward implementation
 - a session signal about building something that might already exist
 
 It should NOT activate on every capture or run on a schedule.
 
+**Observation week responsibility:** when you search the web manually before building something,
+capture it. That's the signal this provider is meant to automate. If those moments don't appear
+in captures, the trigger pattern is weaker than assumed.
+
 ## Output shape
 
-Emits a ReviewItem of type `prior-art-report`:
+Emits a ReviewItem. The `prior-art-report` artifact type is NOT yet in the Decision 021 schema —
+adding it requires a schema extension following the governance process defined in the
+[[../decisions/021-reviewitems-as-judgment-boundary|Decision 021 annotation (2026-05-19)]].
+
+Proposed content structure when the schema is extended:
 
 ```json
 {
@@ -76,12 +88,12 @@ decisions is modified. This would have been relevant before building any equival
 ## Dependencies
 
 - Internal synthesis loop stable (observation week complete)
-- Web search tool available to synthesis runner
-- ReviewItem schema supports `prior-art-report` type
+- Web search capability available to synthesis runner
+- `prior-art-report` artifact type added to ReviewItem schema via governed extension process
 
 ## Sequencing
 
 Do NOT build during observation week. Use observation week to confirm the trigger pattern
 (manual prior-art moments in sessions) actually shows up in captures with enough frequency to
-justify the capability. If it does, this becomes the first post-observation-week synthesis
-extension.
+justify the capability. If the pattern is confirmed, this becomes the first post-observation-week
+synthesis extension.

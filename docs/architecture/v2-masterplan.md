@@ -584,6 +584,11 @@ Layer 4 hides volatility (which model, which version) while exposing continuity 
 
 ### Primary Interface: Web UI
 
+> **Annotation 2026-05-19:** Decision 021 inverted this priority. CLI ships first — web UI does
+> NOT ship first. CLI is the fastest ontology validation loop for the ReviewItem contract.
+> Web UI investment happens after CLI proves the ReviewItem shape via observation week.
+> See [[../decisions/021-reviewitems-as-judgment-boundary|Decision 021]] § "Why CLI surface first."
+
 The main collaborative interface.
 
 Target users: Shrey, Kyle, future collaborators, Ethan.
