@@ -1174,7 +1174,11 @@ print('  prismo review edit <id>       — open in \$EDITOR')
       local item_id="${1:-}"
       [[ -n "$item_id" ]] || die "Usage: prismo review show <id>"
       check_vm
-      curl -sf "${CONTEXT_API}/review/queue/${item_id}" | python3 -c "
+      local raw
+      raw=$(curl -sf "${CONTEXT_API}/review/queue/${item_id}" 2>/dev/null) \
+        || die "ReviewItem '${item_id}' not found"
+      [[ -n "$raw" ]] || die "ReviewItem '${item_id}' not found"
+      echo "$raw" | python3 -c "
 import sys, json
 d = json.load(sys.stdin)
 p = d['proposal']
