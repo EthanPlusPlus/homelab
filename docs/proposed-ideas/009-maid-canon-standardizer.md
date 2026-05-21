@@ -1,14 +1,14 @@
 ---
 id: "009"
 title: Sukuna — Canon Maintenance and Thinking Agent
-status: experimental
-notes: agent built, pending review cadence
+status: closed
+notes: built and running; evolution tracked in 013-sukuna-as-synthesis-consumer
 ---
 
 # 009 — Sukuna: Canon Maintenance and Thinking Agent
 
 ## Status
-In progress — agent definition and invocation script built; onboarding wired; pending first run
+Closed — agent built, running regularly (5+ runs as of 2026-05-21). Next iteration: [[013-sukuna-as-synthesis-consumer|proposed-idea 013]].
 
 ## Background
 
@@ -49,14 +49,14 @@ canon stabilises between runs, a direction keeps section 3 fresh and targeted.
 
 ## Design Constraint: Drafts-Only
 
-Direct autonomous commits to canonical folders are blocked by Decision 003:
+Direct autonomous commits to canonical folders are blocked by the drafts-only constraint (see docs/memory/workflow.md and homelab STRUCTURE.md):
 
 > "Truth is not automated — it is curated. The pipeline reduces effort but does not replace judgment."
 
 Sukuna writes to `~/canon/homelab/docs/drafts/sukuna-YYYY-MM-DD.md` only. It commits and pushes
 the draft file — nothing else. Ethan reviews, applies what's useful, and commits to canon directly.
 
-Direct autonomous commits to canonical folders are blocked by [[003-markdown-knowledge-structure|Decision 003]].
+Direct autonomous commits to canonical folders are blocked by the drafts-only constraint (see docs/memory/workflow.md and homelab STRUCTURE.md).
 
 ---
 

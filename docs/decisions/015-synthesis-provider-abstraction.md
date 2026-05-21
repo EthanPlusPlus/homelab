@@ -35,7 +35,7 @@ class SynthesisProvider(Protocol):
 ### Selection
 
 `SYNTHESIS_PROVIDER` env var. `SYNTHESIS_MODEL` env var for the underlying model name.
-Default: `anthropic` / `claude-haiku-4-5-20251001`.
+Default: `anthropic` / `claude-haiku-4-5-20251001`. See [[023-synthesis-interpretive-augmentation|Decision 023]] for the two-tier model discipline — operational synthesis uses Haiku (`SYNTHESIS_MODEL`); interpretive augmentation uses Sonnet (`ANALYSIS_MODEL`). The `SynthesisProvider.synthesize()` interface covers Class 1 only; Class 2 tool-use + multi-turn loop is a separate contract.
 
 ### Boundary
 

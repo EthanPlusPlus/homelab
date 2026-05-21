@@ -2,6 +2,7 @@
 id: "014"
 title: External Signal Provider — Prior Art and Ecosystem Awareness
 status: superseded
+superseded_by: decisions/023-synthesis-interpretive-augmentation.md
 notes: superseded by Decision 023 (2026-05-19) — interpretive augmentation adopted as synthesis-service Class 2 capability; /synthesis/analyze is the implementation contract
 ---
 

@@ -25,7 +25,7 @@ a Scribe captures session outcomes; a reviewer agent gates changes before they l
 The filesystem-for-durable-truth principle ([[../decisions/021-reviewitems-as-judgment-boundary|Decision 021]]) and
 [[009-maid-canon-standardizer|Sukuna]]'s review cycle serve this need at current scale.
 Autonomous canon writes — even gated — invert the V2 principle that humans retain canon
-authority (see [[v2-masterplan|V2 Masterplan]] Principle 4).
+authority (see [[../architecture/v2-masterplan|V2 Masterplan]] Principle 4).
 
 Not a bad idea in the abstract, but the current model (draft → human review → canon) handles
 the volume Prismo produces. Building the gated-autonomous path before there's a clear

@@ -2,14 +2,14 @@
 id: "006"
 title: Mobile Gateway to Prismo
 status: proposed
-notes: approach not yet decided
+notes: direction resolved by Decision 021 — all Layer 4 surfaces are thin ReviewItem renderers; open question is build sequencing only
 ---
 
 # 006 — Mobile Gateway to Prismo
 
 ## Status
 
-Proposed — approach not yet decided
+Proposed — direction resolved by [[../decisions/021-reviewitems-as-judgment-boundary|Decision 021]]: mobile is a thin ReviewItem renderer (list/show/approve/reject), same contract as `prismo review` CLI. Open question is build sequencing only (CLI ships first per Decision 021).
 
 ## The Idea
 

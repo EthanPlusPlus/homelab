@@ -30,7 +30,7 @@ Current state of all services running on Prismo, with their role in V2.
 
 | Service | Current Role | V2 Disposition |
 |---------|-------------|----------------|
-| prismo CLI (scripts/prismo) | Automates new-project and new-machine setup | Deprecated — replaced by Layer 2 API calls in V2 |
+| prismo CLI (scripts/prismo) | Automates new-project, new-machine setup, and all Layer 4 human interactions | **Not deprecated** — per Decision 021, CLI is the primary Layer 4 surface (thin adapter over Layer 2 API). Actively extended with `prismo review`, `prismo prior-art`, `prismo synth`, `prismo metrics`. Will be superseded only when a web UI ships. |
 | Sukuna (scripts/sukuna) | Canon maintenance agent, on-demand | Per [[../../decisions/021-reviewitems-as-judgment-boundary\|Decision 021]], becomes a synthesis-service consumer that emits ReviewItems instead of writing reports to `drafts/`. The "Sukuna v2 as separate service" framing was dropped. |
 | CLAUDE.md governance | Session behavior, canon discipline, workflow rules | Deprecated as primary governance — becomes a thin Claude runtime adapter; governance moves to workflow-state-service |
 | Hooks (Stop, UserPromptSubmit) | Behavioral enforcement patches | Deprecated — removed once structural workflow enforcement exists |

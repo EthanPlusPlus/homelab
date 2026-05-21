@@ -2,14 +2,16 @@
 id: "010"
 title: Interaction Observer
 status: proposed
-notes: split out from original 008 section 2; not blocked, not yet scoped
+notes: core purpose superseded by Decision 021 Class 1 synthesis (captures → ReviewItems); remaining open question is session-log-access mechanism (hooks vs transcript files)
 ---
 
 # 010 — Interaction Observer
 
 ## Status
 
-Proposed. Not blocked, not yet scoped.
+Proposed. Core purpose — watching sessions and surfacing canon candidates — is substantively answered by Decision 021 Class 1 synthesis (captures + sessions → ReviewItems via synthesis-service). Remaining open question: what does session-log access look like in Claude Code? Hooks? Transcript files? Both?
+
+> **Annotation 2026-05-21:** The "does it write to drafts/ or surface inline?" question is answered by Decision 021: ReviewItems, not drafts. The observer pattern, if built, would `POST /workflow/capture` per finding and let synthesis-service handle the rest.
 
 ## Origin
 
@@ -28,7 +30,7 @@ Catches the gap between what happens in a session and what makes it into the dur
 
 - Most organizational signal is conversational. Decisions get made, observations get surfaced,
   but unless someone explicitly says "make this canon", it disappears at session end.
-- The drafts-only constraint ([[003-knowledge-base-source-of-truth|Decision 003]]) prevents
+- The drafts-only constraint (see docs/memory/workflow.md and homelab STRUCTURE.md) prevents
   autonomous canon writes, but a proposer agent can still surface candidates for human review.
 - This is the V2 [[v2-roadmap|Contribution Capture]] concern (Initiative 5.2 in the V2 roadmap)
   at the Layer 2 level — capture happening at the runtime boundary, not just the UI.
