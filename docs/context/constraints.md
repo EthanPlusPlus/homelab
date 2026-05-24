@@ -58,7 +58,8 @@ Corollary: agent definitions (e.g. `~/.claude/agents/`) must be symlinked from
 | RAM | 8GB current — limits concurrent workloads; 32GB upgrade pending |
 | CPU | Intel i5 quad-core, CPU-only — no GPU acceleration for inference |
 | Storage | Ubuntu VM logical volume at 30GB |
-| Network | Proxmox runs on WiFi (wlp2s0) — Linux bridging not supported over WiFi |
-| VM networking | VMs on internal subnet (192.168.100.0/24) via NAT — not directly addressable on home network (192.168.1.x) |
-| Remote access | VM services require Tailscale or port forwarding — no direct LAN access |
-| Proxmox IP | Static at 192.168.1.9 — no DHCP reservation, but ip_forward and iptables rules are now persisted |
+| Network | Proxmox runs on WiFi (wlp2s0); Ethernet (nic0) plugged in for VM bridge — see Decision 024 |
+| VM networking | VM on `vmbr1` (bridge to `nic0`) — direct LAN IP via DHCP; get current with `ip addr show ens18` on VM. NAT/MASQUERADE architecture (vmbr0, 192.168.100.0/24) is fundamentally broken on this kernel and retired (Decision 024) |
+| Remote access | VM is directly accessible on LAN (192.168.1.x) and via Tailscale (ubuntu-server.tail58b10c.ts.net) |
+| Proxmox IP | Static at 192.168.1.9 |
+| DNS resilience | `/etc/systemd/resolved.conf` on VM has `DNS=8.8.8.8 1.1.1.1` and `FallbackDNS=9.9.9.9` — required to break the Tailscale/DNS deadlock (Tailscale needs DNS to start; without fallback, DNS only resolves via tailscale0 which is down) |
