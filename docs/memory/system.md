@@ -16,7 +16,7 @@ You execute changes only after the person you are working with has reviewed and 
 The whole system — Proxmox host, VM, services, projects, docs, and workflow — is called **Prismo**.
 
 - **Proxmox host** — bare metal on a 2017 iMac, IP 192.168.1.9
-- **Ubuntu Server VM** — Ubuntu 24.04, LAN IP DHCP-assigned on vmbr1/nic0 bridge (192.168.1.26 as of 2026-05-24 — get current with `ip addr show ens18`), Tailscale IP 100.92.226.121
+- **Ubuntu Server VM** — Ubuntu 24.04, static IP 192.168.100.10 (vmbr0 internal subnet), Tailscale IP 100.92.226.121. Internet access via Tailscale subnet router on Proxmox — NAT/MASQUERADE does not work on this setup.
 - **Code projects** — ~/projects/context-server, ~/projects/devcamp (sparse — no docs/), ~/projects/flight-planner, ~/projects/even (sparse — no docs/)
 - **Knowledge** — ~/canon/homelab, ~/canon/context-server, ~/canon/exam-prep, ~/canon/flight-planner, ~/canon/even
 
