@@ -374,8 +374,10 @@ The authoritative transport. Adapters (MCP, CLI) wrap these.
 | `generateOperationalBrief` | `GET /brief` | `api/main.py` |
 | `startSession` | `POST /workflow/session/start` | `workflow/router.py` |
 | `endSession` | `POST /workflow/session/{id}/end` | `workflow/router.py` |
+| `summarizeSession` | `POST /workflow/session/{id}/summarize` | `workflow/router.py` |
 | `getSession` | `GET /workflow/session/{id}` | `workflow/router.py` |
 | `getContributor` | `GET /workflow/contributor/{id}` | `workflow/router.py` |
+| `getLastSession` | `GET /workflow/contributor/{id}/last-session` | `workflow/router.py` |
 | `createWorkstream` | `POST /workflow/workstream` | `workflow/router.py` |
 | `updateWorkstream` | `PATCH /workflow/workstream/{id}` | `workflow/router.py` |
 | `updateFocus` | `PATCH /workflow/context/{session_id}` | `workflow/router.py` |
@@ -396,6 +398,10 @@ The authoritative transport. Adapters (MCP, CLI) wrap these.
 | `workflowMetrics` | `GET /workflow/metrics` | `workflow/metrics.py` |
 | `runSynthesis` | `POST /synthesis/run` | `synthesis/router.py` |
 | `analyzeInterpretive` | `POST /synthesis/analyze` | `synthesis/router.py` |
+| `validateDoctrine` | `GET /doctrine/validate` | `doctrine/router.py` |
+| `validateSupersessionIntegrity` | `GET /doctrine/supersession` | `doctrine/router.py` |
+| `validateProvenance` | `GET /doctrine/provenance` | `doctrine/router.py` |
+| `resolveRelationships` | `GET /doctrine/relationships` | `doctrine/router.py` |
 | `triggerIndex` | `POST /index` | `api/main.py` |
 | `triggerCodeIndex` | `POST /index/code` | `api/main.py` |
 | `health` | `GET /health` | `api/main.py` |
