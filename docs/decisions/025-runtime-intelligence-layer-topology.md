@@ -131,7 +131,11 @@ operational state as sessions, captures, and review items. This makes it:
 The full topology — roles, current providers, execution modes, capability contracts,
 authority boundaries — is inspectable via `GET /runtime/topology`.
 
-This endpoint does not exist yet. It is declared here as the next Layer 3 build target.
+> **Implementation note (2026-05-28):** `GET /runtime/topology` and `GET /runtime/roles/{id}`
+> were built in the same session this decision was written. See `runtime/router.py` and
+> `runtime/topology.py`. The current implementation builds the topology from env vars at
+> query time (env-var mirror). The "topology in operational state" goal — durable snapshots,
+> per-ReviewItem provenance — is the next step, scoped to the PostgreSQL migration.
 
 ## Rationale
 
@@ -170,8 +174,8 @@ the enforcement mechanism for this.
 - The env var naming convention changes from `SYNTHESIS_PROVIDER=claude-code` to a
   three-axis config: `SYNTHESIS_ROLE_MODE=subscription_cli`, `SYNTHESIS_ROLE_PROVIDER=anthropic`.
   This is a migration, not a breaking change — old env vars are supported until deprecated.
-- `GET /runtime/topology` is the next Layer 3 build target. No new capabilities are added
-  to Layer 3 until this endpoint exists.
+- `GET /runtime/topology` was built in the same session as this decision (see implementation
+  note above). The Layer 3 build gate it set has been cleared.
 - Every new intelligence added to Prismo requires a named role entry in the runtime registry
   before implementation begins.
 - LiteLLM is the internal implementation detail for `mode=api` providers. It is not a

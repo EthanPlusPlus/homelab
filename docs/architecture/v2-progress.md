@@ -156,19 +156,34 @@ and the build order flips per [[../decisions/021-reviewitems-as-judgment-boundar
 
 ---
 
-## Phase 4 — Runtime abstraction ⏳ not started
+## Phase 4 — Runtime abstraction ⏳ in progress
 
 Per roadmap: runtime provider interface, local inference, provider routing, persistent session
 systems.
+
+**Shipped (2026-05-26/28):**
+- `runtime/registry.py` — CapabilityRegistry (Decision 024)
+- `runtime/interfaces.py` — SynthesisProvider, EmbeddingProvider, AnalysisProvider Protocols
+- `ClaudeCodeSynthesisProvider`, `ClaudeCodeAnalysisProvider` — second providers proving abstraction
+- `runtime/topology.py` + `GET /runtime/topology` + `GET /runtime/roles/{id}` — live intelligence topology (Decision 025)
+- Four named runtime roles: coding_runtime, synthesis_runtime, analysis_runtime, embedding_runtime (+ collaboration_runtime reserved)
+- `prismo runtime topology` CLI command
 
 **Status of Sukuna's "runtime router earlier" critique:** Resolved. Law 3 + Service Rule
 (Decision 017) prevent Claude-coupling without requiring a router. Router stays in Phase 4,
 to be built when there is a second runtime to route to.
 
-**Adjacent open question:** whether `SynthesisProvider` and `EmbeddingProvider` should be
-unified under a single `RuntimeProvider` (see [[../decisions/015-synthesis-provider-abstraction|Decision 015]]).
-Still deferred to Phase 4. Likely resolution: a `CapabilityRegistry` that routes capability →
-provider, rather than a monolithic `RuntimeProvider`.
+**Adjacent open question (resolved — Decision 024):** whether `SynthesisProvider` and
+`EmbeddingProvider` should be unified under a single `RuntimeProvider`
+(see [[../decisions/015-synthesis-provider-abstraction|Decision 015]]).
+Resolved: `CapabilityRegistry` pattern adopted — routes capability → provider, not monolithic
+`RuntimeProvider`. See [[../decisions/024-capability-registry-phase-4-runtime-abstraction|Decision 024]].
+
+**Remaining Phase 4 work:**
+- Topology in operational state (PostgreSQL migration scope) — durable snapshots, per-ReviewItem provenance
+- LiteLLM wiring inside api-mode providers
+- Three-axis env var naming migration (`SYNTHESIS_ROLE_MODE` / `SYNTHESIS_ROLE_PROVIDER`)
+- Two-provider completion criterion audit surface
 
 ---
 

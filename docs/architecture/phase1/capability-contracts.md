@@ -1,4 +1,10 @@
-# Capability Contracts
+# Service Contracts
+
+> **Terminology note (2026-05-28 — Sukuna):** This document was previously titled "Capability Contracts."
+> Renamed to "Service Contracts" to resolve a collision with Decision 025, which uses "Capability Contracts"
+> to mean the tags a runtime role advertises (`supports_tool_use`, `low_latency`, etc.). These are different
+> concepts. "Service Contracts" = stable HTTP interfaces between layers. "Runtime Capabilities" = what a
+> runtime role advertises in the topology.
 
 Defines organizational capabilities as stable, provider-independent interfaces. These contracts sit between Layer 2 (operational services) and Layer 3 (runtime intelligence). Any runtime that implements a contract can be swapped in without changing the calling layer.
 
