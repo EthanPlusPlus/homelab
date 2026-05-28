@@ -398,6 +398,8 @@ The authoritative transport. Adapters (MCP, CLI) wrap these.
 | `workflowMetrics` | `GET /workflow/metrics` | `workflow/metrics.py` |
 | `runSynthesis` | `POST /synthesis/run` | `synthesis/router.py` |
 | `analyzeInterpretive` | `POST /synthesis/analyze` | `synthesis/router.py` |
+| `getRuntimeTopology` | `GET /runtime/topology` | `runtime/router.py` |
+| `getRuntimeRole` | `GET /runtime/roles/{id}` | `runtime/router.py` |
 | `validateDoctrine` | `GET /doctrine/validate` | `doctrine/router.py` |
 | `validateSupersessionIntegrity` | `GET /doctrine/supersession` | `doctrine/router.py` |
 | `validateProvenance` | `GET /doctrine/provenance` | `doctrine/router.py` |
