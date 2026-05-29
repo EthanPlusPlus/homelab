@@ -179,11 +179,16 @@ to be built when there is a second runtime to route to.
 Resolved: `CapabilityRegistry` pattern adopted — routes capability → provider, not monolithic
 `RuntimeProvider`. See [[../decisions/024-capability-registry-phase-4-runtime-abstraction|Decision 024]].
 
+**Shipped (2026-05-29):**
+- PostgreSQL + pgvector migration — replaces ChromaDB (docs + code_symbols) and both SQLite DBs (workflow.db + code_graph.db) with a single PostgreSQL instance. `db/postgres.py`: `VectorStore` (ChromaDB-compatible interface backed by pgvector HNSW), `PgConn` (sqlite3-compatible wrapper for workflow callers), `init_pg_schema()` (idempotent, creates all tables). `workflow/db.py` delegates to PostgreSQL when `DATABASE_URL` is set, SQLite fallback otherwise (tests unaffected). `docker-compose.yml` uses `pgvector/pgvector:pg16`; `chroma_store` volume removed.
+- `runtime_topology_snapshots` table — `snapshot_topology()` writes on API startup. Closes Decision 025's "topology in operational state" gap. Durable before-after audit trail before per-ReviewItem provenance is wired.
+- `produced_by_role` column on `review_items` — in schema, ready for synthesis-service to populate.
+
 **Remaining Phase 4 work:**
-- Topology in operational state (PostgreSQL migration scope) — durable snapshots, per-ReviewItem provenance
 - LiteLLM wiring inside api-mode providers
 - Three-axis env var naming migration (`SYNTHESIS_ROLE_MODE` / `SYNTHESIS_ROLE_PROVIDER`)
 - Two-provider completion criterion audit surface
+- Per-ReviewItem `produced_by_role` population in synthesis-service
 
 ---
 
