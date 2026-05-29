@@ -135,8 +135,8 @@ and the build order flips per [[../decisions/021-reviewitems-as-judgment-boundar
 
 1. ✅ **ReviewItem contract + endpoints** (shipped 2026-05-17) — 7 endpoints at `/review/queue` prefix in `workflow/review.py`, `review_items` table in workflow DB, 14 tests covering all flows + categorized rejection_reason enforcement. Service Rule: 35 routes documented.
 2. ✅ **synthesis-service minimal** (shipped 2026-05-17) — `synthesis/` package with prompt template, four quality gates (parse, backpressure, confidence ≥ 0.7, dedup ≥ 0.85), pure-ish runner with injected I/O, `POST /synthesis/run` endpoint. 14 tests. **First live run emitted 2 ReviewItems** from pending captures (confidence 0.82 + 0.75). The Decision 021 loop is operational end-to-end. Initial thresholds env-tunable; observation week will calibrate.
-3. **`prismo review` CLI** — terminal TUI for approve/reject/edit. CLI first, NOT web UI (ontology validation needed before UI investment).
-4. **Observation week** — track emission rate, approval rate, rejection reasons, edit frequency, time-to-decision, dedup. Empirical tuning of synthesis-service quality gate.
+3. ✅ **`prismo review` CLI** (shipped — exact date unrecorded) — `prismo review [list|show|approve|reject|edit]`. Approve writes the canon file, commits, and re-indexes. Full human-judgment loop is closed end-to-end.
+4. **Observation week** — track emission rate, approval rate, rejection reasons, edit frequency, time-to-decision, dedup. Empirical tuning of synthesis-service quality gate. No canon closure record exists yet.
 5. **doctrine-service Day-1 capabilities** per [[../decisions/020-doctrine-service-structural-coherence-engine|Decision 020]] — resequenced as the post-approval guardrail. All Decision 020 scope remains authoritative; only order changes.
 
 **Deferred (build after the above lands):**
