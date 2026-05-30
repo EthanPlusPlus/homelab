@@ -198,7 +198,7 @@ Resolved: `CapabilityRegistry` pattern adopted — routes capability → provide
 - `architect/facet.yaml` definition + SKILL.md thin adapter migration
 - `/migrate`, `/sukuna`, `/review` Facets as `facet.yaml` definitions
 - UserPromptSubmit hook pipeline integration (replaces ad-hoc Facet detection)
-- LiteLMLM wiring inside api-mode providers
+- LiteLLM wiring inside api-mode providers
 - Three-axis env var naming migration (`SYNTHESIS_ROLE_MODE` / `SYNTHESIS_ROLE_PROVIDER`)
 - Two-provider completion criterion audit surface
 - Per-ReviewItem `produced_by_role` population in synthesis-service
