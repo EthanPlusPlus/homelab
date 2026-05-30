@@ -1,7 +1,8 @@
 ---
 id: "010"
 title: Interaction Observer
-status: proposed
+status: superseded
+superseded_by: "021"
 notes: core purpose superseded by Decision 021 Class 1 synthesis (captures → ReviewItems); remaining open question is session-log-access mechanism (hooks vs transcript files)
 ---
 

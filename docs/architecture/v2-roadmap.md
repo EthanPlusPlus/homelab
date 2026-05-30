@@ -735,6 +735,13 @@ Decouple organizational cognition from model vendors.
 
 # Initiative 3.1 — Runtime Provider Interface
 
+> **Annotation 2026-05-30 — Decisions 024, 025, 026:** Initiative 3.1 scope is substantially
+> complete. Decision 024 (CapabilityRegistry), Decision 025 (Role/Mode/Provider separation,
+> four named runtime roles, topology endpoint), and Decision 026 (Layer 3.5 Pipeline Service —
+> Activation Router, Context Assembler, Response Processor) are all adopted and implemented.
+> Remaining Phase 4 work: LiteLLM wiring, three-axis env var migration, per-ReviewItem
+> produced_by_role population. See v2-progress.md Phase 4.
+
 # Purpose
 
 Treat models as interchangeable runtimes.

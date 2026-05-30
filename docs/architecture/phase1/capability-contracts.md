@@ -360,6 +360,82 @@ A capability shipped MCP-first with no HTTP contract or no entry here is **Servi
 
 ---
 
+### pipelineProcess
+
+Route a message through the activation pipeline — detect matching Activations and
+assemble pre-built context bundles for the runtime.
+
+```typescript
+pipelineProcess(
+  message: string,
+  options: {
+    session_id?: string,
+    interface?: string,
+    policy?: {
+      min_score?: float,          // override per-activation threshold
+      max_activations?: int
+    }
+  }
+) → PipelineResult {
+  activations: ActivationMatch[],  // scored, sorted descending
+  bundle: {
+    [activation_id: string]: {
+      type: ActivationType,
+      context: Record<string, any>,  // assembled loader outputs
+      heuristics: string
+    }
+  },
+  assembled_at: string,
+  session_id: string
+}
+```
+
+**Current implementation:** `POST /pipeline/process` (`pipeline/api_router.py`)
+**Decision 026:** primary pipeline entry point — hook adapters call this on every prompt.
+
+---
+
+### pipelineActivate
+
+Directly activate a named Activation by ID, bypassing routing.
+
+```typescript
+pipelineActivate(
+  activation_id: string,
+  options: {
+    args?: string,        // passed to conditional_search loaders
+    session_id?: string
+  }
+) → PipelineResult       // same shape as pipelineProcess
+```
+
+**Current implementation:** `POST /pipeline/activate` (`pipeline/api_router.py`)
+
+---
+
+### listActivations
+
+List all registered Activations with their routing metadata.
+
+```typescript
+listActivations() → {
+  count: int,
+  activations: {
+    id: string,
+    type: ActivationType,
+    priority: int,
+    version: int,
+    keywords: string[],
+    threshold: float,
+    example_count: int
+  }[]
+}
+```
+
+**Current implementation:** `GET /pipeline/activations` (`pipeline/api_router.py`)
+
+---
+
 ## HTTP Endpoint Mapping
 
 The authoritative transport. Adapters (MCP, CLI) wrap these.

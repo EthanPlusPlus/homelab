@@ -71,6 +71,13 @@ Direction: [stated direction, or "Free run"]
 [bullets]
 ```
 
+> **Decision 021 conflict (2026-05-30):** Writing to `docs/drafts/` violates Decision 021
+> ("no new files land in drafts/"). The intended future state (proposed-idea 013) is for
+> Sukuna to emit each finding as a ReviewItem via `POST /review/queue` instead of writing
+> markdown reports. Until proposed-idea 013 is built, `docs/drafts/` output continues as
+> the interim behavior — but this instruction block should be replaced once the ReviewItem
+> path exists. See [[../docs/proposed-ideas/013-sukuna-as-synthesis-consumer]].
+
 Write and commit after **each section** — do not wait until all three are done:
 
 After Section 1:

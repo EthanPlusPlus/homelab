@@ -91,6 +91,12 @@ Unregistered intelligence is not permitted.
 
 ### Introduce Capability Contracts
 
+> **Terminology note (2026-05-30):** "Capability Contracts" in this decision means the
+> tags a runtime role advertises (`supports_tool_use`, `low_latency`, etc.). This is
+> distinct from `architecture/phase1/capability-contracts.md` (now titled "Service
+> Contracts"), which defines HTTP interface contracts between layers. Two different
+> concepts, same original name. Read this section as "Runtime Capability Tags."
+
 Each runtime role advertises the capabilities it exposes. This is how the orchestration layer
 routes tasks without hard-coding provider assumptions.
 

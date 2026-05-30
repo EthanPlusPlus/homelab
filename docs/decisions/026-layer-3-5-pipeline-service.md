@@ -80,7 +80,7 @@ Current activation types:
 - `FACET` — runtime cognition shaping module (loads context, attaches heuristics)
 
 Reserved for future use (no implementation yet):
-- `WORKFLOW` — triggers a defined workflow execution sequence
+- `SEQUENCE` — triggers a defined execution sequence (named SEQUENCE not WORKFLOW to avoid collision with the `workflow/` module namespace)
 - `MEMORY_PACK` — activates a curated memory bundle
 - `CONSTRAINT` — applies operational constraints to the runtime
 - `TOOLSET` — exposes a specific set of tools for the task
