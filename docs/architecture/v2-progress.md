@@ -182,7 +182,7 @@ Resolved: `CapabilityRegistry` pattern adopted — routes capability → provide
 **Shipped (2026-05-29):**
 - PostgreSQL + pgvector migration — replaces ChromaDB (docs + code_symbols) and both SQLite DBs (workflow.db + code_graph.db) with a single PostgreSQL instance. `db/postgres.py`: `VectorStore` (ChromaDB-compatible interface backed by pgvector HNSW), `PgConn` (sqlite3-compatible wrapper for workflow callers), `init_pg_schema()` (idempotent, creates all tables). `workflow/db.py` delegates to PostgreSQL when `DATABASE_URL` is set, SQLite fallback otherwise (tests unaffected). `docker-compose.yml` uses `pgvector/pgvector:pg16`; `chroma_store` volume removed.
 - `runtime_topology_snapshots` table — `snapshot_topology()` writes on API startup. Closes Decision 025's "topology in operational state" gap. Durable before-after audit trail before per-ReviewItem provenance is wired.
-- `produced_by_role` column on `review_items` — in schema, ready for synthesis-service to populate.
+- `produced_by_role` column on `review_items` — in schema, ready for synthesis-service to populate. **Wired 2026-05-30** — `ReviewItemCreate.produced_by_role` field added; synthesis runner sets `"synthesis_runtime"` on every emission.
 
 **Shipped (2026-05-30):**
 - [[../decisions/026-layer-3-5-pipeline-service|Decision 026]] — Layer 3.5 Pipeline Service: Activation Router, Context Assembler, Response Processor. Generic `Activation` interface (FACET, SEQUENCE, MEMORY_PACK, CONSTRAINT, TOOLSET). Two-stage routing, scored `ActivationMatch[]`, `POST /pipeline/process` + `POST /pipeline/activate` + `GET /pipeline/activations`. `architect/facet.yaml` + thin `SKILL.md` + `README.md`. UserPromptSubmit hook wired. 25 tests green. Proposed-idea 015 superseded.
@@ -196,12 +196,14 @@ Resolved: `CapabilityRegistry` pattern adopted — routes capability → provide
 - Context-server component canon updated (was frozen at 2026-05-13).
 - 12 Sukuna 2026-05-30 findings actioned (typos, status fixes, annotations, stale references).
 
+**Shipped (2026-05-30, continued):**
+- `migrate`, `sukuna`, `review` Facets — `facet.yaml` definitions in `scripts/facets/`. All 4 facets registered at runtime (architect + 3 new). Activation examples, keywords, context loaders, and heuristics defined for each.
+- `produced_by_role` wired — `ReviewItemCreate` model + INSERT updated; synthesis runner sets `"synthesis_runtime"` on every emission.
+
 **Remaining Phase 4 work:**
-- `/migrate`, `/sukuna`, `/review` Facets as `facet.yaml` definitions
 - `POST /pipeline/process-response` Claude Code hook wiring (deferred — Phase 5)
-- LiteLLM wiring inside api-mode providers
+- LiteLLM wiring inside api-mode providers (pending billing architecture decision)
 - Two-provider completion criterion audit surface
-- Per-ReviewItem `produced_by_role` population in synthesis-service
 
 ---
 
