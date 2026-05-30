@@ -413,6 +413,32 @@ pipelineActivate(
 
 ---
 
+### processResponse
+
+Run a model response through the Response Processor — detect signal-worthy content
+and auto-create captures (Decision 028).
+
+```typescript
+processResponse(
+  response: string,
+  options: {
+    session_id?: string,
+    project?: string,      // default "homelab"
+    interface?: string,
+    auto_capture?: bool    // default true
+  }
+) → {
+  captures_created: int,
+  captures: { id: string, text: string, project: string }[]
+}
+```
+
+**Current implementation:** `POST /pipeline/process-response` (`pipeline/api_router.py`)
+**Note:** Claude Code hook wiring deferred to Phase 5 (avoids transcript-format coupling).
+Phase 5 adapters (WhatsApp, web UI) call this endpoint directly after receiving model output.
+
+---
+
 ### listActivations
 
 List all registered Activations with their routing metadata.
@@ -488,6 +514,7 @@ The authoritative transport. Adapters (MCP, CLI) wrap these.
 | `resolveRelationships` | `GET /doctrine/relationships` | `doctrine/router.py` |
 | `pipelineProcess` | `POST /pipeline/process` | `pipeline/api_router.py` |
 | `pipelineActivate` | `POST /pipeline/activate` | `pipeline/api_router.py` |
+| `processResponse` | `POST /pipeline/process-response` | `pipeline/api_router.py` |
 | `listActivations` | `GET /pipeline/activations` | `pipeline/api_router.py` |
 | `triggerIndex` | `POST /index` | `api/main.py` |
 | `triggerCodeIndex` | `POST /index/code` | `api/main.py` |

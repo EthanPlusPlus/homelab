@@ -185,21 +185,21 @@ Resolved: `CapabilityRegistry` pattern adopted — routes capability → provide
 - `produced_by_role` column on `review_items` — in schema, ready for synthesis-service to populate.
 
 **Shipped (2026-05-30):**
-- [[../decisions/026-layer-3-5-pipeline-service|Decision 026]] — Layer 3.5 realized as
-  Pipeline Service. Defines Activation Router + Context Assembler + Response Processor as
-  the concrete implementation of Layer 3.5. Introduces generic `Activation` interface
-  (Facets become `ActivationType.FACET`). Two-stage routing (keyword filter → embedding
-  validation), scored `ActivationMatch[]` results, `POST /pipeline/process` +
-  `POST /pipeline/activate` HTTP contract. Facet definitions migrate from SKILL.md to
-  `facet.yaml`. Supersedes proposed-idea 015.
+- [[../decisions/026-layer-3-5-pipeline-service|Decision 026]] — Layer 3.5 Pipeline Service: Activation Router, Context Assembler, Response Processor. Generic `Activation` interface (FACET, SEQUENCE, MEMORY_PACK, CONSTRAINT, TOOLSET). Two-stage routing, scored `ActivationMatch[]`, `POST /pipeline/process` + `POST /pipeline/activate` + `GET /pipeline/activations`. `architect/facet.yaml` + thin `SKILL.md` + `README.md`. UserPromptSubmit hook wired. 25 tests green. Proposed-idea 015 superseded.
+- [[../decisions/027-observation-week-closure|Decision 027]] — Observation week closed. Findings: confidence/dedup thresholds appropriate; `wrong-artifact-type` dominated rejections (synthesis prompt issue, not gate issue). Doctrine-service Day-1 and proposed-idea 013 unblocked.
+- [[../decisions/028-response-processor-auto-capture|Decision 028]] — Response Processor auto-creates captures from model output (elegant automation). Pattern-based detection, max 3/response, `source=response_processor`. Human judgment at ReviewItem level (Decision 021 unchanged). `POST /pipeline/process-response` endpoint reserved; Claude Code hook wiring deferred to Phase 5 (avoids transcript-format coupling).
+- [[../decisions/029-collaboration-runtime-authority|Decision 029]] — `collaboration_runtime` authority set: `read_canon`, `capture_signal`, `reviewitem_approval`, `proposed_idea_creation`. Not: `canon_authoring`, `synthesis_invocation`, `analysis_invocation`. RBAC deferred to real friction.
+- Proposed-idea 016 — `routing_runtime` (Haiku-class model to replace embedding Stage 2). `routing_runtime` reserved slot in topology.
+- Three-axis env var migration: `SYNTHESIS_ROLE_MODE` / `SYNTHESIS_ROLE_PROVIDER` supported in `_resolve_role` (legacy `SYNTHESIS_PROVIDER` as fallback).
+- `collaboration_runtime` + `routing_runtime` reserved slots in `topology.py`.
+- `pipeline/processor.py` built — pattern-based capture detection, auto-creates captures via `workflow.db`.
+- Context-server component canon updated (was frozen at 2026-05-13).
+- 12 Sukuna 2026-05-30 findings actioned (typos, status fixes, annotations, stale references).
 
 **Remaining Phase 4 work:**
-- `pipeline/` module build (router, assembler, bundle, api_router)
-- `architect/facet.yaml` definition + SKILL.md thin adapter migration
 - `/migrate`, `/sukuna`, `/review` Facets as `facet.yaml` definitions
-- UserPromptSubmit hook pipeline integration (replaces ad-hoc Facet detection)
+- `POST /pipeline/process-response` Claude Code hook wiring (deferred — Phase 5)
 - LiteLLM wiring inside api-mode providers
-- Three-axis env var naming migration (`SYNTHESIS_ROLE_MODE` / `SYNTHESIS_ROLE_PROVIDER`)
 - Two-provider completion criterion audit surface
 - Per-ReviewItem `produced_by_role` population in synthesis-service
 

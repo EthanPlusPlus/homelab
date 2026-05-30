@@ -175,7 +175,7 @@ Drift between the two is meaningful and worth tracking.
 Frozen as historical record. **No new files land here.** Pre-approval content now lives
 in workflow-state-service as ReviewItems; approved ReviewItems are written directly
 into canonical folders by the approve endpoint. See [[decisions/021-reviewitems-as-judgment-boundary|Decision 021]]
-and `architecture/phase1/capability-contracts.md` (ReviewItem endpoints).
+and `architecture/phase1/capability-contracts.md` (titled "Service Contracts" — HTTP interface definitions for all Layer 2 capabilities).
 
 Drafts already present (capture-*.md, sukuna-*.md) remain as-is and are excluded
 from indexed retrieval (`record_type=draft`).

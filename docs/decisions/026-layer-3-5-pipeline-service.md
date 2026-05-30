@@ -263,14 +263,20 @@ directly.
 
 ---
 
-### Response Processor (reserved for Phase 4 completion)
+### Response Processor
 
-The response processor sits between the model's output and the interface. It is not built in
-this decision's initial implementation; the slot is reserved.
+> **Annotation 2026-05-30 — Decision 028:** The response processor was built in the
+> same session as this decision. Decision 028 defines its behavior: auto-creates captures
+> from model output (no human initiation). The conservative "not auto-submitted" wording
+> below is superseded — captures ARE auto-created; ReviewItems are not (Decision 021
+> unchanged). Claude Code hook wiring deferred to Phase 5 to avoid transcript-format
+> coupling. `POST /pipeline/process-response` endpoint reserved.
 
-Anticipated first capabilities:
-- **Capture detection** — detect architectural decisions or observations in model output,
-  surface as `CaptureSuggestion` (emitted to review queue, not auto-submitted)
+The response processor sits between the model's output and the interface.
+
+First capabilities (shipped 2026-05-30):
+- **Capture detection** — detect signal-worthy observations in model output,
+  auto-create captures via `POST /workflow/capture` (Decision 028)
 - **Interface adaptation** — same model response formatted differently per interface
   (CLI verbosity vs WhatsApp brevity vs voice SSML)
 
@@ -320,5 +326,5 @@ against monolithic god objects and speculative mega-systems.
 - [[015-facets-runtime-cognition-shaping]] — superseded; the concept survives as ActivationType.FACET
 - [[025-runtime-intelligence-layer-topology]] — topology is one context_loader type the assembler executes
 - [[017-three-architectural-laws]] — Law 3 governs the pipeline's HTTP-first contract
-- [[021-reviewitems-as-judgment-boundary]] — response processor cannot auto-create ReviewItems
+- [[021-reviewitems-as-judgment-boundary]] — response processor cannot auto-create ReviewItems (captures yes — see Decision 028; ReviewItems no)
 - [[016-session-hydration-replaces-warmup]] — pipeline injection follows the same hook pattern

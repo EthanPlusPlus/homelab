@@ -1617,10 +1617,38 @@ for a in d.get('activations', []):
         || die "pipeline list: could not reach context-server"
       ;;
 
+    process-response)
+      # Called by Phase 5 adapters (WhatsApp, web UI) after receiving model output.
+      # Reads response text from stdin or args, POSTs to /pipeline/process-response.
+      # Claude Code wiring deferred — see Decision 028.
+      local response_text=""
+      if [[ ! -t 0 ]]; then
+        response_text=$(cat 2>/dev/null)
+      else
+        response_text="${*:-}"
+      fi
+      [[ -n "$response_text" ]] || return 0
+      local project="${PRISMO_PROJECT:-homelab}"
+      local result
+      result=$(curl -sf --max-time 10 -X POST "${CONTEXT_API}/pipeline/process-response" \
+        -H 'Content-Type: application/json' \
+        -d "$(python3 -c "import json,sys; print(json.dumps({'response':sys.argv[1],'project':'${project}'}))" "$response_text")" 2>/dev/null)
+      [[ -n "$result" ]] || return 0
+      echo "$result" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+n = d.get('captures_created', 0)
+if n > 0:
+    print(f'[PIPELINE] {n} capture(s) auto-created from response')
+    for c in d.get('captures', []):
+        print(f\"  [{c['id']}] {c['text'][:80]}\")" 2>/dev/null
+      ;;
+
     *)
-      echo "Usage: prismo pipeline process|activate|list"
+      echo "Usage: prismo pipeline process|activate|process-response|list"
       echo "  process              — route current prompt and emit matching [FACET] blocks (hook use)"
       echo "  activate <id> [args] — directly activate a named facet"
+      echo "  process-response     — run model output through response processor (Phase 5 adapters)"
       echo "  list                 — list registered activations"
       ;;
   esac
@@ -1644,7 +1672,7 @@ cmd_help() {
   echo -e "  ${BOLD}synth${NC}      run [--dry-run] [--project <p>]  Trigger synthesis-service over pending captures"
   echo -e "  ${BOLD}prior-art${NC} \"<desc>\" [--full] [--no-emit]     Research prior art; --full prints complete findings"
   echo -e "  ${BOLD}metrics${NC}   [--project <p>] [--since <days>]  Observation-week empirical dashboard"
-  echo -e "  ${BOLD}pipeline${NC}  process|activate|list             Layer 3.5 activation — Decision 026"
+  echo -e "  ${BOLD}pipeline${NC}  process|activate|process-response|list  Layer 3.5 — Decisions 026/028"
   echo ""
   echo "Examples:"
   echo "  prismo new-machine"

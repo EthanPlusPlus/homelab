@@ -123,8 +123,9 @@ deletion or rename.
 - **Sukuna drafts** — currently markdown under `~/canon/<project>/docs/drafts/` — are
   borderline. They are synthesized but not indexed. Treat them as `record_type=synthesized`
   when they are indexed; until then, the drafts-only constraint
-  ([[003-knowledge-base-source-of-truth|Decision 003]] in homelab — predecessor concept)
-  already prevents them from leaking into active retrieval.
+  the drafts-only constraint already prevents them from leaking into active retrieval.
+  (Note: "Decision 003" referenced here no longer exists in homelab canon — the constraint
+  is now structural via `record_type=draft` in the indexer.)
 - **doctrine-service gains a responsibility:** monitor source-hash drift across synthesized
   records and mark stale ones.
 - **The "organizational mythology" failure mode is structurally prevented**, not merely
