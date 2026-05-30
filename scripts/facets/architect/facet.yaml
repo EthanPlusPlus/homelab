@@ -13,6 +13,12 @@ activation:
     - "Where does this belong in the architecture?"
     - "This feels like it's coupling things it shouldn't"
     - "How does this fit into the masterplan?"
+    - "describe to me the current architecture"
+    - "explain how the layers work"
+    - "what's the overall system design"
+    - "walk me through how the services fit together"
+    - "is this architecturally sound"
+    - "what layer does this belong to"
   keywords:
     - architecture
     - design
