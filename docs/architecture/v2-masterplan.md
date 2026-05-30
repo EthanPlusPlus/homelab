@@ -564,6 +564,19 @@ Providers implement capabilities. This enables runtime swapping.
 
 ---
 
+## Layer 3.5 — Runtime Cognition Shaping
+
+> **Annotation 2026-05-30 — Decision 026:** Layer 3.5 is realized by the Pipeline Service
+> in context-server: Activation Router (detects and scores which Activations apply to a
+> message), Context Assembler (executes context_loaders to build a pre-assembled bundle),
+> and Response Processor (outbound processing — capture detection, interface adaptation).
+> The foundational abstraction is `Activation` (not Facets specifically); Facets are
+> `ActivationType.FACET`. The pipeline owns sequencing; governance layers retain domain
+> ownership. This is a service that calls into layers — not a new tier above them.
+> See [[../decisions/026-layer-3-5-pipeline-service|Decision 026]].
+
+---
+
 ## Layer 4 — Human Interaction Layer
 
 The organizational interaction surface.

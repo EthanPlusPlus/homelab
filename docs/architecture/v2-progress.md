@@ -184,8 +184,21 @@ Resolved: `CapabilityRegistry` pattern adopted — routes capability → provide
 - `runtime_topology_snapshots` table — `snapshot_topology()` writes on API startup. Closes Decision 025's "topology in operational state" gap. Durable before-after audit trail before per-ReviewItem provenance is wired.
 - `produced_by_role` column on `review_items` — in schema, ready for synthesis-service to populate.
 
+**Shipped (2026-05-30):**
+- [[../decisions/026-layer-3-5-pipeline-service|Decision 026]] — Layer 3.5 realized as
+  Pipeline Service. Defines Activation Router + Context Assembler + Response Processor as
+  the concrete implementation of Layer 3.5. Introduces generic `Activation` interface
+  (Facets become `ActivationType.FACET`). Two-stage routing (keyword filter → embedding
+  validation), scored `ActivationMatch[]` results, `POST /pipeline/process` +
+  `POST /pipeline/activate` HTTP contract. Facet definitions migrate from SKILL.md to
+  `facet.yaml`. Supersedes proposed-idea 015.
+
 **Remaining Phase 4 work:**
-- LiteLLM wiring inside api-mode providers
+- `pipeline/` module build (router, assembler, bundle, api_router)
+- `architect/facet.yaml` definition + SKILL.md thin adapter migration
+- `/migrate`, `/sukuna`, `/review` Facets as `facet.yaml` definitions
+- UserPromptSubmit hook pipeline integration (replaces ad-hoc Facet detection)
+- LiteLMLM wiring inside api-mode providers
 - Three-axis env var naming migration (`SYNTHESIS_ROLE_MODE` / `SYNTHESIS_ROLE_PROVIDER`)
 - Two-provider completion criterion audit surface
 - Per-ReviewItem `produced_by_role` population in synthesis-service

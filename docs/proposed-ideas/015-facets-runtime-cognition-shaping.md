@@ -1,20 +1,27 @@
 ---
 id: "015"
 title: Facets — Runtime Cognition Shaping for Prismo
-status: proposed
+status: superseded
 record_type: canonical
 date: 2026-05-29
+superseded_by: "026"
 ---
 
 # 015 — Facets: Runtime Cognition Shaping
 
 ## Status
 
-Proposed. Prior-art research complete (2026-05-29). Design space is open —
-no existing system combines organizational grounding + dynamic system-awareness
-+ graduated activation + explicit non-autonomy into a single primitive.
-Next step: define the first concrete Facet (Architect or Migration) as proof of concept,
-then adopt as a decision once the activation model is validated in practice.
+Superseded by [[../decisions/026-layer-3-5-pipeline-service|Decision 026]] (2026-05-30).
+
+The concept (Layer 3.5 Runtime Cognition Shaping, the Activation Ladder, Facets as
+dynamic system-aware modules) survives intact. Decision 026 provides the concrete
+implementation architecture: the Pipeline Service (Activation Router + Context Assembler
++ Response Processor), the generic `Activation` interface, and the YAML-based Facet
+definition format. Facets become `ActivationType.FACET` within the broader activation
+abstraction.
+
+The V1 SKILL.md prototype (`scripts/facets/architect/SKILL.md`) is superseded by the
+`facet.yaml` format; the SKILL.md becomes a thin adapter stub.
 
 ---
 
