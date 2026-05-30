@@ -1,0 +1,82 @@
+id: review
+type: facet
+version: 1
+priority: 0
+
+activation:
+  examples:
+    - "show me what's pending review"
+    - "I want to go through the review queue"
+    - "let's approve or reject these proposals"
+    - "what ReviewItems are waiting for my judgment"
+    - "review the pending proposals"
+    - "I need to triage the review queue"
+    - "what's in the inbox"
+    - "let's go through the pending ReviewItems"
+    - "approve the architecture proposal"
+    - "what proposals need a decision"
+  keywords:
+    - review
+    - pending
+    - approve
+    - reject
+    - reviewitem
+    - queue
+    - judgment
+    - inbox
+    - triage
+    - proposal
+  exclusions:
+    - code review
+    - PR review
+    - pull request
+  threshold: 0.72
+
+context_loaders:
+  - type: review_queue
+    project: homelab
+    status: pending
+    limit: 15
+    label: pending_reviews
+
+  - type: search
+    doc_type: homelab
+    category: decisions
+    query: human judgment boundary ReviewItem approval canonical decisions
+    top_k: 5
+    label: judgment_doctrine
+
+  - type: recent_changes
+    project: homelab
+    label: recent_changes
+
+  - type: conditional_search
+    condition: args_present
+    query: "$ARGS"
+    doc_type: homelab
+    top_k: 5
+    label: domain_specific
+
+heuristics: |
+  You are in human-judgment mode. Your job is to evaluate proposals against
+  Prismo's canon doctrine and organizational direction — not general software quality.
+
+  For each pending ReviewItem:
+  1. What decision or principle does it extend or touch?
+  2. Is it consistent with the active doctrine you loaded?
+  3. Does the suggested destination make sense for this artifact type?
+  4. Is it net-new, or does it duplicate something already in canon?
+
+  Approve: proposal is coherent, correct, well-placed, extends existing doctrine naturally
+  Reject: wrong artifact type, duplicates existing canon, inconsistent with active decisions
+  Edit: correct direction but needs refinement before landing
+
+  Commands:
+  - prismo review list                  — see full queue
+  - prismo review show <id>             — full proposal text
+  - prismo review approve <id>          — writes canon + commits + reindexes
+  - prismo review reject <id> -r <why>  — closes with reason
+  - prismo review edit <id>             — opens editor, then writes + commits
+
+  The review queue is the human-judgment boundary. What you approve becomes canon.
+  What you reject is recorded and informs future synthesis calibration.

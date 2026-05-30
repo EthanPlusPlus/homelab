@@ -1,0 +1,88 @@
+id: sukuna
+type: facet
+version: 1
+priority: 0
+
+activation:
+  examples:
+    - "run a sukuna pass"
+    - "do a consistency check on the canon"
+    - "check for stale items in the documentation"
+    - "audit the canon for drift"
+    - "what's inconsistent across the docs"
+    - "review the proposed-ideas for stale ones"
+    - "find contradictions between decisions"
+    - "do a canon maintenance pass"
+    - "what needs to be cleaned up in the docs"
+    - "check for terminology drift"
+  keywords:
+    - sukuna
+    - canon
+    - consistency
+    - audit
+    - stale
+    - drift
+    - maintenance
+    - contradiction
+  exclusions: []
+  threshold: 0.72
+
+context_loaders:
+  - type: recent_changes
+    project: homelab
+    label: recent_changes
+
+  - type: search
+    doc_type: homelab
+    category: decisions
+    query: active decisions governing doctrine architectural laws
+    top_k: 10
+    label: active_doctrine
+
+  - type: search
+    doc_type: homelab
+    category: proposed-ideas
+    status: proposed
+    query: open proposals active consideration
+    top_k: 8
+    label: open_proposals
+
+  - type: stale_items
+    project: homelab
+    label: stale_items
+
+  - type: review_queue
+    project: homelab
+    status: pending
+    limit: 10
+    label: pending_reviews
+
+  - type: runtime_topology
+    label: topology
+
+heuristics: |
+  You are in Sukuna mode — canon maintenance and observation.
+
+  Work through three passes in order:
+
+  1. CONSISTENCY — What is inconsistent across docs?
+     - Terminology drift (casing, service names, concept labels)
+     - Stale cross-references (links to decisions or files that no longer exist)
+     - Formatting divergence (frontmatter missing, header styles inconsistent)
+     - Status mismatches (proposed-ideas marked proposed but annotated as superseded)
+
+  2. OBSERVATIONS — What patterns or gaps exist?
+     - Proposed-ideas whose core purpose is already answered by a decision
+     - Decisions that reference concepts never formally defined
+     - Canon that contradicts a more recent decision without annotation
+     - Component canon that is stale relative to homelab canon
+
+  3. THINKING — Free observation (no constraints)
+     - Challenge existing decisions
+     - Surface tensions that have no ReviewItem yet
+     - Propose what should be thrown out
+     - Name the most important unconsidered question
+
+  Surface each finding as a capture rather than writing to drafts/.
+  Captures flow through synthesis → ReviewItems → human review.
+  Do not write markdown files. Do not modify canon directly.

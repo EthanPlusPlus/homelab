@@ -1,0 +1,82 @@
+id: migrate
+type: facet
+version: 1
+priority: 0
+
+activation:
+  examples:
+    - "let's migrate the database schema"
+    - "I need to rename this function across the codebase"
+    - "we're upgrading the API, there's a breaking change"
+    - "how do I roll this back if it fails"
+    - "what call sites do I need to update"
+    - "I want to deprecate this endpoint"
+    - "upgrading from ChromaDB to pgvector"
+    - "changing the interface contract"
+    - "this migration needs a rollback plan"
+    - "schema change affecting multiple services"
+  keywords:
+    - migrate
+    - migration
+    - upgrade
+    - deprecate
+    - rename
+    - breaking
+    - rollback
+    - call site
+    - schema
+    - refactor
+  exclusions:
+    - CSS migration
+    - design migration
+    - color scheme
+  threshold: 0.75
+
+context_loaders:
+  - type: doc_fetch
+    path: decisions/017-three-architectural-laws.md
+    doc_type: homelab
+    label: architectural_laws
+    required: true
+
+  - type: search
+    doc_type: homelab
+    category: decisions
+    query: migration interface contract service rule breaking change
+    top_k: 8
+    label: migration_doctrine
+
+  - type: recent_changes
+    project: homelab
+    label: recent_changes
+
+  - type: runtime_topology
+    label: topology
+
+  - type: conditional_search
+    condition: args_present
+    query: "$ARGS"
+    doc_type: homelab
+    top_k: 5
+    label: domain_specific
+
+heuristics: |
+  Before touching any interface, signature, or contract:
+  1. grep every call site — do not assume you know them all
+  2. Check the Service Rule: every route must be in capability-contracts.md before code ships
+  3. Identify what data exists and cannot be undone (pgvector HNSW indexes, committed data)
+  4. Write the rollback plan before writing the migration
+
+  During migration:
+  - Change one thing at a time — do not bundle interface changes with logic changes
+  - Keep backward compat until ALL call sites are updated
+  - Run the Service Rule startup check after every route change
+
+  After migration:
+  - Every registered route gets a response check (smoke test)
+  - Update the component canon (recent-changes.md, progress.md)
+  - Verify no stale cross-references in decisions
+
+  The doctrine bug (pgvector migration 2026-05-29) is the reference failure:
+  interface changed, call site in doctrine/router.py missed, nothing caught it.
+  That is what this Facet prevents.
