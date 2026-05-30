@@ -1654,6 +1654,151 @@ if n > 0:
   esac
 }
 
+# ── doctrine (Decision 020 — structural coherence) ───────────────────────────
+
+cmd_doctrine() {
+  local sub="${1:-help}"
+  shift 2>/dev/null || true
+
+  # Common optional --project flag parser
+  _parse_project() {
+    local project=""
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
+        --project|-p) project="$2"; shift 2 ;;
+        *) shift ;;
+      esac
+    done
+    echo "$project"
+  }
+
+  check_vm
+
+  case "$sub" in
+    validate)
+      local project
+      project=$(_parse_project "$@")
+      local url="${CONTEXT_API}/doctrine/validate"
+      [[ -n "$project" ]] && url="${url}?project=${project}"
+      curl -sf "$url" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+proj = d.get('project') or '(all)'
+print(f'  doctrine validate — {proj}')
+print(f'  checked: {d[\"checked\"]}    violations: {d[\"violation_count\"]}')
+if not d['violations']:
+    print('  ✓ Canon is structurally clean.')
+else:
+    print()
+    for v in d['violations']:
+        print(f'  [{v[\"rule\"]}]  {v[\"path\"]}')
+        print(f'     {v[\"detail\"]}')
+"
+      ;;
+    supersession)
+      local project
+      project=$(_parse_project "$@")
+      local url="${CONTEXT_API}/doctrine/supersession"
+      [[ -n "$project" ]] && url="${url}?project=${project}"
+      curl -sf "$url" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+proj = d.get('project') or '(all)'
+print(f'  doctrine supersession — {proj}')
+print(f'  superseded docs: {d[\"superseded_count\"]}    chain violations: {d[\"violation_count\"]}')
+if not d['violations']:
+    print('  ✓ All supersession chains are intact.')
+else:
+    print()
+    for v in d['violations']:
+        print(f'  [{v[\"rule\"]}]  {v[\"path\"]}')
+        print(f'     {v[\"detail\"]}')
+"
+      ;;
+    provenance)
+      local project
+      project=$(_parse_project "$@")
+      local url="${CONTEXT_API}/doctrine/provenance"
+      [[ -n "$project" ]] && url="${url}?project=${project}"
+      curl -sf "$url" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+proj = d.get('project') or '(all)'
+print(f'  doctrine provenance — {proj}')
+print(f'  synthesized records: {d[\"synthesized_count\"]}    violations: {d[\"violation_count\"]}')
+if not d['violations']:
+    print('  ✓ All synthesized records carry required provenance.')
+else:
+    print()
+    for v in d['violations']:
+        print(f'  [{v[\"rule\"]}]  {v[\"path\"]}')
+        print(f'     {v[\"detail\"]}')
+"
+      ;;
+    relationships)
+      local path_arg="${1:-}"
+      shift 2>/dev/null || true
+      [[ -n "$path_arg" ]] || die "Usage: prismo doctrine relationships <path> [--project <p>]"
+      local project
+      project=$(_parse_project "$@")
+      local url="${CONTEXT_API}/doctrine/relationships?path=${path_arg}"
+      [[ -n "$project" ]] && url="${url}&project=${project}"
+      curl -sf "$url" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+if not d.get('found'):
+    print(f'  ✗ Not found: {d[\"path\"]}')
+    sys.exit(1)
+print(f'  {d[\"path\"]}  [{d.get(\"status\",\"?\")}]')
+up = d.get('upstream', [])
+down = d.get('downstream', [])
+if up:
+    print(f'  supersedes ({len(up)}):')
+    for r in up:
+        print(f'    → {r[\"path\"]}  [{r[\"status\"]}]')
+else:
+    print('  supersedes: (none)')
+if down:
+    print(f'  superseded by this ({len(down)}):')
+    for r in down:
+        print(f'    ← {r[\"path\"]}  [{r[\"status\"]}]')
+else:
+    print('  superseded by this: (none)')
+"
+      ;;
+    graph)
+      local project
+      project=$(_parse_project "$@")
+      local url="${CONTEXT_API}/doctrine/graph"
+      [[ -n "$project" ]] && url="${url}?project=${project}"
+      curl -sf "$url" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+proj = d.get('project') or '(all)'
+print(f'  doctrine graph — {proj}')
+print(f'  nodes: {d[\"node_count\"]}    edges: {d[\"edge_count\"]}')
+if d['edges']:
+    print()
+    print('  Supersession edges:')
+    for e in d['edges']:
+        print(f'    {e[\"from\"]}')
+        print(f'      → {e[\"to\"]}')
+"
+      ;;
+    *)
+      echo "Usage: prismo doctrine <subcommand> [--project <p>]"
+      echo ""
+      echo "  validate                    — structural metadata linting (missing/invalid fields)"
+      echo "  supersession                — supersession chain integrity (broken pointers)"
+      echo "  provenance                  — Decision 018 provenance on synthesized records"
+      echo "  relationships <path>        — upstream/downstream graph for a single doc"
+      echo "  graph                       — full supersession graph (all nodes + edges)"
+      echo ""
+      echo "All subcommands accept --project <name> to scope to one project."
+      ;;
+  esac
+}
+
 # ── help ──────────────────────────────────────────────────────────────────────
 
 cmd_help() {
@@ -1673,6 +1818,7 @@ cmd_help() {
   echo -e "  ${BOLD}prior-art${NC} \"<desc>\" [--full] [--no-emit]     Research prior art; --full prints complete findings"
   echo -e "  ${BOLD}metrics${NC}   [--project <p>] [--since <days>]  Observation-week empirical dashboard"
   echo -e "  ${BOLD}pipeline${NC}  process|activate|process-response|list  Layer 3.5 — Decisions 026/028"
+  echo -e "  ${BOLD}doctrine${NC}  validate|supersession|provenance|relationships|graph  Structural coherence — Decision 020"
   echo ""
   echo "Examples:"
   echo "  prismo new-machine"
@@ -1714,6 +1860,7 @@ case "$CMD" in
   runtime)        cmd_runtime "$@" ;;
   metrics)        cmd_metrics "$@" ;;
   pipeline)       cmd_pipeline "$@" ;;
+  doctrine)       cmd_doctrine "$@" ;;
   help|--help|-h) cmd_help ;;
   *) die "Unknown command: $CMD  (run 'prismo help')" ;;
 esac

@@ -126,7 +126,7 @@ Everything below turns a written rule into infrastructure:
 
 ---
 
-## Phase 3 — Layer 2 maintenance intelligence ⏳ resequenced 2026-05-17
+## Phase 3 — Layer 2 maintenance intelligence ✅ complete 2026-05-30
 
 Revised scope (Decisions 013, 017, 020, **021**): trio collapses to two services,
 and the build order flips per [[../decisions/021-reviewitems-as-judgment-boundary|Decision 021]].
@@ -137,7 +137,7 @@ and the build order flips per [[../decisions/021-reviewitems-as-judgment-boundar
 2. ✅ **synthesis-service minimal** (shipped 2026-05-17) — `synthesis/` package with prompt template, four quality gates (parse, backpressure, confidence ≥ 0.7, dedup ≥ 0.85), pure-ish runner with injected I/O, `POST /synthesis/run` endpoint. 14 tests. **First live run emitted 2 ReviewItems** from pending captures (confidence 0.82 + 0.75). The Decision 021 loop is operational end-to-end. Initial thresholds env-tunable; observation week will calibrate.
 3. ✅ **`prismo review` CLI** (shipped — exact date unrecorded) — `prismo review [list|show|approve|reject|edit]`. Approve writes the canon file, commits, and re-indexes. Full human-judgment loop is closed end-to-end.
 4. **Observation week** — track emission rate, approval rate, rejection reasons, edit frequency, time-to-decision, dedup. Empirical tuning of synthesis-service quality gate. No canon closure record exists yet.
-5. **doctrine-service Day-1 capabilities** per [[../decisions/020-doctrine-service-structural-coherence-engine|Decision 020]] — **substantially built, unblocked by Decision 027 (2026-05-30).** `doctrine/rules.py`: pure rule evaluators for `validate_metadata`, `validate_supersession`, `validate_provenance`, `resolve_relationships`. `doctrine/router.py`: 4 endpoints (`/doctrine/validate`, `/doctrine/supersession`, `/doctrine/provenance`, `/doctrine/relationships`). `tests/test_doctrine.py`: 29 tests green. MCP tools for all 4 endpoints. **Three gaps to close:** (a) `prismo doctrine` CLI subcommand, (b) `GET /doctrine/graph` full supersession graph endpoint, (c) mark Phase 3 ✅ in v2-progress. Next session: ~1 hour to completion.
+5. ✅ **doctrine-service Day-1 capabilities** per [[../decisions/020-doctrine-service-structural-coherence-engine|Decision 020]] — **complete 2026-05-30.** `doctrine/rules.py`: pure rule evaluators for `validate_metadata`, `validate_supersession`, `validate_provenance`, `resolve_relationships`, `build_supersession_graph`. `doctrine/router.py`: 5 endpoints (`/doctrine/validate`, `/doctrine/supersession`, `/doctrine/provenance`, `/doctrine/relationships`, `/doctrine/graph`). `tests/test_doctrine.py`: 29 tests green. MCP tools for all 5 endpoints (34 total). `prismo doctrine validate|supersession|provenance|relationships|graph` CLI. Service Rule: 51 routes, all documented.
 
 **Deferred (build after the above lands):**
 - Sukuna refactor as synthesis-service consumer

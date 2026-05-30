@@ -512,6 +512,7 @@ The authoritative transport. Adapters (MCP, CLI) wrap these.
 | `validateSupersessionIntegrity` | `GET /doctrine/supersession` | `doctrine/router.py` |
 | `validateProvenance` | `GET /doctrine/provenance` | `doctrine/router.py` |
 | `resolveRelationships` | `GET /doctrine/relationships` | `doctrine/router.py` |
+| `getSupersessionGraph` | `GET /doctrine/graph` | `doctrine/router.py` |
 | `pipelineProcess` | `POST /pipeline/process` | `pipeline/api_router.py` |
 | `pipelineActivate` | `POST /pipeline/activate` | `pipeline/api_router.py` |
 | `processResponse` | `POST /pipeline/process-response` | `pipeline/api_router.py` |
