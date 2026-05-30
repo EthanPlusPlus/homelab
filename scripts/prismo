@@ -533,8 +533,10 @@ cmd_session() {
       check_vm
 
       # Write session summary to operational_events before ending.
-      # Reads current_focus and capture count to build a minimal summary.
-      local ctx_resp focus_text captures_count summary_text
+      # Derives summary from git commits made since session start (objective record of
+      # work done), falling back to current_focus if no commits found. This avoids the
+      # session summary being just the opening greeting (the focus seed problem).
+      local ctx_resp focus_text session_started_at captures_count summary_text git_summary
       ctx_resp=$(curl -sf --max-time 5 "${CONTEXT_API}/workflow/session/${sid}" 2>/dev/null)
       focus_text=$(echo "$ctx_resp" | python3 -c "
 import sys, json
@@ -543,9 +545,38 @@ try:
     print(d.get('context', {}).get('current_focus', '') or '')
 except Exception:
     print('')" 2>/dev/null)
+      session_started_at=$(echo "$ctx_resp" | python3 -c "
+import sys, json
+try:
+    d = json.load(sys.stdin)
+    print(d.get('session', {}).get('started_at', '') or '')
+except Exception:
+    print('')" 2>/dev/null)
       captures_count=$(curl -sf --max-time 5 "${CONTEXT_API}/workflow/captures?status=pending-review" 2>/dev/null \
         | python3 -c "import sys,json; print(len(json.load(sys.stdin).get('captures',[])))" 2>/dev/null || echo "0")
-      summary_text="${focus_text:-session ended}"
+
+      # Collect commit subjects from all canon repos since session start.
+      git_summary=""
+      if [[ -n "$session_started_at" ]]; then
+        local canon_repos=("${HOME}/canon/homelab" "${HOME}/projects/context-server")
+        local all_commits=()
+        for repo in "${canon_repos[@]}"; do
+          [[ -d "$repo/.git" || -f "$repo/.git" ]] || continue
+          local commits
+          commits=$(git -C "$repo" log --since="$session_started_at" --format="%s" 2>/dev/null \
+            | grep -v "^Co-Authored\|^Merge" | head -5 || true)
+          if [[ -n "$commits" ]]; then
+            while IFS= read -r line; do
+              [[ -n "$line" ]] && all_commits+=("$line")
+            done <<< "$commits"
+          fi
+        done
+        if [[ ${#all_commits[@]} -gt 0 ]]; then
+          git_summary=$(printf '%s; ' "${all_commits[@]}" | sed 's/; $//')
+        fi
+      fi
+
+      summary_text="${git_summary:-${focus_text:-session ended}}"
       curl -sf --max-time 5 -X POST "${CONTEXT_API}/workflow/session/${sid}/summarize" \
         -H 'Content-Type: application/json' \
         -d "$(python3 -c "import json; print(json.dumps({'summary': '''${summary_text//\'/\\\'}''', 'captures_count': ${captures_count:-0}}))")" \
