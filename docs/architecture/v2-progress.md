@@ -221,25 +221,47 @@ Resolved: `CapabilityRegistry` pattern adopted — routes capability → provide
 
 ---
 
-## Phase 5 — Human interaction layer ⏳ partially redefined
+## Phase 5 — Human interaction layer ⏳ in progress
 
 Per roadmap: web UI, contribution capture, mobile/ambient interfaces.
 
 **Key reframing (ChatGPT 2026-05-16):** "Layer 4 = interaction surface, not browser." A CLI
 is already Layer 4 in the abstraction the masterplan defines.
 
-Minimal Layer 4 slice now planned in parallel with Phase 3:
+**Forcing function reframing ([[../decisions/031-web-ui-operational-visibility-forcing-function|Decision 031]], 2026-05-31):**
+Web UI no longer waits on collaborator readiness. The system (Phases 0–4 complete, 30+
+decisions, 50+ routes, 4 services) is large enough that coherent visual state is a
+builder-visibility need independent of Shrey/Kyle. All first-slice data exists in the API today.
 
-- `prismo brief <project>` — OperationalBrief viewer (CLI)
-- `prismo capture "this matters"` — contribution capture (CLI, POSTs to `/workflow/capture`; consumed by synthesis-service per [[../decisions/021-reviewitems-as-judgment-boundary|Decision 021]])
-- `prismo stale` / `prismo stale ack <id>` — lifecycle inbox (Phase 2.5)
+**CLI Layer 4 (shipped — Phases 2.5/3):**
+- `prismo brief <project>` — OperationalBrief viewer
+- `prismo capture / review / stale / synth / metrics / doctrine / pipeline` — full surface
 
-Web UI deferred until non-CLI contributors actually need access (Shrey/Kyle). At that point,
-the minimal slice is the same two reads + one write, in a browser.
+**Web UI — first slice: minimal ops dashboard (active)**
+
+Stack: Next.js / TypeScript / Tailwind / shadcn/ui, consuming existing FastAPI API directly.
+Auth: Tailscale-gated (zero new infrastructure).
+
+| Panel | Endpoint |
+|-------|----------|
+| ReviewItem queue | `GET /review/queue` |
+| Synthesis metrics | `GET /workflow/metrics` |
+| Doctrine health | `GET /doctrine/validate` |
+| Runtime topology | `GET /runtime/topology` |
+| Stale items | `GET /workflow/stale-items` |
+| Pipeline activations | `GET /pipeline/activations` |
+| Capture list | `GET /workflow/captures` |
+
+**Web UI — second slice (deferred):**
+Conversation, contribution capture, RBAC, multi-user — when Shrey/Kyle need access.
 
 ---
 
-## Phase 6 — Governance and observability ⏳ not started
+## Phase 6 — Governance and observability ⏳ parallel with Phase 5
+
+Per Decision 031: Phase 6 infra observability (Prometheus / Grafana / Loki) runs as a
+background track alongside Phase 5, not after it. Service metrics and Docker log aggregation
+added incrementally; the web UI is the primary visibility layer.
 ## Phase 7 — Advanced research ⏳ not started
 
 ---
