@@ -1651,7 +1651,6 @@ for a in d.get('activations', []):
     process-response)
       # Called by Phase 5 adapters (WhatsApp, web UI) after receiving model output.
       # Reads response text from stdin or args, POSTs to /pipeline/process-response.
-      # Claude Code wiring deferred — see Decision 028.
       local response_text=""
       if [[ ! -t 0 ]]; then
         response_text=$(cat 2>/dev/null)
@@ -1675,10 +1674,89 @@ if n > 0:
         print(f\"  [{c['id']}] {c['text'][:80]}\")" 2>/dev/null
       ;;
 
+    capture-response)
+      # Called by the Claude Code Stop hook (Decision 028, Phase 5).
+      # Reads Stop hook JSON from stdin ({session_id, transcript_path, ...}),
+      # extracts the last assistant text from the transcript, and pipes it
+      # to /pipeline/process-response. Fails silently — never blocks.
+      if [[ -t 0 ]]; then return 0; fi
+      local raw
+      raw=$(cat 2>/dev/null)
+      [[ -n "$raw" ]] || return 0
+
+      local transcript_path project session_id
+      transcript_path=$(echo "$raw" | python3 -c "
+import sys, json
+try:
+    d = json.loads(sys.stdin.read())
+    print(d.get('transcript_path') or '')
+except Exception:
+    print('')" 2>/dev/null)
+      session_id=$(echo "$raw" | python3 -c "
+import sys, json
+try:
+    d = json.loads(sys.stdin.read())
+    print(d.get('session_id') or '')
+except Exception:
+    print('')" 2>/dev/null)
+      [[ -n "$transcript_path" && -f "$transcript_path" ]] || return 0
+
+      # Extract the last assistant text response from the JSONL transcript.
+      # Skips thinking-only turns and turns with no text content.
+      local response_text
+      response_text=$(python3 -c "
+import json, sys
+
+path = sys.argv[1]
+min_len = 80  # ignore very short responses (tool summaries, one-liners)
+
+last_text = ''
+with open(path) as f:
+    for line in f:
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            entry = json.loads(line)
+        except Exception:
+            continue
+        if entry.get('type') != 'assistant':
+            continue
+        content = entry.get('message', {}).get('content', [])
+        text_blocks = [c.get('text', '') for c in content if c.get('type') == 'text']
+        combined = ' '.join(text_blocks).strip()
+        if len(combined) >= min_len:
+            last_text = combined
+
+print(last_text)
+" "$transcript_path" 2>/dev/null)
+
+      [[ -n "$response_text" ]] || return 0
+
+      local project="${PRISMO_PROJECT:-homelab}"
+      local result
+      result=$(curl -sf --max-time 10 -X POST "${CONTEXT_API}/pipeline/process-response" \
+        -H 'Content-Type: application/json' \
+        -d "$(python3 -c "
+import json, sys
+print(json.dumps({'response': sys.argv[1], 'project': sys.argv[2]}))" \
+          "$response_text" "$project")" 2>/dev/null)
+      [[ -n "$result" ]] || return 0
+      echo "$result" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+n = d.get('captures_created', 0)
+if n > 0:
+    print(f'[PIPELINE] {n} capture(s) auto-created from response')
+    for c in d.get('captures', []):
+        print(f\"  [{c['id']}] {c['text'][:80]}\")" 2>/dev/null
+      ;;
+
     *)
-      echo "Usage: prismo pipeline process|activate|process-response|list"
+      echo "Usage: prismo pipeline process|activate|capture-response|process-response|list"
       echo "  process              — route current prompt and emit matching [FACET] blocks (hook use)"
       echo "  activate <id> [args] — directly activate a named facet"
+      echo "  capture-response     — Stop hook: extract last assistant text from transcript, auto-capture (Decision 028)"
       echo "  process-response     — run model output through response processor (Phase 5 adapters)"
       echo "  list                 — list registered activations"
       ;;
