@@ -532,6 +532,19 @@ cmd_session() {
       sid=$(cat "$SESSION_FILE")
       check_vm
 
+      # Warn on uncommitted changes in canon repos before closing.
+      local dirty_repos=()
+      for repo in "${HOME}/canon/homelab" "${HOME}/projects/context-server" "${HOME}/projects/prismo-ui"; do
+        [[ -d "$repo/.git" || -f "$repo/.git" ]] || continue
+        if ! git -C "$repo" diff --quiet 2>/dev/null || ! git -C "$repo" diff --cached --quiet 2>/dev/null; then
+          dirty_repos+=("$repo")
+        fi
+      done
+      if [[ ${#dirty_repos[@]} -gt 0 ]]; then
+        warn "Uncommitted changes in: ${dirty_repos[*]}"
+        warn "Consider committing before ending the session."
+      fi
+
       # Write session summary to operational_events before ending.
       # Derives summary from git commits made since session start (objective record of
       # work done), falling back to current_focus if no commits found. This avoids the

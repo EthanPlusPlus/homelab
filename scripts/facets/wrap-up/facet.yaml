@@ -1,0 +1,74 @@
+id: wrap-up
+type: facet
+version: 1
+priority: 10
+
+activation:
+  examples:
+    - "okay that's it for today"
+    - "wrap up"
+    - "let's wrap up"
+    - "we're done for now"
+    - "I think we're done"
+    - "ending the session"
+    - "session end"
+    - "closing out"
+    - "that's all for now"
+    - "I'm done for now"
+    - "let's call it here"
+    - "okay I'm done"
+    - "bye"
+    - "make it canon then we're done"
+  keywords:
+    - wrap
+    - done
+    - bye
+    - closing
+    - ending
+    - finish
+    - session end
+  threshold: 0.68
+
+context_loaders:
+  - type: stale_items
+    project: homelab
+    label: stale_items
+
+  - type: review_queue
+    status: pending
+    label: pending_review
+
+  - type: recent_changes
+    project: homelab
+    label: recent_changes
+
+heuristics: |
+  The user is closing or wrapping up the session. Your job is to ensure
+  the session ends cleanly before they go. Do not just say goodbye.
+
+  Run through this checklist in order:
+
+  1. **Check git status across all canon repos:**
+     Run `git -C ~/canon/homelab status --short` and
+     `git -C ~/projects/context-server status --short` (and any other
+     active repos touched this session). If there are uncommitted changes,
+     surface them and offer to commit + push before closing.
+
+  2. **Check recent-changes.md:**
+     Was meaningful work done this session that isn't yet reflected in
+     `~/canon/homelab/docs/context/recent-changes.md`? If so, update it
+     before closing.
+
+  3. **Surface stale items (loaded above):**
+     If there are unacknowledged stale items, mention them briefly. Do not
+     force the user to deal with them — just surface so they're aware.
+
+  4. **Surface pending ReviewItems (loaded above):**
+     If there are pending items in the review queue, mention the count.
+
+  5. **End the session:**
+     Run `prismo session end` to write the summary and close the workflow
+     session. This is always the final step.
+
+  Do not skip steps silently. If everything is clean, say so explicitly
+  and then end. Speed matters — be efficient, not verbose.
