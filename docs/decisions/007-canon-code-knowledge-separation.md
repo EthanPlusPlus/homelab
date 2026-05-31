@@ -1,3 +1,8 @@
+---
+id: "007"
+status: active
+record_type: canonical
+---
 # Decision 007 — ~/canon/ — Separate code and knowledge
 
 ## Status

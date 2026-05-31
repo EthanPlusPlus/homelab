@@ -1,3 +1,8 @@
+---
+id: "012"
+status: active
+record_type: canonical
+---
 # Decision 012 — Session bootstrap and inline canon discipline
 
 ## Status

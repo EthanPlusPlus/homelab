@@ -1,3 +1,8 @@
+---
+id: "019"
+status: active
+record_type: canonical
+---
 # Decision 019 — Lifecycle loop closure pattern
 
 ## Status

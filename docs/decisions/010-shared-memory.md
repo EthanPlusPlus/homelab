@@ -1,3 +1,8 @@
+---
+id: "010"
+status: active
+record_type: canonical
+---
 # Decision 010 — Git-Backed Shared Memory
 
 ## Status

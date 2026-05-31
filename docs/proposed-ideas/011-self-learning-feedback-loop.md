@@ -1,7 +1,7 @@
 ---
 id: "011"
 title: Self-Learning Feedback Loop
-status: deprioritised
+status: closed
 notes: split out from original 008 section 3; revisit if Sukuna output volume creates review bottleneck
 ---
 

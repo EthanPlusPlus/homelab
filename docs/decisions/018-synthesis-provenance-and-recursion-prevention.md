@@ -1,3 +1,8 @@
+---
+id: "018"
+status: active
+record_type: canonical
+---
 # Decision 018 — Synthesis provenance and recursion prevention
 
 ## Status

@@ -1,3 +1,8 @@
+---
+id: "017"
+status: active
+record_type: canonical
+---
 # Decision 017 — Three Permanent Architectural Laws + Layer 2 Service Rule
 
 ## Status
@@ -47,6 +52,7 @@ not belong in the structural layer.
 retrieval topology, relationship traversal, metadata reconciliation.
 
 ---
+id: "017"
 
 ### Law 2 — Interpretation is probabilistic
 

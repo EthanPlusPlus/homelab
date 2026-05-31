@@ -1,3 +1,8 @@
+---
+id: "005"
+status: active
+record_type: canonical
+---
 # Decision 005 — GitHub over Gitea (for now)
 
 ## Status
