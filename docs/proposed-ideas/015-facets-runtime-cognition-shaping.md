@@ -4,7 +4,7 @@ title: Facets — Runtime Cognition Shaping for Prismo
 status: superseded
 record_type: canonical
 date: 2026-05-29
-superseded_by: "026"
+superseded_by: decisions/026-layer-3-5-pipeline-service.md
 ---
 
 # 015 — Facets: Runtime Cognition Shaping
