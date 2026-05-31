@@ -577,10 +577,16 @@ except Exception:
       fi
 
       summary_text="${git_summary:-${focus_text:-session ended}}"
+      local _tmp_summary
+      _tmp_summary=$(mktemp)
+      python3 -c "
+import json, sys
+print(json.dumps({'summary': sys.argv[1], 'captures_count': int(sys.argv[2])}))
+" "$summary_text" "${captures_count:-0}" > "$_tmp_summary"
       curl -sf --max-time 5 -X POST "${CONTEXT_API}/workflow/session/${sid}/summarize" \
         -H 'Content-Type: application/json' \
-        -d "$(python3 -c "import json; print(json.dumps({'summary': '''${summary_text//\'/\\\'}''', 'captures_count': ${captures_count:-0}}))")" \
-        >/dev/null 2>&1 || true
+        -d @"$_tmp_summary" >/dev/null 2>&1 || true
+      rm -f "$_tmp_summary"
 
       curl -sf -X POST "${CONTEXT_API}/workflow/session/${sid}/end" >/dev/null \
         && ok "Session ended: $sid" \
@@ -754,10 +760,11 @@ try:
             smry = ls.get('summary')
             if s and smry:
                 ended = s.get('last_active_at', '')[:16].replace('T', ' ')
-                text = smry.get('summary', '(no summary)')[:120]
+                full_text = smry.get('summary', '(no summary)')
                 caps = smry.get('captures_count', 0)
                 print(f\"  last_session ({s.get('contributor_id','?')}, ended {ended}):\")
-                print(f\"    focus: {text}\")
+                for chunk in [full_text[i:i+120] for i in range(0, len(full_text), 120)]:
+                    print(f\"    {chunk}\")
                 if caps:
                     print(f\"    captures pending: {caps}\")
         except Exception:
