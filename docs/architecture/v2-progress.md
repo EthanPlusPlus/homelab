@@ -156,7 +156,7 @@ and the build order flips per [[../decisions/021-reviewitems-as-judgment-boundar
 
 ---
 
-## Phase 4 — Runtime abstraction ⏳ in progress
+## Phase 4 — Runtime abstraction ✅ complete 2026-05-31
 
 Per roadmap: runtime provider interface, local inference, provider routing, persistent session
 systems.
@@ -200,10 +200,24 @@ Resolved: `CapabilityRegistry` pattern adopted — routes capability → provide
 - `migrate`, `sukuna`, `review` Facets — `facet.yaml` definitions in `scripts/facets/`. All 4 facets registered at runtime (architect + 3 new). Activation examples, keywords, context loaders, and heuristics defined for each.
 - `produced_by_role` wired — `ReviewItemCreate` model + INSERT updated; synthesis runner sets `"synthesis_runtime"` on every emission.
 
-**Remaining Phase 4 work:**
-- `POST /pipeline/process-response` Claude Code hook wiring (deferred — Phase 5)
-- LiteLLM wiring inside api-mode providers (pending billing architecture decision)
-- Two-provider completion criterion audit surface
+**Shipped (2026-05-31):**
+- [[../decisions/030-billing-architecture-intelligence-tiers|Decision 030]] — billing architecture locked: subscription for coding_runtime, LiteLLM for side intelligences (synthesis_runtime, analysis_runtime).
+- LiteLLM wired into `AnthropicSynthesisProvider` — raw anthropic SDK replaced with `litellm.completion()`. Model string-swappable via `SYNTHESIS_MODEL` env var. `AnthropicAnalysisProvider` stays on raw SDK (Anthropic beta web_search tool not supported by LiteLLM). `litellm` added to requirements.txt.
+- Two-provider completion criterion met — `ClaudeCodeSynthesisProvider` + `AnthropicSynthesisProvider` (LiteLLM) satisfy Decision 024 audit surface.
+- `prismo pipeline capture-response` — Stop hook wired in `settings.json`. Reads `transcript_path` from hook JSON, extracts last assistant text, POSTs to `/pipeline/process-response`. Closes Decision 028 Phase 5 hook wiring.
+- `processor.py` bugfix — `contributor_id='system'` set on auto-captures (was silently failing NOT NULL constraint).
+- Proposed-idea 013 closed as superseded by Decision 026 + 028.
+- Proposed-idea 017 written — Capability Orchestrator (meta-router, future).
+- doctrine-service Day-1 complete:
+  - `detect_supersession_cycles()` — DFS cycle detection over superseded_by graph
+  - `detect_source_hash_drift()` — pure function, compares stored hashes vs current content; indexer stores `source_hashes` as JSON from frontmatter
+  - `GET /doctrine/validate` expanded to run all rules (metadata + supersession + cycles + provenance + drift)
+  - `GET /doctrine/supersession` + `/doctrine/provenance` include new violations
+  - 43 tests green
+- Canon repairs: 11 decisions missing frontmatter (005/007/010/012-019 — predated convention), 2 broken supersession chains (short-form IDs), `deprioritised` → `closed` on 011, draft captures `pending-review` → `archived`. Doctrine validate: 0/102 violations.
+- `duplicate_id` rule fixed — now scoped within category (decisions and proposed-ideas have independent numbering).
+
+## Phase 4 ✅ complete 2026-05-31
 
 ---
 
