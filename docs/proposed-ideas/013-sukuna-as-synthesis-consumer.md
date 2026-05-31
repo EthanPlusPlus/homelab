@@ -1,17 +1,24 @@
 ---
 id: "013"
 title: Sukuna as a synthesis-service consumer (emit ReviewItems, not drafts)
-status: proposed
+status: superseded
+superseded_by: decisions/026-layer-3-5-pipeline-service.md
 record_type: canonical
-notes: Sukuna 2026-05-17 self-identified this. Defer until synthesis quality gates are calibrated via observation-week data (primary blocker) and doctrine-service Day-1 ships (secondary).
+notes: Superseded 2026-05-31 — the pipeline (Decision 026) + Response Processor (Decision 028) solve this structurally. Sukuna Facet handles context loading; Response Processor auto-creates captures from model output. Completion criterion is Decision 028's Phase 5 hook wiring.
 ---
 
 # 013 — Sukuna as a synthesis-service consumer
 
 ## Status
 
-Proposed. Defer until after doctrine-service Day-1 capabilities ship
-([[../decisions/020-doctrine-service-structural-coherence-engine|Decision 020]]).
+Superseded 2026-05-31 by [[../decisions/026-layer-3-5-pipeline-service|Decision 026]] + [[../decisions/028-response-processor-auto-capture|Decision 028]].
+
+The pipeline solves this structurally without a Sukuna-specific build:
+- **Sukuna Facet** (`scripts/facets/sukuna/facet.yaml`) handles context loading and heuristics — the "thin orchestrator" input side this proposal described
+- **Response Processor** (Decision 028) auto-creates captures from model output matching signal patterns — the output side
+- Sukuna Facet heuristics already instruct the model to surface findings as captures rather than writing to drafts/
+
+The remaining gap (Phase 5 hook wiring for the Response Processor) is tracked in Decision 028, not here. Once the Claude Code `PostToolUse` hook is wired, a Sukuna pass will automatically seed captures without any script changes.
 
 ## Origin
 
