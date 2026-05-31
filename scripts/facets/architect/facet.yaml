@@ -19,6 +19,14 @@ activation:
     - "walk me through how the services fit together"
     - "is this architecturally sound"
     - "what layer does this belong to"
+    - "how should we reorganize the canon structure"
+    - "recommendation on canon folder organization"
+    - "how do we design a new facet"
+    - "what should the governance structure look like"
+    - "let's restructure the decisions folder"
+    - "how should the canon be organized"
+    - "recommendations on new facets or improvements to existing facets"
+    - "what new facets should we build"
   keywords:
     - architecture
     - design
@@ -30,12 +38,18 @@ activation:
     - contract
     - module
     - pipeline
+    - structure
+    - canon
+    - facet
+    - governance
+    - reorganize
+    - restructure
   exclusions:
     - UI color
     - CSS styling
     - frontend layout
     - font size
-  threshold: 0.72
+  threshold: 0.68
 
 context_loaders:
   - type: doc_fetch

@@ -24,6 +24,8 @@ activation:
     - drift
     - maintenance
     - contradiction
+  shortcut_keywords:
+    - sukuna
   exclusions: []
   threshold: 0.72
 

@@ -23,6 +23,11 @@ Stale items, pending reviews, open proposals, and recent changes are loaded.
 
 ## Important
 
-This Facet replaces the sukuna.md agent's context-loading step.
-Surface findings as `prismo capture "<finding>"` — not by writing files.
-See proposed-idea 013 for the full Sukuna → ReviewItems path.
+**Do not spawn a subagent or run the `scripts/sukuna.md` script.** That is the V1 path —
+it writes to `docs/drafts/` which violates Decision 021. The facet IS the Sukuna pass.
+Run it inline: work through the three sections yourself using the loaded context above,
+then surface each finding as `prismo capture "<finding>"`. Captures flow through
+synthesis → ReviewItems → human review.
+
+This Facet replaces the sukuna.md agent's context-loading step. No markdown files.
+No `docs/drafts/`. No subagent dispatch.
