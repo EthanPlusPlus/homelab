@@ -237,10 +237,10 @@ builder-visibility need independent of Shrey/Kyle. All first-slice data exists i
 - `prismo brief <project>` — OperationalBrief viewer
 - `prismo capture / review / stale / synth / metrics / doctrine / pipeline` — full surface
 
-**Web UI — first slice: minimal ops dashboard (active)**
+**Web UI — first slice: minimal ops dashboard ✅ shipped 2026-05-31**
 
-Stack: Next.js / TypeScript / Tailwind / shadcn/ui, consuming existing FastAPI API directly.
-Auth: Tailscale-gated (zero new infrastructure).
+Stack: Next.js 15 / TypeScript / Tailwind / shadcn/ui, consuming existing FastAPI API directly.
+Auth: Tailscale-gated (zero new infrastructure). Deployed at port 3000 via docker-compose.
 
 | Panel | Endpoint |
 |-------|----------|

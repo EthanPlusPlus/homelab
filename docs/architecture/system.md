@@ -11,6 +11,7 @@ that govern all of it.
 | Proxmox host | Bare metal on a 2017 iMac, IP 192.168.1.9 |
 | Ubuntu Server VM | Ubuntu 24.04, IP 192.168.100.10, Tailscale 100.92.226.121 |
 | context-server | AI context layer — doc indexer, code indexer, MCP server |
+| prismo-ui | Ops dashboard — ReviewQueue, metrics, doctrine health, topology (port 3000) |
 | Portainer | Docker management UI |
 | Tailscale | Mesh VPN, hostname ubuntu-server.tail58b10c.ts.net |
 
@@ -24,6 +25,7 @@ Two sibling directories separate code from knowledge:
   devcamp/
   flight-planner/
   even/
+  prismo-ui/         ← Phase 5 ops dashboard (Next.js, port 3000)
 
 ~/canon/             ← knowledge only (docs worktrees + knowledge bases)
   homelab/           ← primary clone of homelab repo (docs-only)
@@ -31,6 +33,7 @@ Two sibling directories separate code from knowledge:
   exam-prep/         ← study materials (no git repo)
   flight-planner/    ← linked git worktree from flight-planner repo (docs/ only)
   even/              ← linked git worktree from even repo (docs/ only)
+  prismo-ui/         ← linked git worktree from prismo-ui repo (docs/ only)
 ```
 
 ## Repos
@@ -42,6 +45,7 @@ Two sibling directories separate code from knowledge:
 | devcamp | `~/projects/devcamp/` | Active development project |
 | flight-planner | `~/projects/flight-planner/` (code) + `~/canon/flight-planner/` (docs) | Personal flight optimiser |
 | even | `~/projects/even/` (code) + `~/canon/even/` (docs) | iOS receipt-splitting app |
+| prismo-ui | `~/projects/prismo-ui/` (code) + `~/canon/prismo-ui/` (docs) | Phase 5 ops dashboard — http://ubuntu-server.tail58b10c.ts.net:3000 |
 
 ## Working Model
 
