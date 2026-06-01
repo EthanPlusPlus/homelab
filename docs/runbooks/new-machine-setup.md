@@ -21,10 +21,16 @@ git clone git@github.com:EthanPlusPlus/prismo.git ~/canon/prismo
 cd ~/canon/prismo && bash scripts/install-hooks.sh
 ```
 
-### 2. Run the setup script
+### 2. Install prismo on PATH
 
 ```bash
-~/canon/prismo/scripts/prismo new-machine
+sudo ln -s /home/ethan/canon/prismo/scripts/prismo /usr/local/bin/prismo
+```
+
+### 3. Run the setup script
+
+```bash
+prismo new-machine
 ```
 
 The script will:
@@ -33,10 +39,10 @@ The script will:
 - Register the MCP server for each directory
 - Offer to copy memory from the VM
 
-### 3. Verify
+### 4. Verify
 
 ```bash
-~/canon/prismo/scripts/prismo status
+prismo status
 ```
 
 All hooks should be green and context-server reachable.
