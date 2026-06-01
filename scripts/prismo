@@ -6,7 +6,7 @@ set -euo pipefail
 VM_HOST="${VM_HOST:-ubuntu-server.tail58b10c.ts.net}"
 CONTEXT_API="http://${VM_HOST}:8000"
 MCP_URL="http://${VM_HOST}:8001/mcp"
-HOMELAB_REPO="git@github.com:EthanPlusPlus/homelab.git"
+HOMELAB_REPO="git@github.com:EthanPlusPlus/prismo.git"
 
 # ── Output helpers ────────────────────────────────────────────────────────────
 
@@ -136,9 +136,9 @@ cmd_new_machine() {
   mkdir -p "${HOME}/projects" "${HOME}/canon"
   ok "~/projects and ~/canon ready"
 
-  # MCP for homelab itself
-  step "MCP for homelab"
-  add_mcp "${HOME}/canon/homelab"
+  # MCP for prismo itself
+  step "MCP for prismo"
+  add_mcp "${HOME}/canon/prismo"
 
   # Known projects
   echo ""
@@ -162,13 +162,13 @@ cmd_new_machine() {
   # Memory
   step "Shared memory"
   local key
-  key=$(echo "${HOME}/canon/homelab" | sed 's|^/||; s|/|-|g')
+  key=$(echo "${HOME}/canon/prismo" | sed 's|^/||; s|/|-|g')
   local mem_dir="${HOME}/.claude/projects/${key}/memory"
   mkdir -p "$mem_dir"
 
   local shared=("system.md" "workflow.md" "mcp.md" "shorthands.md")
   for f in "${shared[@]}"; do
-    local src="${HOME}/canon/homelab/docs/memory/${f}"
+    local src="${HOME}/canon/prismo/docs/memory/${f}"
     local dst="${mem_dir}/${f}"
     [[ -e "$dst" && ! -L "$dst" ]] && rm "$dst"
     [[ ! -L "$dst" ]] && ln -s "$src" "$dst"
@@ -189,7 +189,7 @@ cmd_new_machine() {
   echo ""
   echo -e "${GREEN}${BOLD}✓ Machine setup complete.${NC}"
   echo ""
-  echo "  Start a session:  cd ~/canon/homelab && claude"
+  echo "  Start a session:  cd ~/canon/prismo && claude"
   echo "  Check everything: prismo status"
 }
 
@@ -331,11 +331,11 @@ DOCEOF
 _(none yet)_
 DOCEOF
 
-    # Copy STRUCTURE.md template from homelab
-    local tmpl="${HOME}/canon/homelab/docs/STRUCTURE.md"
+    # Copy STRUCTURE.md template from prismo
+    local tmpl="${HOME}/canon/prismo/docs/STRUCTURE.md"
     if [[ -f "$tmpl" ]]; then
       cp "$tmpl" "${project_dir}/docs/STRUCTURE.md"
-      warn "docs/STRUCTURE.md copied from homelab template — update it for this project"
+      warn "docs/STRUCTURE.md copied from prismo template — update it for this project"
     fi
 
     git -C "$project_dir" add -A
@@ -381,10 +381,10 @@ DOCEOF
 
   # 9. Homelab reminder
   echo ""
-  warn "Update homelab docs before next session:"
-  info "  ~/canon/homelab/docs/context/     — add ${name} to service inventory"
-  info "  ~/canon/homelab/docs/runbooks/new-machine-setup.md — add sparse-checkout dirs"
-  info "Then: prismo index && cd ~/canon/homelab && git add -A && git commit && git push"
+  warn "Update prismo docs before next session:"
+  info "  ~/canon/prismo/docs/context/     — add ${name} to service inventory"
+  info "  ~/canon/prismo/docs/runbooks/new-machine-setup.md — add sparse-checkout dirs"
+  info "Then: prismo index && cd ~/canon/prismo && git add -A && git commit && git push"
 
   echo ""
   echo -e "${GREEN}${BOLD}✓ Project '${name}' is ready.${NC}"
@@ -431,7 +431,7 @@ cmd_status() {
   echo ""
   echo -e "${BOLD}Git hooks${NC}"
   local repos=(
-    "${HOME}/canon/homelab"
+    "${HOME}/canon/prismo"
     "${HOME}/projects/context-server"
     "${HOME}/canon/context-server"
     "${HOME}/projects/devcamp"
@@ -456,7 +456,7 @@ cmd_status() {
   echo ""
   echo -e "${BOLD}Canon — last commit${NC}"
   local canon_repos=(
-    "${HOME}/canon/homelab"
+    "${HOME}/canon/prismo"
     "${HOME}/canon/context-server"
   )
   for repo in "${canon_repos[@]}"; do
@@ -480,7 +480,7 @@ cmd_status() {
     ok "Memory found for launch dir: $(pwd)  (${symlink_count} shared symlinks)"
   else
     warn "No memory at $mem"
-    info "Launch from ~/canon/homelab for memory to load, or run: prismo new-machine"
+    info "Launch from ~/canon/prismo for memory to load, or run: prismo new-machine"
   fi
 }
 
@@ -495,7 +495,7 @@ _infer_project() {
   elif [[ "$cwd" == "${HOME}/projects/"* ]]; then
     echo "$cwd" | sed "s|${HOME}/projects/||" | cut -d/ -f1
   else
-    echo "homelab"
+    echo "prismo"
   fi
 }
 
@@ -534,7 +534,7 @@ cmd_session() {
 
       # Warn on uncommitted changes in canon repos before closing.
       local dirty_repos=()
-      for repo in "${HOME}/canon/homelab" "${HOME}/projects/context-server" "${HOME}/projects/prismo-ui"; do
+      for repo in "${HOME}/canon/prismo" "${HOME}/projects/context-server" "${HOME}/projects/prismo-ui"; do
         [[ -d "$repo/.git" || -f "$repo/.git" ]] || continue
         if ! git -C "$repo" diff --quiet 2>/dev/null || ! git -C "$repo" diff --cached --quiet 2>/dev/null; then
           dirty_repos+=("$repo")
@@ -571,7 +571,7 @@ except Exception:
       # Collect commit subjects from all canon repos since session start.
       git_summary=""
       if [[ -n "$session_started_at" ]]; then
-        local canon_repos=("${HOME}/canon/homelab" "${HOME}/projects/context-server")
+        local canon_repos=("${HOME}/canon/prismo" "${HOME}/projects/context-server")
         local all_commits=()
         for repo in "${canon_repos[@]}"; do
           [[ -d "$repo/.git" || -f "$repo/.git" ]] || continue
@@ -884,7 +884,7 @@ print(json.dumps({
 # ── brief (Decision 016, 018 — operational brief via service) ─────────────────
 
 cmd_brief() {
-  local project="${1:-homelab}"
+  local project="${1:-prismo}"
   check_vm
   echo ""
   curl -sf "${CONTEXT_API}/brief?project=${project}" | python3 -c "
@@ -977,7 +977,7 @@ for c in caps:
       elif [[ "$cwd" == "${HOME}/projects/"* ]]; then
         project=$(echo "$cwd" | sed "s|${HOME}/projects/||" | cut -d/ -f1)
       fi
-      [[ -z "$project" ]] && project="homelab"
+      [[ -z "$project" ]] && project="prismo"
 
       local session_id=""
       [[ -f "$SESSION_FILE" ]] && session_id=$(cat "$SESSION_FILE")
@@ -1011,7 +1011,7 @@ cmd_synth() {
   case "$sub" in
     run|"")
       shift 2>/dev/null || true
-      local project="homelab"
+      local project="prismo"
       local dry_run="false"
       local max_emit=""
       local capture_ids=""
@@ -1076,7 +1076,7 @@ print(f'  Use: prismo review   — triage what landed')
 
 cmd_prior_art() {
   local description="${*:-}"
-  local project="homelab"
+  local project="prismo"
   local no_emit="false"
   local full="false"
   local args=()
@@ -1678,7 +1678,7 @@ for a in d.get('activations', []):
         response_text="${*:-}"
       fi
       [[ -n "$response_text" ]] || return 0
-      local project="${PRISMO_PROJECT:-homelab}"
+      local project="${PRISMO_PROJECT:-prismo}"
       local result
       result=$(curl -sf --max-time 10 -X POST "${CONTEXT_API}/pipeline/process-response" \
         -H 'Content-Type: application/json' \
@@ -1753,7 +1753,7 @@ print(last_text)
 
       [[ -n "$response_text" ]] || return 0
 
-      local project="${PRISMO_PROJECT:-homelab}"
+      local project="${PRISMO_PROJECT:-prismo}"
       local result
       result=$(curl -sf --max-time 10 -X POST "${CONTEXT_API}/pipeline/process-response" \
         -H 'Content-Type: application/json' \
@@ -1955,8 +1955,8 @@ cmd_help() {
   echo "  prismo index"
   echo "  prismo status"
   echo "  prismo stale"
-  echo "  prismo stale ack homelab/proposed-ideas/002.md --resolution resolved"
-  echo "  prismo brief homelab"
+  echo "  prismo stale ack prismo/proposed-ideas/002.md --resolution resolved"
+  echo "  prismo brief prismo"
   echo "  prismo capture \"the brief endpoint needs caching\""
   echo "  prismo review                          # list pending"
   echo "  prismo review show rv_abc123"
@@ -1965,8 +1965,8 @@ cmd_help() {
   echo "  prismo review edit rv_abc123           # opens \$EDITOR, then writes + commits"
   echo ""
   echo "Bootstrap a new machine (two commands):"
-  echo "  git clone git@github.com:EthanPlusPlus/homelab.git ~/canon/homelab"
-  echo "  ~/canon/homelab/scripts/prismo new-machine"
+  echo "  git clone git@github.com:EthanPlusPlus/prismo.git ~/canon/prismo"
+  echo "  ~/canon/prismo/scripts/prismo new-machine"
 }
 
 # ── dispatch ──────────────────────────────────────────────────────────────────

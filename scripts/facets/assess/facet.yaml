@@ -49,14 +49,14 @@ activation:
 
 context_loaders:
   - type: search
-    doc_type: homelab
+    doc_type: prismo
     category: decisions
     query: active governing decisions architectural laws constraints
     top_k: 10
     label: governing_doctrine
 
   - type: search
-    doc_type: homelab
+    doc_type: prismo
     category: proposed-ideas
     status: proposed
     query: open proposals active consideration
@@ -64,7 +64,7 @@ context_loaders:
     label: open_proposals
 
   - type: recent_changes
-    project: homelab
+    project: prismo
     label: recent_changes
 
   - type: runtime_topology
@@ -73,7 +73,7 @@ context_loaders:
   - type: conditional_search
     condition: args_present
     query: "$ARGS"
-    doc_type: homelab
+    doc_type: prismo
     top_k: 8
     label: domain_specific
 

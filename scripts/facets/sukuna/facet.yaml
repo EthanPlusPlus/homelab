@@ -31,18 +31,18 @@ activation:
 
 context_loaders:
   - type: recent_changes
-    project: homelab
+    project: prismo
     label: recent_changes
 
   - type: search
-    doc_type: homelab
+    doc_type: prismo
     category: decisions
     query: active decisions governing doctrine architectural laws
     top_k: 10
     label: active_doctrine
 
   - type: search
-    doc_type: homelab
+    doc_type: prismo
     category: proposed-ideas
     status: proposed
     query: open proposals active consideration
@@ -50,11 +50,11 @@ context_loaders:
     label: open_proposals
 
   - type: stale_items
-    project: homelab
+    project: prismo
     label: stale_items
 
   - type: review_queue
-    project: homelab
+    project: prismo
     status: pending
     limit: 10
     label: pending_reviews

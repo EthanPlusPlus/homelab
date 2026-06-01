@@ -15,9 +15,9 @@ Pending ReviewItems and judgment doctrine are loaded.
 
 ## If the [FACET: review] block is absent
 
-1. `list_review_queue` — project `homelab`, status `pending`
-2. `search_docs` — doc_type `homelab`, category `decisions`, query `human judgment ReviewItem`
-3. `get_recent_changes` — project `homelab`
+1. `list_review_queue` — project `prismo`, status `pending`
+2. `search_docs` — doc_type `prismo`, category `decisions`, query `human judgment ReviewItem`
+3. `get_recent_changes` — project `prismo`
 
 ## Commands
 

@@ -15,11 +15,11 @@ Stale items, pending reviews, open proposals, and recent changes are loaded.
 
 ## If the [FACET: sukuna] block is absent
 
-1. `get_recent_changes` — project `homelab`
-2. `search_docs` — doc_type `homelab`, category `decisions`, top_k `10`
-3. `search_docs` — doc_type `homelab`, category `proposed-ideas`, status `proposed`, top_k `8`
-4. `list_stale_items` — project `homelab`
-5. `list_review_queue` — project `homelab`, status `pending`
+1. `get_recent_changes` — project `prismo`
+2. `search_docs` — doc_type `prismo`, category `decisions`, top_k `10`
+3. `search_docs` — doc_type `prismo`, category `proposed-ideas`, status `proposed`, top_k `8`
+4. `list_stale_items` — project `prismo`
+5. `list_review_queue` — project `prismo`, status `pending`
 
 ## Important
 

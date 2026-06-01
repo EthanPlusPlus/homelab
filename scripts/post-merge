@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "[post-merge] Re-indexing homelab docs..."
+echo "[post-merge] Re-indexing prismo docs..."
 curl -s -X POST http://localhost:8000/index
 echo ""
 echo "[post-merge] Done."

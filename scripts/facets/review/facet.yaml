@@ -34,26 +34,26 @@ activation:
 
 context_loaders:
   - type: review_queue
-    project: homelab
+    project: prismo
     status: pending
     limit: 15
     label: pending_reviews
 
   - type: search
-    doc_type: homelab
+    doc_type: prismo
     category: decisions
     query: human judgment boundary ReviewItem approval canonical decisions
     top_k: 5
     label: judgment_doctrine
 
   - type: recent_changes
-    project: homelab
+    project: prismo
     label: recent_changes
 
   - type: conditional_search
     condition: args_present
     query: "$ARGS"
-    doc_type: homelab
+    doc_type: prismo
     top_k: 5
     label: domain_specific
 

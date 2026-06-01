@@ -14,8 +14,8 @@ Every doc should earn its place. If removing it would not hurt, it should not ex
 
 ## What this repo is
 
-`~/canon/homelab/` is the **Prismo system canon** by convention (see `memory/system.md`).
-The repo name is historical — Prismo emerged out of the homelab project.
+`~/canon/prismo/` is the **Prismo system canon** by convention (see `memory/system.md`).
+The repo name was historical — renamed from homelab in 2026-06 once the forcing functions (Decision 032, prismo-ui) arrived.
 
 It carries two things at once:
 
@@ -28,7 +28,7 @@ The structure below applies to both. Decisions affecting Prismo-the-system live 
 Decisions affecting a single component's internals (e.g. how context-server implements
 lifecycle-aware retrieval) live in that component's canon at `~/canon/<component>/`.
 
-The eventual rename to `~/canon/prismo/` is deferred to when there's a forcing function
+
 (web UI exposing project structure, new contributor onboarding). Until then the rule
 above keeps things from getting more tangled.
 
@@ -210,7 +210,7 @@ Naming: `NNN-short-slug.md`, same numbering convention as decisions.
 Purpose: Shared session bootstrap files — injected into every Claude Code session via symlinks
 in `~/.claude/projects/<key>/memory/`. Updates automatically on `git pull`.
 
-Note: This folder exists only in the homelab repo. Individual project repos do not have a
+Note: This folder exists only in the prismo repo. Individual project repos do not have a
 `memory/` folder — they use `CLAUDE.md` for project-specific session context.
 
 Belongs here:

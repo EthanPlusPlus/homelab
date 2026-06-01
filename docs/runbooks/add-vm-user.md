@@ -63,11 +63,11 @@ SSH in as the new user:
 ssh <username>@ubuntu-server.tail58b10c.ts.net
 ```
 
-### 4. Clone homelab and install hooks
+### 4. Clone prismo and install hooks
 
 ```bash
-git clone https://github.com/EthanPlusPlus/homelab.git ~/canon/homelab
-cd ~/canon/homelab && bash scripts/install-hooks.sh
+git clone https://github.com/EthanPlusPlus/homelab.git ~/canon/prismo
+cd ~/canon/prismo && bash scripts/install-hooks.sh
 ```
 
 ### 5. Set up memory and MCP
@@ -80,19 +80,19 @@ cd ~/canon/homelab && bash scripts/install-hooks.sh
 mkdir -p ~/projects ~/canon
 
 # Memory symlinks
-KEY=$(echo "$HOME/canon/homelab" | sed 's|^/||; s|/|-|g')
+KEY=$(echo "$HOME/canon/prismo" | sed 's|^/||; s|/|-|g')
 MEM_DIR="$HOME/.claude/projects/$KEY/memory"
 mkdir -p "$MEM_DIR"
 for f in system.md workflow.md mcp.md shorthands.md; do
-  ln -sf "$HOME/canon/homelab/docs/memory/$f" "$MEM_DIR/$f"
+  ln -sf "$HOME/canon/prismo/docs/memory/$f" "$MEM_DIR/$f"
 done
 
 # Agent symlinks
 mkdir -p ~/.claude/agents
-ln -sf ~/canon/homelab/scripts/sukuna.md ~/.claude/agents/sukuna.md
+ln -sf ~/canon/prismo/scripts/sukuna.md ~/.claude/agents/sukuna.md
 
 # Register MCP
-cd ~/canon/homelab && claude mcp add context-server --transport http http://localhost:8001/mcp
+cd ~/canon/prismo && claude mcp add context-server --transport http http://localhost:8001/mcp
 ```
 
 ### 6. Clone project repos (as needed)

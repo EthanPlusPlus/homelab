@@ -51,6 +51,6 @@ This is the shorthand for the full doc workflow, triggered on demand.
 
 ## Notes
 
-- homelab docs live in `~/canon/homelab/` — no merge step needed (primary clone)
+- prismo docs live in `~/canon/prismo/` — no merge step needed (primary clone)
 - context-server docs live in `~/canon/context-server/` — merge `context-server` branch into `master` after committing
 - If unsure which doc type fits, check `docs/STRUCTURE.md`

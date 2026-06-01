@@ -31,7 +31,7 @@ activation:
 
 context_loaders:
   - type: stale_items
-    project: homelab
+    project: prismo
     label: stale_items
 
   - type: review_queue
@@ -39,7 +39,7 @@ context_loaders:
     label: pending_review
 
   - type: recent_changes
-    project: homelab
+    project: prismo
     label: recent_changes
 
 heuristics: |

@@ -37,7 +37,7 @@ On existing sessions it is silent. The hook is silent on context-server downtime
 
 Claude is responsible for `capture_signal` — the user driving the conversation can't realistically transcribe it. When you notice durable signal in a session (architectural insight, inconsistency, decision waiting to happen, tension surfaced), call `capture_signal(text=..., project=..., session_id=...)`. Captures live in workflow-state-service as `pending-review` operational state, not canon. Per [[../decisions/021-reviewitems-as-judgment-boundary|Decision 021]], captures are now consumed by synthesis-service which emits ReviewItems to a human-approval queue (`prismo review`). The legacy `prismo capture promote` path is deprecated and will be removed once synthesis-service is the sole capture consumer.
 
-Use `doc_type=<project-name>` to scope queries to a specific project (e.g., `homelab`, `context-server`, `exam-prep`). The context-server indexes every `~/canon/<X>/` as `doc_type=X`.
+Use `doc_type=<project-name>` to scope queries to a specific project (e.g., `prismo`, `context-server`, `exam-prep`). The context-server indexes every `~/canon/<X>/` as `doc_type=X`.
 
 Always use these tools to answer questions about projects before falling back to bash. MCP context is richer and more reliable than grepping files directly.
 

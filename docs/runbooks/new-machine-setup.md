@@ -14,17 +14,17 @@ Steps to configure a new **local machine** to connect to Prismo remotely via Cla
 
 ## Steps
 
-### 1. Clone homelab
+### 1. Clone prismo
 
 ```bash
-git clone git@github.com:EthanPlusPlus/homelab.git ~/canon/homelab
-cd ~/canon/homelab && bash scripts/install-hooks.sh
+git clone git@github.com:EthanPlusPlus/prismo.git ~/canon/prismo
+cd ~/canon/prismo && bash scripts/install-hooks.sh
 ```
 
 ### 2. Run the setup script
 
 ```bash
-~/canon/homelab/scripts/prismo new-machine
+~/canon/prismo/scripts/prismo new-machine
 ```
 
 The script will:
@@ -36,7 +36,7 @@ The script will:
 ### 3. Verify
 
 ```bash
-~/canon/homelab/scripts/prismo status
+~/canon/prismo/scripts/prismo status
 ```
 
 All hooks should be green and context-server reachable.
@@ -46,14 +46,14 @@ All hooks should be green and context-server reachable.
 ## Memory
 
 Shared memory (system overview, workflow, MCP details, shorthands) lives in
-`~/canon/homelab/docs/memory/` and is symlinked into your local Claude Code memory
+`~/canon/prismo/docs/memory/` and is symlinked into your local Claude Code memory
 directory by `prismo new-machine`. It updates automatically on `git pull`.
 
 Personal memory (behavioral preferences, feedback) is synced optionally via scp
 and stays local — it is never committed to the repo.
 
 Memory is still scoped to the directory Claude Code is launched from.
-**Always launch from `~/canon/homelab`** — that is the directory `prismo new-machine`
+**Always launch from `~/canon/prismo`** — that is the directory `prismo new-machine`
 wires the symlinks for.
 
 ---

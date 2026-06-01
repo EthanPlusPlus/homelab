@@ -16,9 +16,9 @@ heuristic in the loaded context. Make a call at the end.
 
 ## If the [FACET: assess] block is absent
 
-1. `search_docs` — doc_type `homelab`, category `decisions`, top_k `10`
-2. `search_docs` — doc_type `homelab`, category `proposed-ideas`, status `proposed`, top_k `8`
-3. `get_recent_changes` — project `homelab`
+1. `search_docs` — doc_type `prismo`, category `decisions`, top_k `10`
+2. `search_docs` — doc_type `prismo`, category `proposed-ideas`, status `proposed`, top_k `8`
+3. `get_recent_changes` — project `prismo`
 4. `get_runtime_topology`
 5. If a specific topic was provided, `search_docs` on that topic, top_k `8`
 

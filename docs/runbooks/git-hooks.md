@@ -23,7 +23,7 @@ and calls the appropriate context-server endpoint for that repo.
 
 | Location | What gets indexed |
 |----------|------------------|
-| `~/canon/homelab/` | docs (`/index`) — all projects |
+| `~/canon/prismo/` | docs (`/index`) — all projects |
 | `~/projects/context-server/` | code (`/index/code?project=context-server`) |
 | `~/canon/context-server/` | docs (`/index`) — worktree-specific hook, all projects |
 | `~/projects/devcamp/` | code (`/index/code?project=devcamp`) |

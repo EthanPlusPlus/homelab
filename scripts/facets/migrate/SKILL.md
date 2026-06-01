@@ -15,9 +15,9 @@ Reason from that context — migration doctrine, architectural laws, and topolog
 
 ## If the [FACET: migrate] block is absent
 
-1. `get_doc_section` — `decisions/017-three-architectural-laws.md`, doc_type `homelab`
-2. `search_docs` — doc_type `homelab`, category `decisions`, query `migration interface contract service rule`
-3. `get_recent_changes` — project `homelab`
+1. `get_doc_section` — `decisions/017-three-architectural-laws.md`, doc_type `prismo`
+2. `search_docs` — doc_type `prismo`, category `decisions`, query `migration interface contract service rule`
+3. `get_recent_changes` — project `prismo`
 4. `get_runtime_topology`
 
 ## The rule this Facet enforces

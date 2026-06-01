@@ -229,17 +229,17 @@ claude mcp add context-server --transport http \
 This is per-machine and per-repo-directory — it must be run once on each
 machine where you'll work on this project.
 
-### 8. Update homelab docs (the Prismo system canon)
+### 8. Update prismo docs (the Prismo system canon)
 
-Reminder: `~/canon/homelab/` is the de facto Prismo system canon (see `memory/system.md`).
+Reminder: `~/canon/prismo/` is the de facto Prismo system canon (see `memory/system.md`).
 System-wide things go here. Component-internal things go in the project's own canon.
 
-- Add the new project to `~/canon/homelab/docs/architecture/system.md` (repos table + directory tree)
-- Add the new service to the service inventory in `~/canon/homelab/docs/context/services.md` if it exposes one
+- Add the new project to `~/canon/prismo/docs/architecture/system.md` (repos table + directory tree)
+- Add the new service to the service inventory in `~/canon/prismo/docs/context/services.md` if it exposes one
 - Update `new-machine-setup.md` to include the new repo's sparse-checkout dirs
-- Re-index and push homelab
+- Re-index and push prismo
 
-What stays in the project's own canon (NOT homelab):
+What stays in the project's own canon (NOT prismo):
 - Implementation decisions about how that project works internally
 - Project-specific runbooks
 - Project-specific architecture beyond "it exists and lives at X"

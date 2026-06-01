@@ -35,19 +35,19 @@ activation:
 context_loaders:
   - type: doc_fetch
     path: decisions/017-three-architectural-laws.md
-    doc_type: homelab
+    doc_type: prismo
     label: architectural_laws
     required: true
 
   - type: search
-    doc_type: homelab
+    doc_type: prismo
     category: decisions
     query: migration interface contract service rule breaking change
     top_k: 8
     label: migration_doctrine
 
   - type: recent_changes
-    project: homelab
+    project: prismo
     label: recent_changes
 
   - type: runtime_topology
@@ -56,7 +56,7 @@ context_loaders:
   - type: conditional_search
     condition: args_present
     query: "$ARGS"
-    doc_type: homelab
+    doc_type: prismo
     top_k: 5
     label: domain_specific
 

@@ -19,10 +19,10 @@ topology are already loaded.
 
 Context-server may be unreachable. Fall back:
 
-1. `get_doc_section` — `decisions/017-three-architectural-laws.md`, doc_type `homelab`
-2. `search_docs` — doc_type `homelab`, category `decisions`, top_k `10`
-3. `get_recent_changes` — project `homelab`
-4. `search_docs` — doc_type `homelab`, category `proposed-ideas`, status `proposed`, top_k `5`
+1. `get_doc_section` — `decisions/017-three-architectural-laws.md`, doc_type `prismo`
+2. `search_docs` — doc_type `prismo`, category `decisions`, top_k `10`
+3. `get_recent_changes` — project `prismo`
+4. `search_docs` — doc_type `prismo`, category `proposed-ideas`, status `proposed`, top_k `5`
 5. `get_runtime_topology`
 
 If `$ARGUMENTS` names a specific area, also run `search_docs` with `$ARGUMENTS` as query.

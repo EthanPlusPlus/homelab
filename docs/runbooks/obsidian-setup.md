@@ -18,7 +18,7 @@ Then open Obsidian → "Open folder as vault" → `~/obsidian-canon/`.
 
 That's it. The rest of this document explains the architecture and manual steps if needed.
 
-The script is served directly by the context-server API (`/scripts` static mount → `/canon/homelab/scripts/`), so it always reflects the latest version in canon.
+The script is served directly by the context-server API (`/scripts` static mount → `/canon/prismo/scripts/`), so it always reflects the latest version in canon.
 
 ---
 
@@ -83,7 +83,7 @@ tail -f /tmp/canon-sync.log
 The server runs a cron job every 2 minutes to pull and re-index:
 
 ```
-*/2 * * * * cd /home/ethan/canon/homelab && git pull --ff-only && curl -s -X POST http://localhost:8000/index >> /tmp/canon-pull.log 2>&1
+*/2 * * * * cd /home/ethan/canon/prismo && git pull --ff-only && curl -s -X POST http://localhost:8000/index >> /tmp/canon-pull.log 2>&1
 */2 * * * * cd /home/ethan/canon/context-server && git pull --ff-only && curl -s -X POST http://localhost:8000/index >> /tmp/canon-pull.log 2>&1
 */2 * * * * cd /home/ethan/canon/even && git pull --ff-only && curl -s -X POST http://localhost:8000/index >> /tmp/canon-pull.log 2>&1
 ```
@@ -104,4 +104,4 @@ This is already installed. To verify: `crontab -l`
 
 - `exam-prep/` has no git repo — copy it into the vault manually if you want it in Obsidian, but changes won't sync
 - Obsidian's graph view, backlinks, and search work across both repos from day one
-- Wikilinks between homelab and context-server docs work within the vault (Obsidian resolves them by filename)
+- Wikilinks between prismo and context-server docs work within the vault (Obsidian resolves them by filename)

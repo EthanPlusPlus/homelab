@@ -1,6 +1,6 @@
- # Prismo — Homelab Docs
+ # Prismo — System Canon
 
-You are working in the Prismo homelab docs repo. Prismo is the name for the
+You are working in the Prismo system canon repo. Prismo is the name for the
 whole system: Proxmox host, Ubuntu Server VM, services, projects, and the
 workflow that governs all of them.
 
