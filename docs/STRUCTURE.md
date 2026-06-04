@@ -17,20 +17,17 @@ Every doc should earn its place. If removing it would not hurt, it should not ex
 `~/canon/prismo/` is the **Prismo system canon** by convention (see `memory/system.md`).
 The repo name was historical — renamed from homelab in 2026-06 once the forcing functions (Decision 032, prismo-ui) arrived.
 
-It carries two things at once:
+It contains two layers, now separated:
 
-1. **Prismo system-wide governance** — V2 masterplan/roadmap, architectural laws,
-   cross-cutting decisions (013–019), shared session memory, the prismo CLI script.
-2. **Homelab-as-a-component specifics** — hardware specs, Proxmox/Ubuntu VM setup
-   runbooks, service inventory, networking constraints.
+1. **Prismo system-wide governance** — architectural laws, cross-cutting decisions,
+   shared session memory, the prismo CLI script. Lives in `architecture/`, `decisions/`,
+   `runbooks/`, `context/`, `memory/`.
+2. **Infrastructure specifics** — hardware specs, network topology, Proxmox/Ubuntu VM
+   details. Lives in `infra/`. Least portable, most machine-specific content.
 
-The structure below applies to both. Decisions affecting Prismo-the-system live here.
-Decisions affecting a single component's internals (e.g. how context-server implements
-lifecycle-aware retrieval) live in that component's canon at `~/canon/<component>/`.
-
-
-(web UI exposing project structure, new contributor onboarding). Until then the rule
-above keeps things from getting more tangled.
+Decisions affecting Prismo-the-system live here. Decisions affecting a single component's
+internals (e.g. how context-server implements lifecycle-aware retrieval) live in that
+component's canon at `~/canon/<component>/`.
 
 ---
 
@@ -153,20 +150,41 @@ df -h /
 
 ### `architecture/`
 
-Purpose: Intended design of the system — what it is meant to look like.
+Purpose: Intended design of the Prismo system — layers, contracts, and governance.
 
 Belongs here:
-- Hardware specs
-- Network topology
-- Service relationships and boundaries
-- Intended design decisions
+- Layer model and runtime role definitions (`model.md`)
+- Living architectural contracts (`contracts/` — capability-contracts, object model, lifecycle semantics)
+- Phase progress tracking (`v2-progress.md`)
+- Historical founding docs (`history/` — masterplan, roadmap; reference only, not updated)
 
 Does not belong here:
+- Hardware or network specifics (→ `infra/`)
 - Actual current state (→ `context/`)
 - Procedures (→ `runbooks/`)
 
-Note: `architecture/` is the intended design. `context/` is the actual current state.
-Drift between the two is meaningful and worth tracking.
+Sub-folders:
+- `contracts/` — living service contracts enforced by the system (capability-contracts, object model, lifecycle semantics, retrieval architecture)
+- `history/` — founding vision docs (masterplan, roadmap, v2-audit); frozen, not updated; reference only
+- `infra/` is a sibling folder, not a child
+
+---
+
+### `infra/`
+
+Purpose: Physical and network infrastructure specifics — the hardware Prismo currently runs on.
+
+Belongs here:
+- Hardware specs
+- Network topology and NAT configuration
+- Machine-specific constraints
+
+Does not belong here:
+- System design or layer architecture (→ `architecture/`)
+- Current service state (→ `context/`)
+
+Note: `infra/` is the least portable content in this repo. Per Decision 032, portability
+is a first-class constraint — infra specifics should never leak into system-level docs.
 
 ---
 
@@ -175,7 +193,7 @@ Drift between the two is meaningful and worth tracking.
 Frozen as historical record. **No new files land here.** Pre-approval content now lives
 in workflow-state-service as ReviewItems; approved ReviewItems are written directly
 into canonical folders by the approve endpoint. See [[decisions/021-reviewitems-as-judgment-boundary|Decision 021]]
-and `architecture/phase1/capability-contracts.md` (titled "Service Contracts" — HTTP interface definitions for all Layer 2 capabilities).
+and `architecture/contracts/capability-contracts.md` (titled "Service Contracts" — HTTP interface definitions for all Layer 2 capabilities).
 
 Drafts already present (capture-*.md, sukuna-*.md) remain as-is and are excluded
 from indexed retrieval (`record_type=draft`).

@@ -21,7 +21,7 @@ Outcome: invariant structures identified, Claude-coupling surfaced, lifecycle ga
 
 ## Phase 1 — Stable architectural contracts ✅ complete
 
-Deliverables (all in `architecture/phase1/`):
+Deliverables (all in `architecture/contracts/`, moved from `phase1/`):
 
 - `canon-object-model.md` — Decision, Proposal, Project, Session, Workstream, ContextBundle,
   OperationalBrief, RuntimeProfile, Contributor
