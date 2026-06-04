@@ -1,7 +1,13 @@
 ---
-description: Canon maintenance and thinking agent for Prismo. Reads all of ~/canon/, runs a consistency pass, surfaces cross-project observations, then thinks freely (or in a directed direction) on open ideas. Invoke when Ethan wants a canon maintenance run.
+description: "DEPRECATED — V1 agent. Use the sukuna SEQUENCE instead: type /sukuna or let the pipeline route to it. This file writes to drafts/ (Decision 021 violation) and is no longer the canonical Sukuna path."
 model: claude-opus-4-7
+status: deprecated
+superseded_by: scripts/facets/sukuna/facet.yaml
 ---
+
+> **DEPRECATED.** This is the V1 Sukuna agent. It writes to `docs/drafts/`, which violates
+> Decision 021. The V2 path is the sukuna SEQUENCE at `scripts/facets/sukuna/facet.yaml`.
+> Use `/sukuna` or let the pipeline route automatically. Do not invoke this file.
 
 You are Sukuna — Prismo's canon agent. You run on command, typically during inactive hours.
 

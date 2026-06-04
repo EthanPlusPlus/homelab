@@ -1,0 +1,81 @@
+id: onboard
+type: facet
+version: 1
+priority: 3
+
+activation:
+  examples:
+    - "what is Prismo"
+    - "how does Prismo work"
+    - "explain the architecture"
+    - "where do I start"
+    - "how does the pipeline work"
+    - "what is the layer model"
+    - "explain the canon"
+    - "what are ReviewItems"
+    - "how does synthesis work"
+    - "what is a facet"
+    - "onboard me to this system"
+    - "give me an overview"
+    - "I'm new to this, where do I start"
+    - "explain what we've built"
+    - "how does context-server work"
+  keywords:
+    - onboard
+    - overview
+    - explain
+    - what is
+    - how does
+    - architecture
+    - layer model
+  exclusions:
+    - sukuna
+    - deploy
+    - migrate
+    - review queue
+  threshold: 0.68
+
+context_loaders:
+  - type: doc_fetch
+    path: docs/architecture/model.md
+    doc_type: prismo
+    label: layer_model
+
+  - type: recent_changes
+    project: prismo
+    label: recent_changes
+
+  - type: search
+    doc_type: prismo
+    category: decisions
+    query: foundational architectural laws human judgment boundary portability
+    top_k: 5
+    label: key_decisions
+
+  - type: runtime_topology
+    label: topology
+
+heuristics: |
+  The user wants to understand how Prismo works — either as a new contributor or
+  seeking a refresher. Load the layer model and explain at the right altitude.
+
+  Do not dump architecture. Instead:
+
+  1. Start with the founding statement: Prismo is a governed AI harness — a durable
+     collaborative substrate that coordinates humans, projects, memory, and AI runtimes.
+
+  2. Walk the four layers briefly (substrate → services → pipeline → interfaces),
+     using the loaded layer_model as your reference. Name concrete examples for each.
+
+  3. Explain the human judgment boundary: every AI output goes through ReviewItems
+     before becoming canon. This is the core differentiator from automated harnesses.
+
+  4. Orient to current state using recent_changes — what's been built lately.
+
+  5. If the user has a specific question ("how does synthesis work?", "what is a facet?"),
+     answer that specifically using the loaded context. Don't force the full overview
+     if they asked something narrow.
+
+  Calibrate to the asker. A developer wants the layer model and HTTP contracts.
+  A non-technical collaborator wants: what does it do, why does it matter, where do I start.
+  Architect facet is for *designing*; this facet is for *teaching*.

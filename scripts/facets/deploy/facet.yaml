@@ -1,0 +1,73 @@
+id: deploy
+type: sequence
+version: 1
+priority: 5
+
+activation:
+  examples:
+    - "deploy the changes"
+    - "ship it"
+    - "put this into production"
+    - "rebuild the container"
+    - "docker compose up"
+    - "restart the service"
+    - "deploy context-server"
+    - "deploy prismo-ui"
+    - "the changes are ready to deploy"
+    - "let's get this running"
+    - "redeploy after these changes"
+    - "push this to the server"
+    - "run the service rule check"
+    - "re-index after deploy"
+  keywords:
+    - deploy
+    - redeploy
+    - ship
+    - compose up
+    - rebuild
+    - container
+    - production
+    - re-index
+    - reindex
+  threshold: 0.70
+
+context_loaders:
+  - type: search
+    doc_type: prismo
+    query: deployment service rule docker compose health check
+    top_k: 5
+    label: deploy_docs
+
+  - type: runtime_topology
+    label: topology
+
+steps:
+  - id: pre_deploy_check
+    label: "Verify Service Rule passes before deploy"
+    detail: "If touching context-server: confirm all routes are documented in architecture/contracts/capability-contracts.md. The Service Rule check runs at startup and will fail-to-start on undocumented routes."
+
+  - id: commit_push
+    label: "Commit and push all changes"
+    detail: "Check git status across all touched repos. Commit + push before building — the container pulls from the filesystem, not git, but this prevents drift."
+
+  - id: rebuild
+    label: "Rebuild and restart via docker compose"
+    detail: "cd ~/projects/context-server && docker compose up --build -d (for context-server). cd ~/projects/prismo-ui && docker compose up --build -d (for prismo-ui). Check for build errors before proceeding."
+    required: true
+
+  - id: health_check
+    label: "Verify service is healthy"
+    detail: "curl -s http://localhost:8000/ should return 200. Check docker compose logs for startup errors. Confirm Service Rule passes in logs (look for 'Service Rule: N routes documented')."
+    required: true
+
+  - id: reindex
+    label: "Re-index if docs or code changed"
+    detail: "If doc content changed: curl -X POST http://localhost:8000/index. If code changed: curl -X POST http://localhost:8000/index/code?project=context-server. Skip if only pipeline/service code changed with no new symbols."
+
+  - id: smoke_test
+    label: "Smoke test the changed capability"
+    detail: "Hit the specific endpoint that changed. If synthesis: POST /synthesis/run with a test capture. If pipeline: POST /pipeline/process with a test prompt. If doctrine: GET /doctrine/validate. Confirm response shape matches capability-contracts.md."
+
+  - id: topology_verify
+    label: "Verify runtime topology reflects deployed state"
+    detail: "GET /runtime/topology or prismo runtime topology. Confirm all expected roles are present and providers match what was just deployed."

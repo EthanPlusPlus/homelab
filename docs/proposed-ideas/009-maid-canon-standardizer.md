@@ -2,7 +2,7 @@
 id: "009"
 title: Sukuna — Canon Maintenance and Thinking Agent
 status: closed
-notes: built and running; evolution tracked in 013-sukuna-as-synthesis-consumer
+notes: "V1 agent (scripts/sukuna.md) deprecated 2026-06-04. Replaced by sukuna SEQUENCE at scripts/facets/sukuna/facet.yaml — type: sequence, 4 explicit steps, emits captures instead of writing drafts/."
 ---
 
 # 009 — Sukuna: Canon Maintenance and Thinking Agent

@@ -87,10 +87,6 @@ for f in system.md workflow.md mcp.md shorthands.md; do
   ln -sf "$HOME/canon/prismo/docs/memory/$f" "$MEM_DIR/$f"
 done
 
-# Agent symlinks
-mkdir -p ~/.claude/agents
-ln -sf ~/canon/prismo/scripts/sukuna.md ~/.claude/agents/sukuna.md
-
 # Register MCP
 cd ~/canon/prismo && claude mcp add context-server --transport http http://localhost:8001/mcp
 ```

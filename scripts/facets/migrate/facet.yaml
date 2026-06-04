@@ -1,6 +1,6 @@
 id: migrate
-type: facet
-version: 1
+type: sequence
+version: 2
 priority: 0
 
 activation:
@@ -60,23 +60,40 @@ context_loaders:
     top_k: 5
     label: domain_specific
 
-heuristics: |
-  Before touching any interface, signature, or contract:
-  1. grep every call site — do not assume you know them all
-  2. Check the Service Rule: every route must be in capability-contracts.md before code ships
-  3. Identify what data exists and cannot be undone (pgvector HNSW indexes, committed data)
-  4. Write the rollback plan before writing the migration
+steps:
+  - id: grep_call_sites
+    label: "Grep all call sites before touching anything"
+    detail: "Run grep -rn '<symbol_or_route>' ~/projects/ to find every caller. Do not proceed until you have the full list. Missed call sites are how the pgvector/doctrine bug happened (2026-05-29)."
+    required: true
 
-  During migration:
-  - Change one thing at a time — do not bundle interface changes with logic changes
-  - Keep backward compat until ALL call sites are updated
-  - Run the Service Rule startup check after every route change
+  - id: service_rule_baseline
+    label: "Capture Service Rule baseline"
+    detail: "GET http://localhost:8000/doctrine/validate or check startup logs. Record current violation count. Any new violations after migration = regression."
+    required: true
 
-  After migration:
-  - Every registered route gets a response check (smoke test)
-  - Update the component canon (recent-changes.md, progress.md)
-  - Verify no stale cross-references in decisions
+  - id: capability_contracts_check
+    label: "Check capability-contracts.md before any route changes"
+    detail: "If adding/removing/changing a route: update architecture/contracts/capability-contracts.md FIRST. The Service Rule check fails-to-start on undocumented routes — discover this at planning time, not deploy time."
 
-  The doctrine bug (pgvector migration 2026-05-29) is the reference failure:
-  interface changed, call site in doctrine/router.py missed, nothing caught it.
-  That is what this Facet prevents.
+  - id: rollback_plan
+    label: "Write the rollback plan"
+    detail: "Name the specific revert: which migration to undo, which git SHA to reset to, whether data written during migration can be undone. If data cannot be undone, this is a one-way door — say so explicitly before proceeding."
+    required: true
+
+  - id: one_change_at_a_time
+    label: "Change one thing at a time"
+    detail: "Do not bundle interface changes with logic changes. Keep backward compat until ALL call sites are updated. If changing a function signature: update callers before changing the implementation, or vice versa — never leave them inconsistent."
+
+  - id: post_migration_service_rule
+    label: "Run Service Rule check after every route change"
+    detail: "GET /doctrine/validate. Zero new violations. If violations appear: fix before moving on. Do not accumulate violations across steps."
+    required: true
+
+  - id: smoke_test
+    label: "Smoke test every changed route"
+    detail: "Hit each changed endpoint with a real request. Verify response shape matches capability-contracts.md. Check docker compose logs for errors."
+    required: true
+
+  - id: update_canon
+    label: "Update component canon"
+    detail: "Update recent-changes.md with what changed. Update progress.md if a phase item closed. Check for stale cross-references in decisions that named the old interface."

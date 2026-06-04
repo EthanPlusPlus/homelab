@@ -1475,7 +1475,7 @@ Edited and approved ReviewItem ${item_id} from synthesis-service.
 
 # ── pipeline (Decision 026 — Layer 3.5 activation) ───────────────────────────
 
-_KNOWN_FACETS="architect migrate sukuna review"
+_KNOWN_FACETS="architect assess migrate sukuna review deploy onboard wrap-up"
 
 # _extract_prompt: read UserPromptSubmit hook JSON from stdin, return prompt text
 _pipeline_extract_prompt() {
