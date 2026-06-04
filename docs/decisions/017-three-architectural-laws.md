@@ -2,6 +2,7 @@
 id: "017"
 status: active
 record_type: canonical
+category: governance
 ---
 # Decision 017 — Three Permanent Architectural Laws + Layer 2 Service Rule
 

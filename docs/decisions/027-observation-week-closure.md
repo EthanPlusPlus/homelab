@@ -3,6 +3,7 @@ id: "027"
 title: Observation week closed — synthesis quality gate calibration findings
 status: active
 record_type: canonical
+category: governance
 date: 2026-05-30
 ---
 

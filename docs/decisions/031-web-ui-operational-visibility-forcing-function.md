@@ -3,6 +3,7 @@ id: "031"
 title: Web UI — operational visibility as primary forcing function
 status: active
 record_type: canonical
+category: architecture
 date: 2026-05-31
 ---
 

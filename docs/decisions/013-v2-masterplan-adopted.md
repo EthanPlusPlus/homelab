@@ -2,6 +2,7 @@
 id: "013"
 status: active
 record_type: canonical
+category: architecture
 ---
 # Decision 013 — Prismo V2 masterplan and roadmap adopted as governing architecture
 

@@ -3,6 +3,7 @@ id: "022"
 title: Adapter ontology drift as architectural smell
 status: active
 record_type: canonical
+category: architecture
 date: 2026-05-17
 ---
 

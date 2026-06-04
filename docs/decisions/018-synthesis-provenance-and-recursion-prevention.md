@@ -2,6 +2,7 @@
 id: "018"
 status: active
 record_type: canonical
+category: architecture
 ---
 # Decision 018 — Synthesis provenance and recursion prevention
 

@@ -2,6 +2,7 @@
 id: "005"
 status: active
 record_type: canonical
+category: infrastructure
 ---
 # Decision 005 — GitHub over Gitea (for now)
 

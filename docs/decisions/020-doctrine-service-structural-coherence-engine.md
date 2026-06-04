@@ -3,6 +3,7 @@ id: "020"
 title: doctrine-service — structural coherence engine
 status: active
 record_type: canonical
+category: architecture
 date: 2026-05-16
 ---
 

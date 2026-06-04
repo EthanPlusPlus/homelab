@@ -3,6 +3,7 @@ id: "025"
 title: Runtime Intelligence Layer — topology, roles, and execution modes
 status: active
 record_type: canonical
+category: architecture
 date: 2026-05-28
 ---
 

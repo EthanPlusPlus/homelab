@@ -2,6 +2,7 @@
 id: "012"
 status: active
 record_type: canonical
+category: workflow
 ---
 # Decision 012 — Session bootstrap and inline canon discipline
 

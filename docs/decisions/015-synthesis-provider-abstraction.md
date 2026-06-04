@@ -2,6 +2,7 @@
 id: "015"
 status: active
 record_type: canonical
+category: architecture
 ---
 # Decision 015 — Synthesis provider abstraction (Layer 2 / Layer 3 boundary)
 

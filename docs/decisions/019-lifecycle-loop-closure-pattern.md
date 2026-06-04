@@ -2,6 +2,7 @@
 id: "019"
 status: active
 record_type: canonical
+category: architecture
 ---
 # Decision 019 — Lifecycle loop closure pattern
 

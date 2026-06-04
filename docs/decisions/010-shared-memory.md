@@ -2,6 +2,7 @@
 id: "010"
 status: active
 record_type: canonical
+category: workflow
 ---
 # Decision 010 — Git-Backed Shared Memory
 

@@ -3,6 +3,7 @@ id: "030"
 title: Billing architecture — subscription for main intelligence, API for side intelligences
 status: active
 record_type: canonical
+category: infrastructure
 date: 2026-05-31
 ---
 

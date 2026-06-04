@@ -3,6 +3,7 @@ id: "021"
 title: ReviewItems as the human-judgment boundary — synthesis emits, humans approve, canon updates
 status: active
 record_type: canonical
+category: governance
 date: 2026-05-17
 ---
 

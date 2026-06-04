@@ -3,6 +3,7 @@ id: "023"
 title: Synthesis-service owns interpretive augmentation — /synthesis/analyze contract
 status: active
 record_type: canonical
+category: architecture
 date: 2026-05-19
 ---
 

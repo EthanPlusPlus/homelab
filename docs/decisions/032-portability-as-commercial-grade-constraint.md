@@ -3,6 +3,7 @@ id: "032"
 title: Portability as a first-class constraint for commercial viability
 status: active
 record_type: canonical
+category: governance
 date: 2026-05-31
 ---
 

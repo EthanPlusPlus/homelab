@@ -3,6 +3,7 @@ id: "024"
 title: CapabilityRegistry — Phase 4 runtime abstraction
 status: active
 record_type: canonical
+category: architecture
 date: 2026-05-26
 ---
 

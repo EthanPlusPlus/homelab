@@ -3,6 +3,7 @@ id: "028"
 title: Response Processor — automatic capture from model output
 status: active
 record_type: canonical
+category: architecture
 date: 2026-05-30
 ---
 

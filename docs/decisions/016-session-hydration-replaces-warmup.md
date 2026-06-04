@@ -2,6 +2,7 @@
 id: "016"
 status: active
 record_type: canonical
+category: workflow
 ---
 # Decision 016 — Session hydration replaces the warm-up ritual
 

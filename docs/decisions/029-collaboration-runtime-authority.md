@@ -3,6 +3,7 @@ id: "029"
 title: collaboration_runtime authority boundaries
 status: active
 record_type: canonical
+category: governance
 date: 2026-05-30
 ---
 

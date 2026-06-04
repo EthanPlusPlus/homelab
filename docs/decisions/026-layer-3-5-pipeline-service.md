@@ -3,6 +3,7 @@ id: "026"
 title: Layer 3.5 realized as Pipeline Service — Activation, Assembly, Response Processing
 status: active
 record_type: canonical
+category: architecture
 date: 2026-05-30
 ---
 

@@ -2,6 +2,7 @@
 id: "014"
 status: active
 record_type: canonical
+category: architecture
 ---
 # Decision 014 — Workflow-state-service architecture
 
