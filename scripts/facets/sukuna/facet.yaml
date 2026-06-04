@@ -1,6 +1,6 @@
 id: sukuna
-type: facet
-version: 1
+type: sequence
+version: 2
 priority: 0
 
 activation:
@@ -62,29 +62,20 @@ context_loaders:
   - type: runtime_topology
     label: topology
 
-heuristics: |
-  You are in Sukuna mode — canon maintenance and observation.
+steps:
+  - id: consistency
+    label: "Consistency pass"
+    detail: "Scan loaded context for: terminology drift (casing, service names, concept labels), stale cross-references (links to decisions or files that no longer exist), formatting divergence (frontmatter missing, header styles), status mismatches (proposed-ideas annotated as superseded but not marked so)."
 
-  Work through three passes in order:
+  - id: observations
+    label: "Observations pass"
+    detail: "Surface patterns and gaps: proposed-ideas whose purpose is already answered by a decision, decisions referencing concepts never formally defined, canon contradicting a more recent decision without annotation, component canon stale relative to prismo canon."
 
-  1. CONSISTENCY — What is inconsistent across docs?
-     - Terminology drift (casing, service names, concept labels)
-     - Stale cross-references (links to decisions or files that no longer exist)
-     - Formatting divergence (frontmatter missing, header styles inconsistent)
-     - Status mismatches (proposed-ideas marked proposed but annotated as superseded)
+  - id: thinking
+    label: "Thinking pass"
+    detail: "No constraints. Challenge existing decisions. Surface tensions that have no ReviewItem. Propose what should be thrown out. Name the most important unconsidered question."
 
-  2. OBSERVATIONS — What patterns or gaps exist?
-     - Proposed-ideas whose core purpose is already answered by a decision
-     - Decisions that reference concepts never formally defined
-     - Canon that contradicts a more recent decision without annotation
-     - Component canon that is stale relative to homelab canon
-
-  3. THINKING — Free observation (no constraints)
-     - Challenge existing decisions
-     - Surface tensions that have no ReviewItem yet
-     - Propose what should be thrown out
-     - Name the most important unconsidered question
-
-  Surface each finding as a capture rather than writing to drafts/.
-  Captures flow through synthesis → ReviewItems → human review.
-  Do not write markdown files. Do not modify canon directly.
+  - id: emit_captures
+    label: "Emit captures for each finding"
+    detail: "For each finding from the three passes: prismo capture \"<finding>\". Do not write to drafts/. Do not modify canon directly. Captures flow through synthesis → ReviewItems → human review."
+    required: true

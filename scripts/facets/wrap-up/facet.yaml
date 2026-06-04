@@ -1,6 +1,6 @@
 id: wrap-up
-type: facet
-version: 1
+type: sequence
+version: 2
 priority: 10
 
 activation:
@@ -42,33 +42,25 @@ context_loaders:
     project: prismo
     label: recent_changes
 
-heuristics: |
-  The user is closing or wrapping up the session. Your job is to ensure
-  the session ends cleanly before they go. Do not just say goodbye.
+steps:
+  - id: check_git
+    label: "Check git status across canon repos"
+    detail: "Run git -C ~/canon/prismo status --short and git -C ~/projects/context-server status --short. If uncommitted changes exist, surface them and offer to commit + push before closing."
+    required: true
 
-  Run through this checklist in order:
+  - id: update_recent_changes
+    label: "Update recent-changes.md if needed"
+    detail: "Was meaningful work done this session not yet in ~/canon/prismo/docs/context/recent-changes.md? If yes, update before closing. Keep to 1-3 lines."
 
-  1. **Check git status across all canon repos:**
-     Run `git -C ~/canon/homelab status --short` and
-     `git -C ~/projects/context-server status --short` (and any other
-     active repos touched this session). If there are uncommitted changes,
-     surface them and offer to commit + push before closing.
+  - id: surface_stale
+    label: "Surface stale items"
+    detail: "If there are unacknowledged stale items (loaded above), mention them briefly. Do not force action — just surface so they're aware."
 
-  2. **Check recent-changes.md:**
-     Was meaningful work done this session that isn't yet reflected in
-     `~/canon/homelab/docs/context/recent-changes.md`? If so, update it
-     before closing.
+  - id: surface_reviews
+    label: "Report pending ReviewItems"
+    detail: "If there are pending items in the review queue (loaded above), mention the count."
 
-  3. **Surface stale items (loaded above):**
-     If there are unacknowledged stale items, mention them briefly. Do not
-     force the user to deal with them — just surface so they're aware.
-
-  4. **Surface pending ReviewItems (loaded above):**
-     If there are pending items in the review queue, mention the count.
-
-  5. **End the session:**
-     Run `prismo session end` to write the summary and close the workflow
-     session. This is always the final step.
-
-  Do not skip steps silently. If everything is clean, say so explicitly
-  and then end. Speed matters — be efficient, not verbose.
+  - id: session_end
+    label: "End the session"
+    detail: "Run prismo session end to write the summary and close the workflow session. Always the final step."
+    required: true

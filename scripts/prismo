@@ -1494,7 +1494,7 @@ print(text[:400])
 " 2>/dev/null
 }
 
-# _format_facet_block: render a PipelineResult bundle as a [FACET] system block
+# _format_facet_bundle: render a PipelineResult bundle as a [FACET] or [SEQUENCE] system block
 _format_facet_bundle() {
   local activation_id="$1"
   local score="$2"
@@ -1513,21 +1513,36 @@ try:
     result = json.loads(bundle_raw)
     bundle = result.get('bundle', {})
     entry = bundle.get(activation_id, {})
+    activation_type = entry.get('type', 'facet')
     context = entry.get('context', {})
     heuristics = entry.get('heuristics', '').strip()
+    steps = entry.get('steps', [])
 except Exception as e:
     print(f'[FACET: {activation_id} | parse error: {e}]')
     sys.exit(0)
 
 score_str = f'score: {score}' if mode == 'auto' else 'explicit'
-print(f'[FACET: {activation_id} | {score_str}]')
+label = 'SEQUENCE' if activation_type == 'sequence' else 'FACET'
+print(f'[{label}: {activation_id} | {score_str}]')
 
-# Heuristics block
-if heuristics:
+if activation_type == 'sequence' and steps:
+    # SEQUENCE: numbered step list
     print()
-    print('Reasoning posture:')
-    for line in heuristics.splitlines():
-        print(f'  {line}')
+    print(f'Steps ({len(steps)}):')
+    for i, step in enumerate(steps, 1):
+        step_label = step.get('label', step.get('id', f'step-{i}'))
+        detail = step.get('detail', '')
+        req = ' *' if step.get('required') else ''
+        print(f'  {i}. {step_label}{req}')
+        if detail:
+            print(f'     {detail}')
+else:
+    # FACET: free-form reasoning posture
+    if heuristics:
+        print()
+        print('Reasoning posture:')
+        for line in heuristics.splitlines():
+            print(f'  {line}')
 
 # Summary of loaded context
 loaded = list(context.keys())
