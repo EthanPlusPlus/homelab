@@ -535,6 +535,10 @@ The authoritative transport. Adapters (MCP, CLI) wrap these.
 | `triggerCodeIndex` | `POST /index/code` | `api/main.py` |
 | `health` | `GET /health` | `api/main.py` |
 
+**Infrastructure-exempt routes** — excluded from Service Rule enforcement (Decision 034). These are
+infra-layer endpoints, not capability-contract routes:
+- `GET /metrics` — Prometheus scrape endpoint (`prometheus-fastapi-instrumentator`). Auth-exempt; Prometheus scrapes from inside Docker network.
+
 Capabilities not yet in this table: `summarize`, `synthesize`, `codegen`, `plan`, `detectContradictions` — Phase 3+ work.
 
 ---
