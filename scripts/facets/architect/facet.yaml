@@ -27,9 +27,16 @@ activation:
     - "how should the canon be organized"
     - "recommendations on new facets or improvements to existing facets"
     - "what new facets should we build"
+    - "yes design the auth layer"
+    - "yes go ahead and design it"
+    - "design the auth layer taking into account how tailscale works"
+    - "design X considering the constraint of Y"
+    - "yes let's design this taking into account the existing setup"
+    - "design the new service keeping in mind the current infrastructure"
+    - "yes, architect this out considering the homelab constraints"
+    - "build out the architecture for this considering how the VM network works"
   keywords:
     - architecture
-    - design
     - layer
     - service
     - system
@@ -44,6 +51,10 @@ activation:
     - governance
     - reorganize
     - restructure
+  shortcut_keywords:
+    - design
+    - auth layer
+    - auth system
   exclusions:
     - UI color
     - CSS styling

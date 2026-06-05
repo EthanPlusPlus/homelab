@@ -462,6 +462,19 @@ listActivations() → {
 
 ---
 
+### pipelineReload
+
+Force-reload the activation registry from disk without restarting the API process.
+Picks up facet.yaml edits immediately.
+
+```
+pipelineReload() → { reloaded: int, activations: string[] }
+```
+
+**Current implementation:** `POST /pipeline/reload` (`pipeline/api_router.py`)
+
+---
+
 ## HTTP Endpoint Mapping
 
 The authoritative transport. Adapters (MCP, CLI) wrap these.
@@ -517,6 +530,7 @@ The authoritative transport. Adapters (MCP, CLI) wrap these.
 | `pipelineActivate` | `POST /pipeline/activate` | `pipeline/api_router.py` |
 | `processResponse` | `POST /pipeline/process-response` | `pipeline/api_router.py` |
 | `listActivations` | `GET /pipeline/activations` | `pipeline/api_router.py` |
+| `pipelineReload` | `POST /pipeline/reload` | `pipeline/api_router.py` |
 | `triggerIndex` | `POST /index` | `api/main.py` |
 | `triggerCodeIndex` | `POST /index/code` | `api/main.py` |
 | `health` | `GET /health` | `api/main.py` |
