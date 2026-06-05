@@ -262,6 +262,18 @@ Conversation, contribution capture, RBAC, multi-user — when Shrey/Kyle need ac
 Per Decision 031: Phase 6 infra observability (Prometheus / Grafana / Loki) runs as a
 background track alongside Phase 5, not after it. Service metrics and Docker log aggregation
 added incrementally; the web UI is the primary visibility layer.
+
+**Architecture locked ([[../decisions/034-phase-6-observability-layer|Decision 034]], 2026-06-05):**
+Hard boundary: Prometheus owns infra health; `GET /workflow/metrics` + web UI own cognitive
+health. Cognitive alerting via Prometheus is a Law 1/Law 2 violation — out of scope.
+
+**Phase 6 slice 1 build spec:**
+- `prometheus-fastapi-instrumentator` → `/metrics` on context-server (no domain coupling)
+- `prom/prometheus` + `grafana/loki` + `grafana/promtail` + `grafana/grafana` in docker-compose
+- Config files committed under `context-server/observability/` — portable, no manual setup
+- Grafana at port 3001; starter dashboard: request rate, latency p50/p95/p99, error rate, log stream
+- Alert rules (Grafana only, no Alertmanager): service down >2m, error rate >5%, p99 >2s
+- Build pending.
 ## Phase 7 — Advanced research ⏳ not started
 
 ---
