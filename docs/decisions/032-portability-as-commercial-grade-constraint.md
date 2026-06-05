@@ -10,10 +10,10 @@ date: 2026-05-31
 # Decision 032 — Portability as a first-class constraint for commercial viability
 
 ## Status
-Adopted
+Complete — build order steps 1–3 shipped 2026-06-05.
 
 ## Date
-2026-05-31
+2026-05-31 (adopted) / 2026-06-05 (steps 1–3 complete)
 
 ## Context
 
@@ -88,11 +88,18 @@ This decision is about edges, not foundations.
 
 ### Build priority order (follows from this decision)
 
-1. **Env var audit** — replace all hardcoded hostnames, paths, and identities
-   with configuration; establish a canonical `.env.example` covering the full stack
-2. **Auth** — API key auth at minimum; replaces Tailscale as the access layer
-   and makes the system network-agnostic
-3. **Single compose** — one `docker compose up` story, one env file, full stack
+1. ✅ **Env var audit** — hardcoded hostnames (`ubuntu-server.tail58b10c.ts.net`),
+   paths (`/home/ethan/...`), and repo identity replaced with env vars across
+   `context-server`, `prismo-ui`, and the `prismo` CLI. `.env.example` added to
+   both service repos as the canonical onboarding artifact. `VM_HOST` defaults to
+   `localhost`; `CONTEXT_API`, `MCP_URL`, `PRISMO_REPO` independently overridable.
+2. ✅ **Auth** — `Authorization: Bearer <API_KEY>` middleware in `context-server`
+   (Decision 033). Dev mode (empty key) passes all requests. All 53 `curl` calls
+   in the prismo CLI thread the key via `_api_curl()`. MCP server uses `_client()`
+   factory. Exempt routes: `/health`, `/docs`, `/openapi.json`.
+3. ✅ **Single compose** — `context-server/docker-compose.yml` now includes the
+   `ui` service (`build: ../prismo-ui`). One command from one directory:
+   `docker compose up --build -d` starts postgres, api, mcp, and ui.
 4. **Observability** (Phase 6) — metrics, structured logging, alerting; required
    to operate reliably on any infrastructure
 5. **Conversational UI** — the product interface; builds on top of the
