@@ -7,6 +7,18 @@ VM_HOST="${VM_HOST:-localhost}"
 CONTEXT_API="${CONTEXT_API:-http://${VM_HOST}:8000}"
 MCP_URL="${MCP_URL:-http://${VM_HOST}:8001/mcp}"
 PRISMO_REPO="${PRISMO_REPO:-git@github.com:EthanPlusPlus/prismo.git}"
+API_KEY="${API_KEY:-}"
+
+# ── Auth helper ───────────────────────────────────────────────────────────────
+# All context-server API calls go through _api_curl. Passes Authorization header
+# when API_KEY is set; falls through transparently in dev mode (no key).
+_api_curl() {
+  if [[ -n "$API_KEY" ]]; then
+    curl -sf -H "Authorization: Bearer ${API_KEY}" "$@"
+  else
+    curl -sf "$@"
+  fi
+}
 
 # ── Output helpers ────────────────────────────────────────────────────────────
 
@@ -34,7 +46,7 @@ check_prereqs() {
 
 check_vm() {
   step "Checking VM connectivity"
-  curl -sf --max-time 5 "${CONTEXT_API}/health" >/dev/null 2>&1 \
+  _api_curl --max-time 5 "${CONTEXT_API}/health" >/dev/null 2>&1 \
     || die "Cannot reach context-server at ${CONTEXT_API} — is Tailscale connected?"
   ok "context-server reachable"
 }
@@ -368,9 +380,9 @@ DOCEOF
   # 7. Initial index
   step "Initial index"
   info "Indexing docs..."
-  curl -sf -X POST "${CONTEXT_API}/index" >/dev/null && ok "Docs indexed"
+  _api_curl -X POST "${CONTEXT_API}/index" >/dev/null && ok "Docs indexed"
   info "Indexing code..."
-  curl -sf -X POST "${CONTEXT_API}/index/code?project=${name}" >/dev/null \
+  _api_curl -X POST "${CONTEXT_API}/index/code?project=${name}" >/dev/null \
     && ok "Code indexed" \
     || warn "Code index skipped (empty repo is fine — re-run: prismo index ${name})"
 
@@ -402,12 +414,12 @@ cmd_index() {
   check_vm
   if [[ -n "$project" ]]; then
     step "Indexing code: $project"
-    curl -sf -X POST "${CONTEXT_API}/index/code?project=${project}" \
+    _api_curl -X POST "${CONTEXT_API}/index/code?project=${project}" \
       | python3 -m json.tool 2>/dev/null \
       || curl -f -X POST "${CONTEXT_API}/index/code?project=${project}"
   else
     step "Indexing all docs"
-    curl -sf -X POST "${CONTEXT_API}/index" \
+    _api_curl -X POST "${CONTEXT_API}/index" \
       | python3 -m json.tool 2>/dev/null \
       || curl -f -X POST "${CONTEXT_API}/index"
   fi
@@ -419,9 +431,9 @@ cmd_status() {
   echo -e "\n${BOLD}Prismo Status${NC}\n"
 
   echo -e "${BOLD}VM / context-server${NC}"
-  if curl -sf --max-time 5 "${CONTEXT_API}/health" 2>/dev/null | grep -q '"ok"'; then
+  if _api_curl --max-time 5 "${CONTEXT_API}/health" 2>/dev/null | grep -q '"ok"'; then
     local count
-    count=$(curl -sf --max-time 5 "${CONTEXT_API}/health" | python3 -c "import sys,json; print(json.load(sys.stdin).get('docs_indexed','?'))" 2>/dev/null || echo "?")
+    count=$(_api_curl --max-time 5 "${CONTEXT_API}/health" | python3 -c "import sys,json; print(json.load(sys.stdin).get('docs_indexed','?'))" 2>/dev/null || echo "?")
     ok "context-server  ${CONTEXT_API}  (${count} docs indexed)"
   else
     warn "context-server unreachable — ${CONTEXT_API}"
@@ -503,7 +515,7 @@ _session_is_active() {
   local sid="$1"
   [[ -n "$sid" ]] || return 1
   local status
-  status=$(curl -sf --max-time 3 "${CONTEXT_API}/workflow/session/${sid}" 2>/dev/null \
+  status=$(_api_curl --max-time 3 "${CONTEXT_API}/workflow/session/${sid}" 2>/dev/null \
     | python3 -c "import sys,json; print(json.load(sys.stdin).get('session',{}).get('status',''))" 2>/dev/null)
   [[ "$status" == "active" ]]
 }
@@ -518,7 +530,7 @@ cmd_session() {
       local contributor="${2:-ethan}"
       check_vm
       local resp
-      resp=$(curl -sf -X POST "${CONTEXT_API}/workflow/session/start" \
+      resp=$(_api_curl -X POST "${CONTEXT_API}/workflow/session/start" \
         -H 'Content-Type: application/json' \
         -d "{\"contributor_id\":\"${contributor}\",\"project\":\"${project}\"}")
       local sid
@@ -550,7 +562,7 @@ cmd_session() {
       # work done), falling back to current_focus if no commits found. This avoids the
       # session summary being just the opening greeting (the focus seed problem).
       local ctx_resp focus_text session_started_at captures_count summary_text git_summary
-      ctx_resp=$(curl -sf --max-time 5 "${CONTEXT_API}/workflow/session/${sid}" 2>/dev/null)
+      ctx_resp=$(_api_curl --max-time 5 "${CONTEXT_API}/workflow/session/${sid}" 2>/dev/null)
       focus_text=$(echo "$ctx_resp" | python3 -c "
 import sys, json
 try:
@@ -565,7 +577,7 @@ try:
     print(d.get('session', {}).get('started_at', '') or '')
 except Exception:
     print('')" 2>/dev/null)
-      captures_count=$(curl -sf --max-time 5 "${CONTEXT_API}/workflow/captures?status=pending-review" 2>/dev/null \
+      captures_count=$(_api_curl --max-time 5 "${CONTEXT_API}/workflow/captures?status=pending-review" 2>/dev/null \
         | python3 -c "import sys,json; print(len(json.load(sys.stdin).get('captures',[])))" 2>/dev/null || echo "0")
 
       # Collect commit subjects from all canon repos since session start.
@@ -596,12 +608,12 @@ except Exception:
 import json, sys
 print(json.dumps({'summary': sys.argv[1], 'captures_count': int(sys.argv[2])}))
 " "$summary_text" "${captures_count:-0}" > "$_tmp_summary"
-      curl -sf --max-time 5 -X POST "${CONTEXT_API}/workflow/session/${sid}/summarize" \
+      _api_curl --max-time 5 -X POST "${CONTEXT_API}/workflow/session/${sid}/summarize" \
         -H 'Content-Type: application/json' \
         -d @"$_tmp_summary" >/dev/null 2>&1 || true
       rm -f "$_tmp_summary"
 
-      curl -sf -X POST "${CONTEXT_API}/workflow/session/${sid}/end" >/dev/null \
+      _api_curl -X POST "${CONTEXT_API}/workflow/session/${sid}/end" >/dev/null \
         && ok "Session ended: $sid" \
         || warn "Server-side end failed (session may already be ended)"
       rm -f "$SESSION_FILE"
@@ -612,7 +624,7 @@ print(json.dumps({'summary': sys.argv[1], 'captures_count': int(sys.argv[2])}))
         sid=$(cat "$SESSION_FILE")
         check_vm
         local info
-        info=$(curl -sf "${CONTEXT_API}/workflow/session/${sid}" 2>/dev/null)
+        info=$(_api_curl "${CONTEXT_API}/workflow/session/${sid}" 2>/dev/null)
         if [[ -n "$info" ]]; then
           echo "$info" | python3 -m json.tool
         else
@@ -667,7 +679,7 @@ print(text[:200])
       fi
 
       # Close orphan active sessions for this contributor+project
-      curl -sf --max-time 3 "${CONTEXT_API}/workflow/state/${project}" 2>/dev/null \
+      _api_curl --max-time 3 "${CONTEXT_API}/workflow/state/${project}" 2>/dev/null \
         | python3 -c "
 import sys, json
 try:
@@ -677,12 +689,12 @@ try:
             print(s['id'])
 except Exception:
     pass" 2>/dev/null | while read -r orphan_id; do
-        [[ -n "$orphan_id" ]] && curl -sf --max-time 3 -X POST "${CONTEXT_API}/workflow/session/${orphan_id}/end" >/dev/null 2>&1
+        [[ -n "$orphan_id" ]] && _api_curl --max-time 3 -X POST "${CONTEXT_API}/workflow/session/${orphan_id}/end" >/dev/null 2>&1
       done
 
       # Start new session
       local resp
-      resp=$(curl -sf --max-time 5 -X POST "${CONTEXT_API}/workflow/session/start" \
+      resp=$(_api_curl --max-time 5 -X POST "${CONTEXT_API}/workflow/session/start" \
         -H 'Content-Type: application/json' \
         -d "{\"contributor_id\":\"${contributor}\",\"project\":\"${project}\"}" 2>/dev/null)
       [[ -n "$resp" ]] || return 0
@@ -692,7 +704,7 @@ except Exception:
 
       # Seed focus from prompt if available
       if [[ -n "$focus_seed" ]]; then
-        curl -sf --max-time 3 -X PATCH "${CONTEXT_API}/workflow/context/${sid}" \
+        _api_curl --max-time 3 -X PATCH "${CONTEXT_API}/workflow/context/${sid}" \
           -H 'Content-Type: application/json' \
           -d "$(python3 -c "import json; print(json.dumps({'current_focus': '''${focus_seed//\'/\\\'}'''}))")" \
           >/dev/null 2>&1
@@ -700,10 +712,10 @@ except Exception:
 
       # Fetch ContextBundle, unacknowledged stale items, and last session summary
       local bundle stale captures last_session
-      bundle=$(curl -sf --max-time 10 "${CONTEXT_API}/context?project=${project}&contributor=${contributor}&depth=standard" 2>/dev/null)
-      stale=$(curl -sf --max-time 5 "${CONTEXT_API}/stale-items?project=${project}" 2>/dev/null)
-      captures=$(curl -sf --max-time 5 "${CONTEXT_API}/workflow/captures?project=${project}&status=pending-review" 2>/dev/null)
-      last_session=$(curl -sf --max-time 5 "${CONTEXT_API}/workflow/contributor/${contributor}/last-session?project=${project}" 2>/dev/null)
+      bundle=$(_api_curl --max-time 10 "${CONTEXT_API}/context?project=${project}&contributor=${contributor}&depth=standard" 2>/dev/null)
+      stale=$(_api_curl --max-time 5 "${CONTEXT_API}/stale-items?project=${project}" 2>/dev/null)
+      captures=$(_api_curl --max-time 5 "${CONTEXT_API}/workflow/captures?project=${project}&status=pending-review" 2>/dev/null)
+      last_session=$(_api_curl --max-time 5 "${CONTEXT_API}/workflow/contributor/${contributor}/last-session?project=${project}" 2>/dev/null)
       echo ""
       echo "[PRISMO SESSION] session=${sid} project=${project} contributor=${contributor}"
       if [[ -n "$stale" ]]; then
@@ -794,7 +806,7 @@ except Exception as e:
       local sid
       sid=$(cat "$SESSION_FILE")
       check_vm
-      curl -sf -X PATCH "${CONTEXT_API}/workflow/context/${sid}" \
+      _api_curl -X PATCH "${CONTEXT_API}/workflow/context/${sid}" \
         -H 'Content-Type: application/json' \
         -d "{\"current_focus\":\"${focus_text}\"}" >/dev/null \
         && ok "Focus updated: $focus_text" \
@@ -867,13 +879,13 @@ print(json.dumps({
   'defer_days': $defer,
 }))
 ")
-      curl -sf -X POST "${CONTEXT_API}/workflow/stale/ack" \
+      _api_curl -X POST "${CONTEXT_API}/workflow/stale/ack" \
         -H 'Content-Type: application/json' \
         -d "$payload" | python3 -m json.tool && ok "Acknowledged: $item_id"
       ;;
     acks)
       check_vm
-      curl -sf "${CONTEXT_API}/workflow/stale/acks" | python3 -m json.tool
+      _api_curl "${CONTEXT_API}/workflow/stale/acks" | python3 -m json.tool
       ;;
     *)
       die "Unknown stale subcommand: $subcmd  (try: list, ack, acks)"
@@ -887,7 +899,7 @@ cmd_brief() {
   local project="${1:-prismo}"
   check_vm
   echo ""
-  curl -sf "${CONTEXT_API}/brief?project=${project}" | python3 -c "
+  _api_curl "${CONTEXT_API}/brief?project=${project}" | python3 -c "
 import sys, json
 data = json.load(sys.stdin)
 print(f'  {data.get(\"project\", \"?\")}  ({data.get(\"depth\", \"standard\")})')
@@ -935,7 +947,7 @@ for c in caps:
       # Ask the service to generate the promotion artifact (Law 3 — service owns
       # the artifact-generation logic; this CLI is a thin filesystem adapter).
       local resp
-      resp=$(curl -sf -X POST "${CONTEXT_API}/workflow/capture/${cid}/promote" 2>&1) \
+      resp=$(_api_curl -X POST "${CONTEXT_API}/workflow/capture/${cid}/promote" 2>&1) \
         || die "Promote endpoint failed: $resp"
       local project filename content
       project=$(echo "$resp" | python3 -c "import sys,json; print(json.load(sys.stdin)['project'])")
@@ -946,7 +958,7 @@ for c in caps:
       local file="${drafts_dir}/${filename}"
       printf '%s' "$content" > "$file"
       # Record where it landed so the workflow-state-service can link back.
-      curl -sf -X PATCH "${CONTEXT_API}/workflow/capture/${cid}" \
+      _api_curl -X PATCH "${CONTEXT_API}/workflow/capture/${cid}" \
         -H 'Content-Type: application/json' \
         -d "{\"status\":\"promoted\",\"promoted_to_path\":\"${filename}\"}" >/dev/null
       ok "Promoted ${cid} → ${file}"
@@ -956,7 +968,7 @@ for c in caps:
       local cid="${1:-}"
       [[ -n "$cid" ]] || die "Usage: prismo capture dismiss <capture_id>"
       check_vm
-      curl -sf -X PATCH "${CONTEXT_API}/workflow/capture/${cid}" \
+      _api_curl -X PATCH "${CONTEXT_API}/workflow/capture/${cid}" \
         -H 'Content-Type: application/json' \
         -d '{"status":"dismissed"}' >/dev/null && ok "Dismissed: $cid"
       ;;
@@ -993,7 +1005,7 @@ print(json.dumps({
   'source': 'manual',
 }))")
       local resp
-      resp=$(curl -sf -X POST "${CONTEXT_API}/workflow/capture" \
+      resp=$(_api_curl -X POST "${CONTEXT_API}/workflow/capture" \
         -H 'Content-Type: application/json' \
         -d "$body")
       local cid
@@ -1034,7 +1046,7 @@ if me: body['max_emit'] = int(me)
 ci = '$capture_ids'
 if ci: body['capture_ids'] = [x.strip() for x in ci.split(',') if x.strip()]
 print(json.dumps(body))")
-      curl -sf -X POST "${CONTEXT_API}/synthesis/run" \
+      _api_curl -X POST "${CONTEXT_API}/synthesis/run" \
         -H 'Content-Type: application/json' \
         -d "$payload" | python3 -c "
 import sys, json
@@ -1164,7 +1176,7 @@ cmd_runtime() {
   check_vm
   case "$sub" in
     topology)
-      curl -sf "${CONTEXT_API}/runtime/topology" | python3 -c "
+      _api_curl "${CONTEXT_API}/runtime/topology" | python3 -c "
 import sys, json
 d = json.load(sys.stdin)
 print('')
@@ -1189,7 +1201,7 @@ for role_id, role in d.get('roles', {}).items():
     role)
       local role_id="${1:-}"
       [[ -n "$role_id" ]] || die "Usage: prismo runtime role <role_id>"
-      curl -sf "${CONTEXT_API}/runtime/roles/${role_id}" | python3 -m json.tool \
+      _api_curl "${CONTEXT_API}/runtime/roles/${role_id}" | python3 -m json.tool \
         || die "Role not found: ${role_id}"
       ;;
     *)
@@ -1305,7 +1317,7 @@ print('  prismo review edit <id>       — open in \$EDITOR')
       [[ -n "$item_id" ]] || die "Usage: prismo review show <id>"
       check_vm
       local raw
-      raw=$(curl -sf "${CONTEXT_API}/review/queue/${item_id}" 2>/dev/null) \
+      raw=$(_api_curl "${CONTEXT_API}/review/queue/${item_id}" 2>/dev/null) \
         || die "ReviewItem '${item_id}' not found"
       [[ -n "$raw" ]] || die "ReviewItem '${item_id}' not found"
       echo "$raw" | python3 -c "
@@ -1344,7 +1356,7 @@ print('═══ END ═══')
       # Approve transitions state + returns payload; we write the file locally
       # since /canon is read-only in the api container (Law 3 — adapter writes).
       local resp project dest content target_path canon_root
-      resp=$(curl -sf -X POST "${CONTEXT_API}/review/queue/${item_id}/approve" \
+      resp=$(_api_curl -X POST "${CONTEXT_API}/review/queue/${item_id}/approve" \
         -H 'Content-Type: application/json' -d '{"decided_by":"ethan"}' 2>&1) \
         || die "Approve endpoint failed: $resp"
 
@@ -1377,7 +1389,7 @@ Approved ReviewItem ${item_id} from synthesis-service.
         && git push) || die "git commit/push failed in $canon_root"
       ok "Committed + pushed in $canon_root"
 
-      curl -sf -X POST "${CONTEXT_API}/index" >/dev/null && ok "Re-indexed"
+      _api_curl -X POST "${CONTEXT_API}/index" >/dev/null && ok "Re-indexed"
       ;;
     reject|r)
       shift
@@ -1402,7 +1414,7 @@ print(json.dumps({
   'rejection_reason': '$reason',
   'rejection_note': '''$note''' or None,
 }))")
-      curl -sf -X POST "${CONTEXT_API}/review/queue/${item_id}/reject" \
+      _api_curl -X POST "${CONTEXT_API}/review/queue/${item_id}/reject" \
         -H 'Content-Type: application/json' -d "$payload" >/dev/null \
         && ok "Rejected ${item_id} (${reason})"
       ;;
@@ -1414,7 +1426,7 @@ print(json.dumps({
       local editor="${EDITOR:-vi}"
       local tmpf
       tmpf=$(mktemp --suffix=.md)
-      curl -sf "${CONTEXT_API}/review/queue/${item_id}" \
+      _api_curl "${CONTEXT_API}/review/queue/${item_id}" \
         | python3 -c "import sys,json; print(json.load(sys.stdin)['proposal']['content'])" > "$tmpf"
       local before_hash
       before_hash=$(md5sum "$tmpf" | awk '{print $1}')
@@ -1432,7 +1444,7 @@ print(json.dumps({
 import json
 with open('$tmpf') as f: content = f.read()
 print(json.dumps({'decided_by': 'ethan', 'content': content}))")
-      resp=$(curl -sf -X POST "${CONTEXT_API}/review/queue/${item_id}/edit" \
+      resp=$(_api_curl -X POST "${CONTEXT_API}/review/queue/${item_id}/edit" \
         -H 'Content-Type: application/json' -d "$edited_payload" 2>&1) \
         || { rm -f "$tmpf"; die "Edit endpoint failed: $resp"; }
       rm -f "$tmpf"
@@ -1465,7 +1477,7 @@ Edited and approved ReviewItem ${item_id} from synthesis-service.
 " \
         && git push) || die "git commit/push failed in $canon_root"
       ok "Committed + pushed in $canon_root"
-      curl -sf -X POST "${CONTEXT_API}/index" >/dev/null && ok "Re-indexed"
+      _api_curl -X POST "${CONTEXT_API}/index" >/dev/null && ok "Re-indexed"
       ;;
     *)
       die "Unknown review subcommand: $sub  (try: list, show, approve, reject, edit)"
@@ -1617,7 +1629,7 @@ cmd_pipeline() {
         local args
         args=$(echo "$prompt" | sed -E "s|^/[^ ]+ *||")
         local result
-        result=$(curl -sf --max-time 15 -X POST "${CONTEXT_API}/pipeline/activate" \
+        result=$(_api_curl --max-time 15 -X POST "${CONTEXT_API}/pipeline/activate" \
           -H 'Content-Type: application/json' \
           -d "$(python3 -c "import json,sys; print(json.dumps({'activation_id':'${explicit_facet}','args':sys.argv[1]}))" "$args")" 2>/dev/null)
         [[ -n "$result" ]] || return 0
@@ -1626,7 +1638,7 @@ cmd_pipeline() {
       else
         # Automatic: route via /pipeline/process
         local result
-        result=$(curl -sf --max-time 10 -X POST "${CONTEXT_API}/pipeline/process" \
+        result=$(_api_curl --max-time 10 -X POST "${CONTEXT_API}/pipeline/process" \
           -H 'Content-Type: application/json' \
           -d "$(python3 -c "import json,sys; print(json.dumps({'message':sys.argv[1],'policy':{'min_score':0.72}}))" "$prompt")" 2>/dev/null)
         [[ -n "$result" ]] || return 0
@@ -1661,7 +1673,7 @@ for match in d.get('activations', []):
       [[ -n "$facet_id" ]] || { echo "Usage: prismo pipeline activate <facet-id> [args]"; return 1; }
       local args="${*:-}"
       local result
-      result=$(curl -sf --max-time 15 -X POST "${CONTEXT_API}/pipeline/activate" \
+      result=$(_api_curl --max-time 15 -X POST "${CONTEXT_API}/pipeline/activate" \
         -H 'Content-Type: application/json' \
         -d "$(python3 -c "import json,sys; print(json.dumps({'activation_id':sys.argv[1],'args':sys.argv[2]}))" "$facet_id" "$args")" 2>/dev/null)
       if [[ -z "$result" ]]; then
@@ -1673,7 +1685,7 @@ for match in d.get('activations', []):
 
     list)
       # List registered activations
-      curl -sf "${CONTEXT_API}/pipeline/activations" 2>/dev/null \
+      _api_curl "${CONTEXT_API}/pipeline/activations" 2>/dev/null \
         | python3 -c "
 import sys, json
 d = json.load(sys.stdin)
@@ -1695,7 +1707,7 @@ for a in d.get('activations', []):
       [[ -n "$response_text" ]] || return 0
       local project="${PRISMO_PROJECT:-prismo}"
       local result
-      result=$(curl -sf --max-time 10 -X POST "${CONTEXT_API}/pipeline/process-response" \
+      result=$(_api_curl --max-time 10 -X POST "${CONTEXT_API}/pipeline/process-response" \
         -H 'Content-Type: application/json' \
         -d "$(python3 -c "import json,sys; print(json.dumps({'response':sys.argv[1],'project':'${project}'}))" "$response_text")" 2>/dev/null)
       [[ -n "$result" ]] || return 0
@@ -1770,7 +1782,7 @@ print(last_text)
 
       local project="${PRISMO_PROJECT:-prismo}"
       local result
-      result=$(curl -sf --max-time 10 -X POST "${CONTEXT_API}/pipeline/process-response" \
+      result=$(_api_curl --max-time 10 -X POST "${CONTEXT_API}/pipeline/process-response" \
         -H 'Content-Type: application/json' \
         -d "$(python3 -c "
 import json, sys
