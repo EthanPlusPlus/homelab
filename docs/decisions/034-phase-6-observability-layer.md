@@ -10,7 +10,7 @@ date: 2026-06-05
 # Decision 034 — Phase 6 observability layer architecture and infra/application metrics boundary
 
 ## Status
-Adopted — build pending.
+Active — shipped 2026-06-05.
 
 ## Date
 2026-06-05

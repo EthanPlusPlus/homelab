@@ -52,7 +52,7 @@ must not know or care about network topology — that would reintroduce the coup
 - `api/main.py` — middleware wired at app level; `Authorization` added to CORS allowed headers
 - `context_mcp/main.py` — `_client()` factory returns `httpx.AsyncClient` with auth headers
   pre-configured; all MCP → API calls go through it
-- `canon/prismo/scripts/prismo` — `_api_curl()` helper wraps all 46 `curl -sf` calls targeting
+- `canon/prismo/scripts/prismo` — `_api_curl()` helper wraps all 57 `curl -sf` calls targeting
   `CONTEXT_API`; passes header when `API_KEY` is set
 - `docker-compose.yml` — `API_KEY=${API_KEY:-}` in both `api` and `mcp` service env sections
 - `.env.example` — `API_KEY=` documented with dev-mode note
@@ -69,7 +69,7 @@ must not know or care about network topology — that would reintroduce the coup
 
 ## Relationship to Other Decisions
 
-- [[032-portability-commercial-constraint]] — auth is step 2 of the portability build order
+- [[032-portability-as-commercial-grade-constraint|Decision 032]] — auth is step 2 of the portability build order
 - [[017-three-architectural-laws]] — Law 1: auth validation is deterministic (key matches or
   not); exempt paths protect structural enforcement infrastructure
 - [[025-runtime-intelligence-layer-topology]] — no new runtime role introduced; auth is
