@@ -831,7 +831,7 @@ cmd_stale() {
       local url="${CONTEXT_API}/stale-items"
       [[ -n "$project" ]] && url="${url}?project=${project}"
       echo ""
-      curl -sf "$url" | python3 -c "
+      _api_curl "$url" | python3 -c "
 import sys, json
 data = json.load(sys.stdin)
 items = data.get('items', [])
@@ -926,7 +926,7 @@ cmd_capture() {
       check_vm
       local url="${CONTEXT_API}/workflow/captures?status=pending-review"
       [[ -n "$project" ]] && url="${url}&project=${project}"
-      curl -sf "$url" | python3 -c "
+      _api_curl "$url" | python3 -c "
 import sys, json
 d = json.load(sys.stdin)
 caps = d.get('captures', [])
@@ -1223,7 +1223,7 @@ cmd_metrics() {
   check_vm
   local url="${CONTEXT_API}/workflow/metrics?since_days=${since}"
   [[ -n "$project" ]] && url="${url}&project=${project}"
-  curl -sf "$url" | python3 -c "
+  _api_curl "$url" | python3 -c "
 import sys, json
 d = json.load(sys.stdin)
 rv = d['review_items']
@@ -1287,7 +1287,7 @@ cmd_review() {
       check_vm
       local url="${CONTEXT_API}/review/queue?status=${status}"
       [[ -n "$project" ]] && url="${url}&project=${project}"
-      curl -sf "$url" | python3 -c "
+      _api_curl "$url" | python3 -c "
 import sys, json
 d = json.load(sys.stdin)
 items = d.get('items', [])
@@ -1836,7 +1836,7 @@ cmd_doctrine() {
       project=$(_parse_project "$@")
       local url="${CONTEXT_API}/doctrine/validate"
       [[ -n "$project" ]] && url="${url}?project=${project}"
-      curl -sf "$url" | python3 -c "
+      _api_curl "$url" | python3 -c "
 import sys, json
 d = json.load(sys.stdin)
 proj = d.get('project') or '(all)'
@@ -1856,7 +1856,7 @@ else:
       project=$(_parse_project "$@")
       local url="${CONTEXT_API}/doctrine/supersession"
       [[ -n "$project" ]] && url="${url}?project=${project}"
-      curl -sf "$url" | python3 -c "
+      _api_curl "$url" | python3 -c "
 import sys, json
 d = json.load(sys.stdin)
 proj = d.get('project') or '(all)'
@@ -1876,7 +1876,7 @@ else:
       project=$(_parse_project "$@")
       local url="${CONTEXT_API}/doctrine/provenance"
       [[ -n "$project" ]] && url="${url}?project=${project}"
-      curl -sf "$url" | python3 -c "
+      _api_curl "$url" | python3 -c "
 import sys, json
 d = json.load(sys.stdin)
 proj = d.get('project') or '(all)'
@@ -1899,7 +1899,7 @@ else:
       project=$(_parse_project "$@")
       local url="${CONTEXT_API}/doctrine/relationships?path=${path_arg}"
       [[ -n "$project" ]] && url="${url}&project=${project}"
-      curl -sf "$url" | python3 -c "
+      _api_curl "$url" | python3 -c "
 import sys, json
 d = json.load(sys.stdin)
 if not d.get('found'):
@@ -1927,7 +1927,7 @@ else:
       project=$(_parse_project "$@")
       local url="${CONTEXT_API}/doctrine/graph"
       [[ -n "$project" ]] && url="${url}?project=${project}"
-      curl -sf "$url" | python3 -c "
+      _api_curl "$url" | python3 -c "
 import sys, json
 d = json.load(sys.stdin)
 proj = d.get('project') or '(all)'
