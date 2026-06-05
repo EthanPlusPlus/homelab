@@ -273,7 +273,7 @@ health. Cognitive alerting via Prometheus is a Law 1/Law 2 violation — out of 
 - Config files committed under `context-server/observability/` — portable, no manual setup
 - Grafana at port 3001; starter dashboard: request rate, latency p50/p95/p99, error rate, log stream
 - Alert rules (Grafana only, no Alertmanager): service down >2m, error rate >5%, p99 >2s
-- Build pending.
+- **Shipped 2026-06-05.** Deploy: `docker compose up --build -d` from `context-server/`. Grafana at `:3001`, Prometheus at `:9090`.
 ## Phase 7 — Advanced research ⏳ not started
 
 ---
