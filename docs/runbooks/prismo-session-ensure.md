@@ -55,3 +55,11 @@ Silent — no re-hydration or focus update.
 ## Error Handling
 
 Never blocks user prompts. Degrades gracefully if context-server is unreachable.
+
+## Session End (Required)
+
+Before ending a session:
+
+1. **Update `recent-changes.md`** — add an entry summarising what shipped: decisions made, docs created/updated, artifacts produced. Keep the rolling log to ~10 entries.
+2. **Commit all changes** — stage and commit all doc updates in canon repo(s) with a clear summary message.
+3. **Close session** — `prismo session end` writes `current_focus` + capture count as summary before closing.
