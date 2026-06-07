@@ -48,7 +48,7 @@ context-server, exposed through both HTTP and MCP transports.
 
 - **Owns:** active sessions, active workstreams, session focus, operational concurrency awareness.
 - **Does not own:** canon decisions, doctrine state, project metadata, proposals — those live in canon.
-- **Feeds into:** `ContextBundle.core_operational_state` (see [[architecture/phase1/canon-object-model|canon-object-model]]).
+- **Feeds into:** `ContextBundle.core_operational_state` (see [[../architecture/contracts/canon-object-model|canon-object-model]]).
 
 ### Event log
 

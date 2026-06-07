@@ -1,7 +1,7 @@
 ---
 id: "021"
 title: doctrine-service — detect_broken_xrefs() rule
-status: proposed
+status: experimental
 record_type: canonical
 date: 2026-06-07
 ---
@@ -10,7 +10,9 @@ date: 2026-06-07
 
 ## Status
 
-Proposed. Surfaced via synthesis from a broken `[[...]]` link found in Decision 033.
+Experimental — built 2026-06-07. Rule is live in `doctrine/rules.py` and exposed
+via `GET /doctrine/xrefs` and `GET /doctrine/validate`. Surfaced via synthesis from
+a broken `[[...]]` link found in Decision 033.
 
 ## The Idea
 
@@ -19,12 +21,13 @@ existing structural checks:
 
 - `detect_supersession_cycles()` — already built
 - `detect_source_hash_drift()` — already built
-- `detect_broken_xrefs()` — **this proposal**
+- `detect_broken_xrefs()` — **built 2026-06-07**
 
 A broken cross-reference is any `[[...]]` citation in canon where the referenced
-slug does not match an existing file in `docs/decisions/`, `docs/proposed-ideas/`,
-`docs/architecture/`, or `docs/runbooks/`. This is a deterministic check — no model
-required. Law 1 territory.
+slug does not resolve to an indexed doc. Note: the check runs against the ChromaDB
+index, not the filesystem directly — a newly written file that has not been re-indexed
+will appear as a broken target. Re-index before treating results as authoritative.
+This is a structural check — no model required. Law 1 territory.
 
 ## Why it matters
 
@@ -35,20 +38,26 @@ required. Law 1 territory.
   times as the project has matured)
 - Are currently only caught by Sukuna passes, which are manual and Claude-specific
 
-## Implementation shape
+## Implementation
+
+Pure function in `doctrine/rules.py` — no I/O, testable without ChromaDB:
 
 ```python
-def detect_broken_xrefs(canon_root: Path) -> list[dict]:
+def detect_broken_xrefs(
+    all_docs: list[dict],          # [{"path": str, "metadata": dict}, ...]
+    current_contents: dict[str, str],  # {path: full_text} from ChromaDB
+) -> list[dict]:
     """
-    Walk all .md files under canon_root/docs/.
-    Extract all [[slug]] and [[slug|label]] patterns.
-    For each slug, check whether slug.md exists in any of the known subdirs.
-    Return violations: {file, slug, line_number}.
+    Extract all [[slug]] and [[slug|label]] patterns from each doc's content.
+    Resolve each slug relative to the citing file's directory:
+      - Slug with "/" → relative path normalised from source dir, append .md if needed
+      - Bare slug (no "/") → suffix-match against any indexed path (/{slug}.md)
+    Deduplicate per-doc. Return violations: {"rule": "broken_xref", "path", "detail"}.
     """
 ```
 
-Expose via `GET /doctrine/validate` (already aggregates all rules) and
-`GET /doctrine/xrefs` as a standalone endpoint.
+Exposed via `GET /doctrine/validate` (aggregates all rules) and
+`GET /doctrine/xrefs` as a standalone endpoint. 12 tests in `tests/test_doctrine.py`.
 
 ## Why not a runbook
 

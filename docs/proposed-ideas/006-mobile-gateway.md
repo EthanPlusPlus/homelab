@@ -1,52 +1,90 @@
 ---
 id: "006"
-title: Mobile Gateway to Prismo
+title: Agentic Loop — primary interaction harness
 status: proposed
-notes: reframed 2026-06-05 — goal is a chat-based agentic loop Ethan controls, not a Claude Code wrapper
+notes: reframed 2026-06-05 — goal is a chat-based agentic loop Ethan controls, not a Claude Code wrapper. Reframed again 2026-06-07 — agentic loop is the PRIMARY harness, not an ambient/mobile supplement.
 ---
 
-# 006 — Mobile Gateway to Prismo
+# 006 — Agentic Loop (Primary Harness)
 
 ## Status
 
-Proposed — architecture direction updated. Goal is an owned agentic loop with chat interaction, not a thin wrapper around Claude Code.
+Proposed — architecture direction updated twice. Current framing: the agentic loop
+is the primary Prismo interaction surface — the place where all real work happens
+(ideation, planning, building, architecture, synthesis passes). Not an ambient
+companion to Claude Code. A full harness in the sense of Decision 035.
 
 ## The Idea
 
-A mobile-accessible interface to Prismo where you can have a conversation, trigger pipeline activations (facets), review and approve ReviewItems, add captures, and query knowledge — all from a phone, without needing Claude Code.
+An agentic loop chat that does exactly what Claude Code sessions do today — and
+more. Multi-turn conversation, facet activations, canon discipline, synthesis
+runs, ReviewItem triage, implementation — the full Prismo workflow. Accessible
+from any device without Claude Code.
 
-The key constraint: this is not a Claude Code remote. Claude Code is restrictive (approval prompts, no persistent agentic loop, session-scoped). The mobile gateway should provide an agentic loop that Ethan controls — conversation-first, with facets available as first-class tools at any point.
+The key constraint: this is not a Claude Code remote. Claude Code is restrictive
+(approval prompts, session-scoped context windows, CLI-first). The agentic loop
+should provide a conversation-first interface where Prismo owns the loop.
 
-## Why This Is Distinct from Claude Code
+## Why This Is the Primary Harness
 
-Claude Code is a coding harness tied to a developer machine session. The mobile gateway is:
-- **Persistent** — the loop doesn't end when a session closes
-- **Conversational** — chat as the primary interface, not CLI commands
-- **Controllable** — facet invocation, ReviewItem actions, and captures are always available without prompt approval friction
-- **Ambient** — captures an idea on the go before it's lost; not for heavy implementation
+Claude Code is the current primary harness by default, not by design. It was the
+available tool when Prismo was built. The agentic loop is what Prismo is building
+toward: a surface it controls, on a model it chooses, billed the way it decides.
 
-## Architecture Direction
+This is the biggest Layer 4 build in the roadmap. Decision 035 defines the
+normalised interface (three API calls). The agentic loop is the heaviest adapter
+against that interface — multi-turn, session-aware, activation-routing per
+message, response-processor per response.
 
-Layer 4 surface per Decision 021: thin renderer against existing API contracts. The intelligence lives in context-server (pipeline, synthesis, retrieval). The mobile interface is:
-- A conversation loop backed by an LLM (model-agnostic per Decision 025 runtime roles)
-- Facets available as tools in that loop (pipeline already exposes `/pipeline/activate`)
-- ReviewItem queue surfaced inline (`/review/queue`)
-- Capture submission (`/workflow/capture`)
+## What the Agentic Loop Requires
 
-No new backend work required beyond what's already built.
+Unlike the Claude Code adapter (~20 lines in `capture-response`), the agentic
+loop adapter is a full system:
+
+- **Multi-turn conversation** — message history, not one-shot queries
+- **Session lifecycle** — `POST /workflow/session/start` on open, `POST /workflow/session/:id/end` on close
+- **Activation routing per message** — `pipeline/router.route()` on every user turn, same as Claude Code's UserPromptSubmit hook
+- **Response processor per response** — `processor.process()` on every assistant turn; captures flow automatically
+- **Evolving context** — facets fire and inject context as the conversation shifts topics
+
+## What POST /chat Is Not
+
+`POST /chat` (built 2026-06-07) is a single-turn Q&A endpoint. It loads system
+state, calls analysis_runtime, returns one answer. It is not the agentic loop.
+It is not a starting point for the agentic loop. The agentic loop requires a
+conversation engine, not a query endpoint. `POST /chat` may survive as a
+lightweight state-query tool for surfaces that need it; it is not the foundation
+for this.
+
+## Prerequisite: Billing Decision
+
+Decision 030 locks billing: coding_runtime = subscription CLI (Claude Code), side
+intelligences = LiteLLM pay-per-token. The agentic loop is the primary
+intelligence — it IS the coding_runtime replacement. Running it on pay-per-token
+API at the volume and depth of a full working session is a real cost. This needs
+a position before design begins:
+
+- Continue subscription CLI via `claude -p` as the loop engine (limits control)
+- Anthropic API pay-per-token (full control, variable cost)
+- Route by task complexity: Haiku for lightweight turns, Sonnet for heavy ones (PI-016/PI-017)
+
+Decision 030 must be annotated with this reframe before implementation starts.
 
 ## Leading Questions
 
-- What hosts the conversation loop? Options: a lightweight Layer 4 service in context-server, a standalone mobile app, or a WhatsApp/SMS gateway.
-- Which model runs the conversational layer? (Haiku-class for latency, or routed based on task complexity per PI-016)
-- How does auth work without Tailscale? (Feeds into Decision 032 auth layer — API key or OAuth)
-- Is this the same surface as the WhatsApp gateway from the V2 masterplan, or a separate build?
+- Which model runs the agentic loop, and on which billing model?
+- Does the loop host its own model calls (API) or delegate to an existing runtime?
+- What is the conversation state store — in-memory per connection, or persisted in workflow-state-service?
+- How does multi-turn context management work — full history, windowed, or summarised?
+- Mobile deployment: WhatsApp gateway, web chat, native app — which first?
+- Auth: Tailscale-gated (same as web UI) or token-based for mobile?
 
 ## Relationship to Other Work
 
-- Decision 021: ReviewItem as the integration primitive — mobile is a renderer
-- Decision 025: Runtime topology — conversational runtime is a new runtime role
-- Decision 031: Web UI is ops visibility; mobile is the ambient interaction surface
-- Decision 032: Portability + auth layer is a prerequisite
-- PI-016: Small model router could handle conversational routing
-- PI-017: Capability orchestrator is the agentic loop design problem
+- [[../decisions/035-harness-adapter-pattern|Decision 035]] — normalised interface this adapter implements; agentic loop is the heaviest adapter
+- [[../decisions/030-billing-architecture-intelligence-tiers|Decision 030]] — billing architecture; needs annotation for primary intelligence question
+- [[../decisions/025-runtime-intelligence-layer-topology|Decision 025]] — a new runtime role may be needed: `loop_runtime`
+- [[../decisions/026-layer-3-5-pipeline-service|Decision 026]] — activation routing and response processor are the pipeline hooks the loop uses
+- [[../decisions/031-web-ui-operational-visibility-forcing-function|Decision 031]] — web UI is ops visibility; agentic loop is the work surface; distinct
+- [[017-capability-orchestrator|PI-017]] — capability orchestrator is the agentic loop's routing design problem
+- [[016-routing-intelligence-small-model-router|PI-016]] — model routing by complexity; directly applicable here

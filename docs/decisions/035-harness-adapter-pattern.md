@@ -12,8 +12,16 @@ supersedes: []
 
 ## Status
 
-Active — Claude Code adapter exists (retroactively named). Conversational UI adapter
-defined here; to be built when the conversational UI is built.
+Active — Claude Code adapter exists (retroactively named). Agentic loop adapter
+is the next harness (PI-006); it is the heaviest adapter against this interface —
+multi-turn, session-aware, full pipeline integration. See PI-006 for scope.
+
+**Annotation 2026-06-07:** The "conversational UI adapter" defined below is
+correctly scoped for a thin UI making three API calls. The agentic loop
+(PI-006) is a full harness — not a three-call adapter — that requires
+conversation state management, per-turn activation routing, and per-response
+processing. The normalised interface (three endpoints) still holds as the
+contract; the adapter implementation is much heavier than originally implied.
 
 ## Context
 

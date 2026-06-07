@@ -274,6 +274,17 @@ health. Cognitive alerting via Prometheus is a Law 1/Law 2 violation — out of 
 - Grafana at port 3001; starter dashboard: request rate, latency p50/p95/p99, error rate, log stream
 - Alert rules (Grafana only, no Alertmanager): service down >2m, error rate >5%, p99 >2s
 - **Shipped 2026-06-05.** Deploy: `docker compose up --build -d` from `context-server/`. Grafana at `:3001`, Prometheus at `:9090`.
+- **Hardened 2026-06-07.** `noDataState: OK` on `prismo-api-down` alert rule — fixed false-positive 6am alerts caused by Prometheus cold-start NoData state.
+
+**Harness portability ([[../decisions/035-harness-adapter-pattern|Decision 035]], 2026-06-07):**
+Finding: system is more portable than assumed. Session identity is Prismo-generated (not sourced from Claude Code). Only harness-specific code is `capture-response` (~20 lines, JSONL transcript parsing). Three-endpoint normalised interface defined: `POST /workflow/session/start`, `POST /pipeline/process-response`, `POST /workflow/session/:id/end`. Claude Code adapter retroactively named; conversational UI adapter defined (three direct HTTP calls, no CLI dependency).
+
+**POST /chat endpoint (2026-06-07):**
+Natural language queries against live system state. `analysis_runtime` (Anthropic Sonnet via ANALYSIS_MODEL). Returns grounded response + context counts. Does not take actions — directs to CLI. `chat/router.py` + `tests/test_chat.py` (9 tests). Registered in `capability-contracts.md` as `conversationalQuery` capability.
+
+**doctrine-service: detect_broken_xrefs() (PI-021, 2026-06-07):**
+Cross-reference integrity as a Law 1 rule. `detect_broken_xrefs(all_docs, current_contents)` in `doctrine/rules.py`. Exposed via `GET /doctrine/xrefs` and included in `GET /doctrine/validate`. 12 tests. Part of Sukuna structural distillation — first structural Sukuna check fully mechanised.
+
 ## Phase 7 — Advanced research ⏳ not started
 
 ---

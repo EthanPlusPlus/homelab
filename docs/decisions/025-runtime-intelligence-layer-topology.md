@@ -83,7 +83,8 @@ Runtime roles are named slots in the intelligence topology. Current roles:
 - **synthesis_runtime**: Generates ReviewItems from captures. Bounded, non-recursive,
   quality-gated. Currently subscription_cli.
 - **analysis_runtime**: Interpretive augmentation with tool use and web search. Currently
-  subscription_cli.
+  subscription_cli. Also powers `POST /chat` (Decision 035) — natural language queries
+  against live system state, using Anthropic SDK directly (ANALYSIS_MODEL env var).
 - **embedding_runtime**: Dense vector embeddings for semantic retrieval. Currently local
   (sentence-transformers).
 
@@ -94,7 +95,7 @@ Unregistered intelligence is not permitted.
 
 > **Terminology note (2026-05-30):** "Capability Contracts" in this decision means the
 > tags a runtime role advertises (`supports_tool_use`, `low_latency`, etc.). This is
-> distinct from `architecture/phase1/capability-contracts.md` (now titled "Service
+> distinct from `architecture/contracts/capability-contracts.md` (now titled "Service
 > Contracts"), which defines HTTP interface contracts between layers. Two different
 > concepts, same original name. Read this section as "Runtime Capability Tags."
 

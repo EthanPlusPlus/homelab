@@ -14,7 +14,7 @@ Closed. Premise disproven in practice.
 ## Original Idea
 
 Replace self-policing Phase 2 with a pipeline of dedicated agents: Proposer, Validator,
-Devil's Advocate, Scribe. [[011-hermes-cross-project-discipline|Hermes (Decision 011)]] was
+Devil's Advocate, Scribe. Hermes (011) was
 the attempt at the Validator role.
 
 ## Why Closed
