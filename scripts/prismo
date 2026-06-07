@@ -1722,6 +1722,7 @@ if n > 0:
       ;;
 
     capture-response)
+      # Claude Code adapter — Layer 1 (Decision 035).
       # Called by the Claude Code Stop hook (Decision 028, Phase 5).
       # Reads Stop hook JSON from stdin ({session_id, transcript_path, ...}),
       # extracts the last assistant text from the transcript, and pipes it
@@ -1748,7 +1749,7 @@ except Exception:
     print('')" 2>/dev/null)
       [[ -n "$transcript_path" && -f "$transcript_path" ]] || return 0
 
-      # Extract the last assistant text response from the JSONL transcript.
+      # Claude Code JSONL transcript format — extract last assistant text.
       # Skips thinking-only turns and turns with no text content.
       local response_text
       response_text=$(python3 -c "
