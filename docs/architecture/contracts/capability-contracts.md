@@ -179,6 +179,39 @@ generateOperationalBrief(
 
 ---
 
+### conversationalQuery
+
+Answer a natural language query against live Prismo system state. Uses analysis_runtime
+(Law 2 — interpretive output, not authoritative). Does not take actions; directs the
+caller to the appropriate CLI/API call when action is needed.
+
+```typescript
+conversationalQuery(
+  query: string,
+  project?: string,         // default "prismo"
+  contributor?: string,     // default "ethan"
+  session_id?: string       // optional — for future session-scoped context
+) → {
+  response: string,         // natural language answer
+  query: string,
+  project: string,
+  generated_at: string,     // ISO 8601 UTC
+  context_counts: {
+    review_queue: number,
+    captures_pending: number,
+    recent_sessions: number,
+    stale_items: number
+  }
+}
+```
+
+**Provider requirement:** analysis_runtime (ANALYSIS_MODEL, default claude-sonnet-4-6).
+**Current implementation:** `POST /chat` — loads live DB state, calls Anthropic SDK directly.
+**Decision 035:** this endpoint is the normalised response interface for the conversational UI
+harness adapter. The UI calls it directly; no CLI dependency.
+
+---
+
 ### captureSignal
 
 Capture a conversational signal as operational state (not canon). Per Decision 018,
@@ -493,6 +526,7 @@ The authoritative transport. Adapters (MCP, CLI) wrap these.
 | `projectSnapshot` | `GET /project-state` | `api/main.py` |
 | `detectStaleness` | `GET /stale-items` | `api/main.py` |
 | `generateOperationalBrief` | `GET /brief` | `api/main.py` |
+| `conversationalQuery` | `POST /chat` | `chat/router.py` |
 | `startSession` | `POST /workflow/session/start` | `workflow/router.py` |
 | `endSession` | `POST /workflow/session/{id}/end` | `workflow/router.py` |
 | `summarizeSession` | `POST /workflow/session/{id}/summarize` | `workflow/router.py` |
