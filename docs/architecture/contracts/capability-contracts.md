@@ -560,6 +560,7 @@ The authoritative transport. Adapters (MCP, CLI) wrap these.
 | `validateProvenance` | `GET /doctrine/provenance` | `doctrine/router.py` |
 | `resolveRelationships` | `GET /doctrine/relationships` | `doctrine/router.py` |
 | `getSupersessionGraph` | `GET /doctrine/graph` | `doctrine/router.py` |
+| `checkXrefs` | `GET /doctrine/xrefs` | `doctrine/router.py` |
 | `pipelineProcess` | `POST /pipeline/process` | `pipeline/api_router.py` |
 | `pipelineActivate` | `POST /pipeline/activate` | `pipeline/api_router.py` |
 | `processResponse` | `POST /pipeline/process-response` | `pipeline/api_router.py` |
