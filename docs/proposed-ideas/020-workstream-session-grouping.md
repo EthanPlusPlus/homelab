@@ -2,6 +2,7 @@
 id: "020"
 title: Workstreams — logical grouping layer above sessions
 status: superseded
+superseded_by: decisions/037-loop-conversation-continuity.md
 record_type: canonical
 date: 2026-06-07
 notes: promoted 2026-06-09 into Decisions 037/038 — builds in loop phase C with two extensions (phase enum, lightweight flag)

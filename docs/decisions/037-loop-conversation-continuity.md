@@ -175,6 +175,6 @@ actually ships.
 - [[038-workstream-phase-gate|Decision 038]] — consumes assumption/question state
 - [[014-workflow-state-service-architecture|Decision 014]] — the service extended
 - [[028-response-processor-auto-capture|Decision 028]] — assumption detection extends it
-- [[018-synthesis-provenance|Decision 018]] — brief provenance rules apply to workstream briefs
+- [[018-synthesis-provenance-and-recursion-prevention|Decision 018]] — brief provenance rules apply to workstream briefs
 - [[../proposed-ideas/019-session-aware-facet-activation|PI-019]] — partially implemented
 - [[../proposed-ideas/020-workstream-session-grouping|PI-020]] — promoted into this decision

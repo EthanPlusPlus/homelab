@@ -2,6 +2,7 @@
 id: "006"
 title: Agentic Loop — primary interaction harness
 status: superseded
+superseded_by: decisions/036-loop-runtime-role-contract-billing.md
 notes: promoted 2026-06-09 into Decisions 036 (role/contract/billing), 037 (conversation continuity), 038 (phase gate). Build plan at fergie/loop-build-plan.md.
 ---
 
