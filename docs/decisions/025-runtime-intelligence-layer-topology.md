@@ -12,6 +12,16 @@ date: 2026-05-28
 ## Status
 Adopted
 
+> **Annotation 2026-06-09 — Decision 036:** A fifth runtime role is registered:
+> `loop_runtime` (multi-turn conversational harness, Prismo's primary interaction
+> surface). The reserved `collaboration_runtime` slot (registered in
+> `runtime/topology.py`, authority set by Decision 029) is superseded by merge
+> into `loop_runtime` — same cognitive responsibility, one role. Decision 036
+> also defers a structural extension this decision does not yet model: a
+> **routing policy** axis between role and provider (per-turn model selection
+> within one role). The three-axis model stands until PI-022 is built; when it
+> is, this decision gains the fourth axis explicitly.
+
 ## Date
 2026-05-28
 

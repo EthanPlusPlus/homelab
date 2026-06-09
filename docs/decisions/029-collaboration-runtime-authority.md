@@ -12,6 +12,16 @@ date: 2026-05-30
 ## Status
 Adopted
 
+> **Annotation 2026-06-09 — Decision 036:** `collaboration_runtime` is merged
+> into `loop_runtime`. The authority set defined below survives intact as the
+> loop's v1 tool set for **all** contributors (including Ethan — no RBAC v1),
+> with one addition: `workstream_create`. Rationale: creating a named work
+> container is a deterministic Layer 2 operation (PI-020), not the
+> session/infrastructure control that the `workflow_admin` exclusion protects.
+> Conversational workstream creation is core loop UX. The RBAC posture below
+> (design from real friction) is unchanged — when differentiation becomes real,
+> it lands as per-contributor tool sets within `loop_runtime`.
+
 ## Date
 2026-05-30
 

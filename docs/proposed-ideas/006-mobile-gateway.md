@@ -1,18 +1,23 @@
 ---
 id: "006"
 title: Agentic Loop — primary interaction harness
-status: proposed
-notes: reframed 2026-06-05 — goal is a chat-based agentic loop Ethan controls, not a Claude Code wrapper. Reframed again 2026-06-07 — agentic loop is the PRIMARY harness, not an ambient/mobile supplement.
+status: superseded
+notes: promoted 2026-06-09 into Decisions 036 (role/contract/billing), 037 (conversation continuity), 038 (phase gate). Build plan at fergie/loop-build-plan.md.
 ---
 
 # 006 — Agentic Loop (Primary Harness)
 
 ## Status
 
-Proposed — architecture direction updated twice. Current framing: the agentic loop
-is the primary Prismo interaction surface — the place where all real work happens
-(ideation, planning, building, architecture, synthesis passes). Not an ambient
-companion to Claude Code. A full harness in the sense of Decision 035.
+**Superseded — promoted into canon 2026-06-09.** The design sessions of
+2026-06-07 → 2026-06-09 answered every leading question below. See:
+
+- [[../decisions/036-loop-runtime-role-contract-billing|Decision 036]] — role, capability contract, billing, identity, deployment
+- [[../decisions/037-loop-conversation-continuity|Decision 037]] — messages, checkpoints, session cycling, hydration
+- [[../decisions/038-workstream-phase-gate|Decision 038]] — shift-left QA gate
+- `fergie/loop-build-plan.md` — implementation phases A0–E
+
+Original framing preserved below for provenance.
 
 ## The Idea
 

@@ -255,6 +255,29 @@ Auth: Tailscale-gated (zero new infrastructure). Deployed at port 3000 via docke
 **Web UI — second slice (deferred):**
 Conversation, contribution capture, RBAC, multi-user — when Shrey/Kyle need access.
 
+**Agentic loop — primary harness ⏳ designed 2026-06-09, build not started**
+
+The biggest Phase 5 build and the realisation of the masterplan's "runtime
+abstraction" milestone: Prismo's primary interaction surface becomes a harness
+Prismo owns. Fully designed across 2026-06-07 → 2026-06-09 sessions; PI-006
+promoted into three decisions:
+
+- [[../decisions/036-loop-runtime-role-contract-billing|Decision 036]] —
+  `loop_runtime` role (absorbs collaboration_runtime), tool-set-as-authority,
+  capability contract, local-first execution strategy, api billing with
+  guardrails, per-contributor bearer tokens (Decision 033 iteration)
+- [[../decisions/037-loop-conversation-continuity|Decision 037]] — Message
+  object, stored-transcript/assembled-context split, session cycling over
+  workstreams with structured checkpoints, workstream-scoped hydration,
+  activation stickiness
+- [[../decisions/038-workstream-phase-gate|Decision 038]] — shift-left QA:
+  deterministic preflight + adversarial fresh-eyes review + human disposition
+  on planning→executing transitions
+
+Multi-user is v1 scope (executive decision). Build phases A0–E tracked in
+`../fergie/loop-build-plan.md` — detail lives there, not here. Supersedes the
+"second slice" framing above: the loop IS the conversational surface.
+
 ---
 
 ## Phase 6 — Governance and observability ⏳ parallel with Phase 5

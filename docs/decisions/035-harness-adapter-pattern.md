@@ -23,6 +23,14 @@ conversation state management, per-turn activation routing, and per-response
 processing. The normalised interface (three endpoints) still holds as the
 contract; the adapter implementation is much heavier than originally implied.
 
+**Annotation 2026-06-09:** The agentic loop harness is now fully designed —
+Decisions 036 (role/contract/billing), 037 (conversation continuity), 038
+(phase gate). PI-006 is promoted. The loop-server is a separate service; build
+plan at `fergie/loop-build-plan.md`. A future OpenCode adapter (coding harness
+replacement) was scoped during design: OpenCode exposes an HTTP API + lifecycle
+events, so the adapter calls it from Python directly — sequenced after the loop
+ships, tracked in fergie.
+
 ## Context
 
 The masterplan (Decision 013) states: *"Layer 4 hides volatility (which model, which

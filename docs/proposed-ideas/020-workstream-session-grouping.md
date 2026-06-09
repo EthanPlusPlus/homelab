@@ -1,17 +1,25 @@
 ---
 id: "020"
 title: Workstreams — logical grouping layer above sessions
-status: proposed
+status: superseded
 record_type: canonical
 date: 2026-06-07
+notes: promoted 2026-06-09 into Decisions 037/038 — builds in loop phase C with two extensions (phase enum, lightweight flag)
 ---
 
 # 020 — Workstreams
 
 ## Status
 
-Proposed. The `active_workstreams` field is already reserved in the session
-hydration output (returns 0). The data model slot exists; the concept is not yet built.
+**Superseded — promoted into canon 2026-06-09.** Absorbed by
+[[../decisions/037-loop-conversation-continuity|Decision 037]] (workstream-scoped
+hydration, checkpoints, multi-user concurrency) and
+[[../decisions/038-workstream-phase-gate|Decision 038]] (which extends the object
+with `phase` and `lightweight` fields). The API surface sketched below ships in
+loop build phase C (`fergie/loop-build-plan.md`). Constraints below (no required
+FK, retroactive assignment, Law 1 determinism) carry forward unchanged.
+
+Original proposal preserved below for provenance.
 
 ## The Problem
 

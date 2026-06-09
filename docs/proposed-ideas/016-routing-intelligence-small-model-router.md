@@ -15,6 +15,12 @@ Not blocking any current work — the keyword+embedding router is functional.
 Build when the routing miss-rate becomes a real pain point or when smart
 model substitution (see open design questions) is being designed anyway.
 
+> **Note 2026-06-09:** Scope boundary clarified during the loop design sessions:
+> this PI routes **facet activations** (which facets fire on a message). Routing
+> **which model handles a turn** (complexity routing within `loop_runtime`) is a
+> different problem — see [[022-loop-model-routing-policy|PI-022]]. The two were
+> loosely conflated in early PI-006 drafts; they are siblings, not the same idea.
+
 ---
 
 ## The Problem

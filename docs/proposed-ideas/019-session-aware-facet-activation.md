@@ -11,6 +11,14 @@ notes: from capture cap_6d89cd01b8 — deploy facet won't fire retroactively mid
 
 Proposed — surfaced from operational observation.
 
+> **Note 2026-06-09:** Partially implemented by
+> [[../decisions/037-loop-conversation-continuity|Decision 037]] for the loop
+> harness: activations are session-sticky, recorded in checkpoints, re-fired
+> (with re-fetched context) in the next session of a workstream, and workstream
+> `phase` (Decision 038) sets activation priors — phase transitions add, never
+> remove. The Claude Code harness still has the original problem; this PI stays
+> open for that surface.
+
 ## The Problem
 
 Facets activate on routing signals at prompt time. If you're mid-build when the deploy facet would be relevant, it won't retroactively activate — the session is already running and the pipeline has no awareness of session state.

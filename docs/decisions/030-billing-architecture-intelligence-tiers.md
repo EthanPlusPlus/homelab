@@ -12,6 +12,17 @@ date: 2026-05-31
 ## Status
 Adopted
 
+> **Annotation 2026-06-09 — Decision 036:** Scope clarified. The subscription
+> commitment below covers `coding_runtime` (Claude Code sessions) only. This
+> decision was written before a second primary-intelligence role existed; its
+> "main intelligence" economics argument does not transfer to `loop_runtime`,
+> which bills api pay-per-token with guardrails (per-contributor telemetry,
+> spend alerts, per-turn/per-session ceilings) per Decision 036, on a
+> local-first trajectory. "The door stays open" below worked as designed — the
+> slot model absorbed a new role without structural change. The Phase 4 LiteLLM
+> wiring (synthesis/analysis providers) is explicitly backseated as of
+> 2026-06-09 — still queued, not abandoned.
+
 ## Date
 2026-05-31
 
