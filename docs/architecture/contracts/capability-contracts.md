@@ -570,6 +570,18 @@ The authoritative transport. Adapters (MCP, CLI) wrap these.
 | `triggerCodeIndex` | `POST /index/code` | `api/main.py` |
 | `health` | `GET /health` | `api/main.py` |
 
+**loop-server routes** (port 8002, separate service — Decision 036). Contributor-token
+authenticated (not the service API key). The loop is a harness adapter (Decision 035):
+session start/end and process-response calls are made by loop-server against the api
+service routes above.
+
+| Capability | HTTP Endpoint | Module |
+|------------|---------------|--------|
+| `loopSessionStart` | `POST /loop/session/start` | `loop_server/main.py` |
+| `loopSessionEnd` | `POST /loop/session/{id}/end` | `loop_server/main.py` |
+| `loopTurn` | `POST /loop/session/{id}/message` | `loop_server/main.py` (SSE) |
+| `loopHealth` | `GET /health` | `loop_server/main.py` |
+
 **Infrastructure-exempt routes** — excluded from Service Rule enforcement (Decision 034). These are
 infra-layer endpoints, not capability-contract routes:
 - `GET /metrics` — Prometheus scrape endpoint (`prometheus-fastapi-instrumentator`). Auth-exempt; Prometheus scrapes from inside Docker network.

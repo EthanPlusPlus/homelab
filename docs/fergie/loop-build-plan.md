@@ -18,39 +18,52 @@ Status legend: ⬜ not started · ⏳ in progress · ✅ done
 
 ---
 
-## Phase A0 — Foundations ⬜
+## Phase A0 — Foundations ✅ 2026-06-10
 
-- ⬜ PostgreSQL migration of workflow-state-service (sessions, workstreams,
-  session_context, operational_events) — pgvector instance already runs; add
-  operational schema. SQLite fallback stays for tests (Decision 014 pattern).
-- ⬜ `contributors` table + per-contributor bearer tokens (Decision 033's
-  anticipated iteration). `resolve_contributor()` interface in loop-server.
-- ⬜ Optimistic concurrency on workstream writes (version column)
-- ⬜ Verify operational DB backup story; create dump schedule if absent
-- ⬜ `messages` table schema (lands with A, designed here)
+- ✅ PostgreSQL migration of workflow-state-service — **was already done**
+  (2026-05-29 pgvector migration covered workflow.db; verified live).
+  SQLite fallback intact for tests.
+- ✅ `contributors` table + per-contributor bearer tokens —
+  `loop_server/identity.py` (create/list/revoke CLI, sha256 hashes,
+  `resolve_contributor()` seam)
+- ✅ Optimistic concurrency on workstream writes — `version` column,
+  `expected_version` on PATCH, 409 with current_version on conflict. Also
+  fixed positional INSERT that the new column would have broken.
+- ✅ Backup: `scripts/pg-backup.sh` (nightly pg_dump, 14-day retention,
+  tested — 3.3M dump). **Cron install pending Ethan** (`crontab /tmp/crontab.proposed`,
+  which also fixes the re-index crons that have been silently 401ing since
+  Decision 033 deployed — found during this build).
+- ✅ `messages` table (+ embedding-backlog partial index)
 
-## Phase A — Core loop ⬜
+## Phase A — Core loop ✅ core shipped 2026-06-10 (telemetry dashboards remain)
 
-- ⬜ `loop-server` service scaffold (FastAPI, compose entry, Service Rule
-  registration in capability-contracts.md)
-- ⬜ `LoopProvider` interface: `chat(messages, tools, stream) → normalised
-  event stream`; error taxonomy (rate limit, context overflow, malformed tool
-  call); incremental tool-call assembly; per-provider prompt adaptation hook
-- ⬜ `AnthropicLoopProvider` (SDK, Sonnet-class)
-- ⬜ `FakeProvider` — scripted record/replay for deterministic tests (also how
-  the malformed-JSON retry policy is tested without burning tokens)
-- ⬜ Malformed tool-call policy: bounded retries with reprompt (start: 2), then
-  surface to user
-- ⬜ Turn guards: max tool iterations per turn (start: 10), per-session token
-  ceiling with warning before hard stop
-- ⬜ Message persistence (user immediate / assistant on completion / tools as
-  they land)
-- ⬜ v1 tool set wired (Decision 036): read_canon, capture_signal,
-  reviewitem_approval, proposed_idea_creation, workstream_create
-- ⬜ **System prompt authoring** — versioned canon artifact: Prismo identity,
-  canon discipline, capture awareness, tool policy, checkpoint behaviour.
-  Expect iteration; this is real authoring work, not config.
-- ⬜ Per-contributor token telemetry → Grafana (Decision 034 stack) + spend alerts
+- ✅ `loop-server` service: `loop_server/` module, compose service on port
+  8002, routes documented in capability-contracts.md
+- ✅ `LoopProvider` interface (`providers/base.py`): normalised event
+  vocabulary (text / tool_call / turn_end), error taxonomy (RateLimited /
+  Overloaded / ContextOverflow / MalformedToolCall), prompt-adaptation hook
+- ✅ `AnthropicLoopProvider` — async streaming, in-provider tool-call assembly
+- ✅ `FakeProvider` — scripted turns + raisable errors, records chat() inputs
+- ✅ Malformed tool-call policy — 2 bounded reprompt retries, then surfaced
+- ✅ Turn guards — LOOP_MAX_TOOL_ITERATIONS=10, session token ceiling
+  (LOOP_SESSION_TOKEN_CEILING), input size limit (413)
+- ✅ Message persistence with crash semantics (user immediate, assistant on
+  completion, `turn_status` marks incompletes) + char-budget recent window +
+  tool-result truncation (2k, re-fetchable)
+- ✅ v1 tool set — 9 tools mapping the 5 authorities; reject/approve/capture
+  request shapes verified against the live API
+- ✅ System prompt v1 — `loop_server/prompts/system.md` (identity, grounding
+  discipline, judgment boundary, capture awareness). Iteration expected.
+- ✅ Token recording per turn (`loop_tokens` operational_events, per session)
+  · ⬜ Grafana panel + spend alerts on top of it (Decision 034 stack)
+- ✅ 8 engine tests green (FakeProvider, SQLite); existing suite unaffected
+  (13 pre-existing env-dependent failures on master, verified by baseline run)
+- ✅ **Live smoke test passed**: real turn → search_canon tool call → grounded
+  streamed answer → persisted messages → session ended via adapter calls
+
+Early Phase B items that landed with A: versioned SSE events incl.
+tool_activity (no dead air) and human-readable errors; session start/end
+endpoints; async fire-and-forget process-response per turn.
 
 ## Phase B — Surface ⬜
 
