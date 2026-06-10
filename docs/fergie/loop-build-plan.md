@@ -65,23 +65,35 @@ Early Phase B items that landed with A: versioned SSE events incl.
 tool_activity (no dead air) and human-readable errors; session start/end
 endpoints; async fire-and-forget process-response per turn.
 
-## Phase B — Surface ⬜
+## Phase B — Surface ✅ shipped 2026-06-10 (compaction summary moved to C)
 
-- ⬜ SSE event protocol spec: versioned events from day one; text deltas,
-  **tool-activity events** (no dead air during chains), error events
-  (human-readable for non-technical users — never stack traces), checkpoint
-  prompts
-- ⬜ Chat page in prismo-ui → loop-server
-- ⬜ Session lifecycle: explicit close, idle timeout, context-pressure prompt
-  (~70% budget: checkpoint or compact)
-- ⬜ Per-turn pipeline integration: `POST /pipeline/process` on user turns
-  (activation routing), `POST /pipeline/process-response` async fire-and-forget
-  on assistant turns (concatenated assistant text only, tool payloads excluded)
-- ⬜ Context assembly per Decision 037 (fixed order, stable prefix, 32k floor,
-  char-based compaction trigger, tool-result truncation, input size limits)
-- ⬜ Activation stickiness: session-lifetime, manual release, re-fetch on
-  re-fire
-- ⬜ Token paste onboarding flow (one-time, localStorage)
+- ✅ SSE event vocabulary live: text / tool_activity / activations /
+  context_pressure / error (human-readable) / turn_complete, all `v: 1`
+- ✅ Chat page at `/chat` in prismo-ui: token onboarding (localStorage, 401
+  recovery), streamed turns, tool-activity indicators, activation chips,
+  pressure + error banners, incomplete-turn state, end-session. Dashboard
+  nav link. Dockerfile fix: NEXT_PUBLIC_* as build args (latent bug — runtime
+  env never reached the client bundle).
+- ✅ Session lifecycle: explicit close, idle reaper (LOOP_IDLE_TIMEOUT_HOURS=4,
+  loop sessions only), context_pressure event at 70% window budget
+- ✅ Per-turn pipeline integration: `loop_server/activations.py` routes every
+  user turn via POST /pipeline/process; process-response async per assistant
+  turn (landed in A)
+- ✅ Activation stickiness: session-lifetime in operational_events, re-fetch
+  on re-fire, facet block replaced never accumulated, never-blocking on
+  pipeline failure, manual release endpoint
+- ✅ Context assembly: fixed order (system → facets → window → message),
+  char budgets, tool-result truncation, input limits.
+  ⬜ → moved to Phase C: rolling compaction summary (belongs with checkpoint
+  generation — same summarisation machinery)
+- ✅ Verified e2e: design-flavored message → architect facet activated +
+  persisted sticky → canon tools ran → grounded streamed answer
+
+## Checkpoint quirks found in B (carry into C)
+
+- prismo-ui calls the api service without the service API key — the ops
+  dashboard relies on dev-mode/API_KEY-set-at-compose behaviour; chat page is
+  unaffected (contributor tokens). Revisit when API_KEY is enforced for ui.
 
 ## Phase C — Continuity ⬜
 
