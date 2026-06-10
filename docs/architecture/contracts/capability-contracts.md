@@ -566,6 +566,10 @@ The authoritative transport. Adapters (MCP, CLI) wrap these.
 | `processResponse` | `POST /pipeline/process-response` | `pipeline/api_router.py` |
 | `listActivations` | `GET /pipeline/activations` | `pipeline/api_router.py` |
 | `pipelineReload` | `POST /pipeline/reload` | `pipeline/api_router.py` |
+| `listWorkstreams` | `GET /workflow/workstreams` | `workflow/router.py` |
+| `getWorkstream` | `GET /workflow/workstream/{id}` | `workflow/router.py` |
+| `listWorkstreamAssumptions` | `GET /workflow/workstream/{id}/assumptions` | `workflow/router.py` |
+| `assignSessionWorkstream` | `PATCH /workflow/session/{id}` | `workflow/router.py` |
 | `triggerIndex` | `POST /index` | `api/main.py` |
 | `triggerCodeIndex` | `POST /index/code` | `api/main.py` |
 | `health` | `GET /health` | `api/main.py` |
@@ -578,8 +582,13 @@ service routes above.
 | Capability | HTTP Endpoint | Module |
 |------------|---------------|--------|
 | `loopSessionStart` | `POST /loop/session/start` | `loop_server/main.py` |
-| `loopSessionEnd` | `POST /loop/session/{id}/end` | `loop_server/main.py` |
+| `loopSessionEnd` | `POST /loop/session/{id}/end` | `loop_server/main.py` (drafts checkpoint) |
 | `loopTurn` | `POST /loop/session/{id}/message` | `loop_server/main.py` (SSE) |
+| `loopReleaseActivation` | `POST /loop/session/{id}/release/{activation_id}` | `loop_server/main.py` |
+| `loopListWorkstreams` | `GET /loop/workstreams` | `loop_server/main.py` (proxy) |
+| `loopCreateWorkstream` | `POST /loop/workstreams` | `loop_server/main.py` (proxy) |
+| `loopListCheckpoints` | `GET /loop/workstream/{id}/checkpoints` | `loop_server/main.py` |
+| `loopReviewCheckpoint` | `PATCH /loop/checkpoint/{id}` | `loop_server/main.py` |
 | `loopHealth` | `GET /health` | `loop_server/main.py` |
 
 **Infrastructure-exempt routes** — excluded from Service Rule enforcement (Decision 034). These are

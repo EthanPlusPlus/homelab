@@ -95,21 +95,41 @@ endpoints; async fire-and-forget process-response per turn.
   dashboard relies on dev-mode/API_KEY-set-at-compose behaviour; chat page is
   unaffected (contributor tokens). Revisit when API_KEY is enforced for ui.
 
-## Phase C — Continuity ⬜
+## Phase C — Continuity ✅ shipped 2026-06-10
 
-- ⬜ Workstream API (PI-020 surface): start/end/list/detail, retroactive
-  session assignment, no required FK
-- ⬜ `phase` + `lightweight` fields (Decision 038)
-- ⬜ Checkpoint generation: structured fields (decisions / assumptions / open
-  questions / next steps / active activations); auto-draft + async review;
-  skip heuristic for trivial sessions; clean turn boundaries only
-- ⬜ Workstream-scoped hydration: brief engine extension (Decision 018
-  provenance), regenerate on checkpoint write, cached between
-- ⬜ Assumption/question capture subtypes with disposition lifecycle
-  (open/validated/accepted-as-risk) — response processor detection patterns
-  (Decision 028 extension)
-- ⬜ `GET /workflow/workstream/:id/assumptions` + UI panel
-- ⬜ Unreviewed-checkpoint banner on next workstream visit
+- ✅ Workstream API: list (+session counts), detail (+open assumptions,
+  latest checkpoint), retroactive session assignment (PATCH), no required FK
+- ✅ `phase` (ideating/planning/executing, validated) + `lightweight` fields
+- ✅ Checkpoints: auto-draft on session end via loop provider (structured
+  extraction prompt, lenient JSON parse, graceful degradation on garbage);
+  skip heuristic (<4 substantive messages); draft→reviewed lifecycle with
+  human edit winning; activations recorded in fields
+- ✅ Rolling compaction (resequenced from B): at 90% window pressure, older
+  turns summarised into system-block slot 3; messages marked 'compacted',
+  never deleted; verified keeps recent verbatim
+- ✅ Workstream-scoped hydration: deterministic composition v1 (goal, phase,
+  checkpoint fields, open assumptions; drafts flagged provisional).
+  Interpretive brief-engine merge deferred until real multi-contributor
+  checkpoint collisions exist.
+- ✅ Capture subtypes: processor detects assumption/question patterns →
+  disposition=open; capture_signal tool gains capture_type; PATCH capture
+  gains disposition (the Decision 038 gate lever). Fixed pre-existing bug:
+  processor dropped session_id, which would have silently emptied the ledger.
+- ✅ `GET /workflow/workstream/:id/assumptions` — cross-session ledger
+- ✅ UI: workstream picker (select/create) at session start, checkpoint
+  summary on session end, unreviewed-draft banner with one-tap approve
+- ✅ Identity injection ("You are speaking with {name}") — the screenshot gap
+- ✅ E2E verified: checkpoint extracted decision/assumption/question
+  correctly; fresh session recalled all three unaided and flagged the
+  draft as provisional; model-logged assumption landed in the ledger
+- ⬜ Telemetry dashboards (carried from A — still the standing remainder)
+
+## Quirks found in C
+
+- `docker compose restart` left api/loop with stale network DNS after the
+  api container was recreated — force-recreate both when api is rebuilt.
+- Service Rule check caught the four new workflow routes before first start
+  (the gate doing its job on its own builder).
 
 ## Phase D — Gate ⬜
 
