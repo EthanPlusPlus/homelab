@@ -570,6 +570,7 @@ The authoritative transport. Adapters (MCP, CLI) wrap these.
 | `getWorkstream` | `GET /workflow/workstream/{id}` | `workflow/router.py` |
 | `listWorkstreamAssumptions` | `GET /workflow/workstream/{id}/assumptions` | `workflow/router.py` |
 | `assignSessionWorkstream` | `PATCH /workflow/session/{id}` | `workflow/router.py` |
+| `transitionWorkstream` | `POST /workflow/workstream/{id}/transition` | `workflow/router.py` (phase gate, Decision 038) |
 | `triggerIndex` | `POST /index` | `api/main.py` |
 | `triggerCodeIndex` | `POST /index/code` | `api/main.py` |
 | `health` | `GET /health` | `api/main.py` |

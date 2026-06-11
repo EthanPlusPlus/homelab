@@ -30,9 +30,10 @@ Status legend: ⬜ not started · ⏳ in progress · ✅ done
   `expected_version` on PATCH, 409 with current_version on conflict. Also
   fixed positional INSERT that the new column would have broken.
 - ✅ Backup: `scripts/pg-backup.sh` (nightly pg_dump, 14-day retention,
-  tested — 3.3M dump). **Cron install pending Ethan** (`crontab /tmp/crontab.proposed`,
-  which also fixes the re-index crons that have been silently 401ing since
-  Decision 033 deployed — found during this build).
+  tested — 3.3M dump). Cron installed by Ethan 2026-06-10 (same install fixed
+  the re-index crons that had been silently 401ing since Decision 033).
+  Gate finding 2026-06-10: no alerting exists on cron failure — backup.log
+  goes unwatched. Accepted-as-risk for now; revisit with observability work.
 - ✅ `messages` table (+ embedding-backlog partial index)
 
 ## Phase A — Core loop ✅ core shipped 2026-06-10 (telemetry dashboards remain)
@@ -46,7 +47,9 @@ Status legend: ⬜ not started · ⏳ in progress · ✅ done
 - ✅ `FakeProvider` — scripted turns + raisable errors, records chat() inputs
 - ✅ Malformed tool-call policy — 2 bounded reprompt retries, then surfaced
 - ✅ Turn guards — LOOP_MAX_TOOL_ITERATIONS=10, session token ceiling
-  (LOOP_SESSION_TOKEN_CEILING), input size limit (413)
+  (LOOP_SESSION_TOKEN_CEILING=500000 tokens/session, hard stop with
+  graceful message; distinct from the 32k per-turn context floor — ceiling
+  bounds cumulative spend, floor bounds assembly), input size limit (413)
 - ✅ Message persistence with crash semantics (user immediate, assistant on
   completion, `turn_status` marks incompletes) + char-budget recent window +
   tool-result truncation (2k, re-fetchable)
@@ -131,19 +134,35 @@ endpoints; async fire-and-forget process-response per turn.
 - Service Rule check caught the four new workflow routes before first start
   (the gate doing its job on its own builder).
 
-## Phase D — Gate ⬜
+## Phase D — Gate ✅ shipped 2026-06-10
 
-- ⬜ `POST /workflow/workstream/:id/transition` with gate evaluation
-  (harness-agnostic, Layer 2)
-- ⬜ Deterministic preflight: plan doc resolves, zero open
-  assumptions/questions across ALL workstream sessions, research citations on
-  external deps. Items reference artifacts that resolve — no booleans.
-- ⬜ Adversarial review: analysis_runtime, artifacts only (never the planning
-  conversation), structured findings (claim/severity/evidence);
-  zero-findings-on-nontrivial = blocking anomaly
-- ⬜ Findings → ReviewItems (existing contract)
+- ✅ `POST /workflow/workstream/:id/transition` — harness-agnostic gate,
+  guards only planning→executing; lightweight bypass (recorded judgment)
+- ✅ Deterministic preflight: plan_doc resolves in the index; zero open
+  assumptions/questions across ALL workstream sessions (cross-contributor)
+- ✅ Adversarial review: `plan_review` analysis type on analysis_runtime —
+  receives ONLY plan doc + dispositioned ledger, never the conversation;
+  structured findings (claim/severity/evidence); zero-findings-on-substantial
+  injected as a blocking anomaly finding
+- ✅ State machine via existing ReviewItem contract: review_created (409) →
+  awaiting_disposition (409, no re-bill) → approved = pass / rejected =
+  fresh pass on next attempt. 7 tests green.
+- ✅ **First live run red-teamed this very plan: 12 findings, including two
+  true positives** — the stale "cron pending" line (fixed above) and the
+  undocumented token ceiling (fixed above). The gate caught its own build
+  plan drifting from reality on day one.
+- Deviation from D038 noted honestly: the deterministic research-citation
+  check needs a structured plan-doc schema that doesn't exist yet — citation
+  interrogation lives in the adversarial prompt instead. Revisit if plan
+  docs gain structure.
 - Deferred by design: gate-audit cadence (build when the gate first misses
   something real)
+
+## Telemetry tail (from Phase A) ✅ 2026-06-10
+
+- ✅ loop-server `/metrics` (instrumentator) + `loop_tokens_total` /
+  `loop_turns_total` per contributor; prometheus scrape job added.
+  Grafana panel: build in the UI off these series when wanted.
 
 ## Phase E — Local provider ⬜
 
