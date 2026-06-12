@@ -246,6 +246,31 @@ What stays in the project's own canon (NOT prismo):
 
 ---
 
+## Placeholder path requirement for .env.example
+
+When creating or updating `.env.example` in a new project, **all host-machine
+paths must be parameterized placeholders, never hardcoded user paths**
+([[../decisions/032-portability-as-commercial-grade-constraint|Decision 032]]).
+
+Instead of:
+
+```bash
+PROJECTS_PATH_HOST=/home/ethan/projects
+CANON_PATH_HOST=/home/ethan/canon
+```
+
+Use:
+
+```bash
+PROJECTS_PATH_HOST=${HOME}/projects
+CANON_PATH_HOST=${HOME}/canon
+```
+
+Applies to `.env.example` and any committed template env files. Does NOT
+apply to the actual `.env` (gitignored, machine-specific by design).
+
+---
+
 ## Checklist
 
 - [ ] Repo cloned with sparse checkout (no docs/ in ~/projects/<name>)
