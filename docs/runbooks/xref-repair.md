@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Broken `[[...]]` links fail silently during retrieval — lookups return nothing
+Broken double-bracket wiki-links fail silently during retrieval — lookups return nothing
 instead of the intended document. Detection is automated
 ([[../proposed-ideas/021-doctrine-xref-validation|PI-021]], shipped 2026-06-07);
 repair is manual. This runbook covers the repair loop.
@@ -34,7 +34,7 @@ repair is manual. This runbook covers the repair loop.
    - Reference into `drafts/` or `history/` pointing at a doc that was
      deleted or never indexed (drafts are not indexed by default)
 
-3. **Repair** — update the `[[slug]]` to the current filename (no `.md`).
+3. **Repair** — update the link slug to the current filename (no `.md`).
    If a file was renamed, grep canon for the old slug and fix *every* referrer.
 
 4. **Verify** — re-index, then re-run step 1; the violation count must drop.
