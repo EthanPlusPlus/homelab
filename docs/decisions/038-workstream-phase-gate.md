@@ -13,7 +13,28 @@ superseded_by: []
 
 ## Status
 
-Adopted. Ships as build phase D of the loop build (`fergie/loop-build-plan.md`).
+Adopted. Shipped 2026-06-10 (loop build phase D). First live run red-teamed
+the loop's own build plan: 12 findings, 2 true positives, both fixed.
+
+> **Annotation 2026-06-12 — disposition semantics (gate finding F3, from the
+> gate's own first run):** The gate's first review correctly flagged that
+> pass/block semantics were unspecified. Now specified:
+> - **Blocking threshold:** ALL findings block, regardless of severity — the
+>   unit of disposition is the plan-review ReviewItem, not individual
+>   findings. Approving it asserts every finding was read and resolved
+>   (fixed, or accepted-as-risk in the plan/ledger).
+> - **Disposition authority:** anyone holding `reviewitem_approval`
+>   (Decision 029 set, inherited by loop_runtime v1 tool set) — same
+>   authority as any other ReviewItem; no special gate-approver role.
+> - **"Resolved" means:** the plan doc or assumptions ledger visibly changed,
+>   or the risk is explicitly recorded as accepted. Approval without artifact
+>   change is itself the recorded judgment.
+> - **No time budget:** the transition blocks until disposition; there is no
+>   timeout or auto-pass. Urgency is the human's problem, deliberately.
+> - **One further deviation recorded:** the deterministic research-citation
+>   preflight check requires a structured plan-doc schema that does not
+>   exist; citation interrogation lives in the adversarial reviewer's prompt
+>   until plan docs gain structure.
 
 ## Context
 

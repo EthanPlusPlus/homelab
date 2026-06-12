@@ -34,6 +34,11 @@ Status legend: ⬜ not started · ⏳ in progress · ✅ done
   the re-index crons that had been silently 401ing since Decision 033).
   Gate finding 2026-06-10: no alerting exists on cron failure — backup.log
   goes unwatched. Accepted-as-risk for now; revisit with observability work.
+  **Verified 2026-06-12: backups fired 06-11 and 06-12 (3.3–3.4M dumps, log
+  clean).** Same check found the re-index cron fix was a bash-ism that dies
+  under cron's sh — POSIX-safe replacement staged (`/tmp/crontab.proposed2`,
+  pending Ethan). pgvector checked for CVE-2026-3172: already on patched
+  0.8.2; image now pinned by digest.
 - ✅ `messages` table (+ embedding-backlog partial index)
 
 ## Phase A — Core loop ✅ core shipped 2026-06-10 (telemetry dashboards remain)
@@ -170,6 +175,15 @@ endpoints; async fire-and-forget process-response per turn.
 - **Blocker (verified in context/progress.md):** VM RAM upgrade to 32GB is the
   named prerequisite for Ollama. Until then, provider development tests against
   FakeProvider; live local validation waits on hardware.
+- **Sizing honesty (gate finding F5, needs Ethan's hardware decision):** 32GB
+  system RAM is the floor for *running Ollama at all*, not for the target
+  workload. Qwen-class 32B at Q4 with the 32k context floor wants ~28–32GB
+  for the model alone, before OS + loop-server + PostgreSQL — CPU-only
+  inference at that margin carries a 5–10× latency penalty. Realistic local
+  loop serving needs a GPU (24GB VRAM class minimum for 32B Q4). The 32GB
+  upgrade enables the plumbing testbed and small-model side intelligences;
+  it does not deliver the loop on local. Hardware spec decision stays
+  telemetry-driven per Decision 036 — loop_tokens data is accumulating now.
 - ⬜ Tool-use validation on target model (Qwen-class 32B+ is the 2026-06
   reliability floor; smaller models only validate plumbing, not quality)
 - ⬜ Telemetry review → hardware sizing input (the abundance-mindset purchase
@@ -177,13 +191,27 @@ endpoints; async fire-and-forget process-response per turn.
 - ⬜ Nightly embedding batch job over eligible messages (substantive assistant
   turns, checkpoints, capture-linked) — retrieval stays off until designed
 
+## Compaction spec (gate finding F9 — was underspecified)
+
+Summarisation runs on the **same loop provider/model** as conversation (one
+model, no second provider dependency). Prompt: `_COMPACT_PROMPT` in
+`loop_server/checkpoint.py`, ~400-word target. Trigger: 90% of
+`LOOP_WINDOW_CHAR_BUDGET` (default 60000 chars). The most recent
+`COMPACT_KEEP_RECENT=8` messages stay verbatim. **Cascade is handled**: a
+prior summary row is folded into the next compaction's input, so summaries
+never accumulate — there is at most one live summary per session. Failure
+mode: empty summary → compaction aborts, window unchanged, turn proceeds
+(possibly over budget — provider ContextOverflow is the backstop).
+
 ## After the loop ships (tracked, not scheduled)
 
-- OpenCode adapter for coding_runtime (HTTP API from Python, not the TS SDK;
-  custom tool definitions can expose Prismo endpoints natively to the coding
-  agent) — removes the last subscription dependency
-- WhatsApp gateway as the next loop surface (masterplan: meet Shrey/Kyle where
-  they are)
+- OpenCode adapter for coding_runtime — **requires a PI first** (gate finding
+  F10: unanchored backlog item with unresearched external API). The PI must
+  cite OpenCode's HTTP API docs and spec the tool-definition contract before
+  any build. Removes the last subscription dependency.
+- WhatsApp gateway as the next loop surface — **requires privacy/data-residency
+  analysis + a Decision before build** (gate finding F12: WhatsApp Business
+  API terms, retention, GDPR posture for messages persisted to Prismo).
 - Semantic retrieval over conversation history (flag-flip per Decision 037)
 - PI-022 model routing policy — trigger conditions in the PI
 - LiteLLM wiring for synthesis/analysis providers (Decision 030 remainder,
