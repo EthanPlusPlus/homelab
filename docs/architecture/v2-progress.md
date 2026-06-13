@@ -255,12 +255,16 @@ Auth: Tailscale-gated (zero new infrastructure). Deployed at port 3000 via docke
 **Web UI — second slice (deferred):**
 Conversation, contribution capture, RBAC, multi-user — when Shrey/Kyle need access.
 
-**Agentic loop — primary harness ⏳ designed 2026-06-09, build not started**
+**Agentic loop — primary harness ✅ phases A0–D shipped 2026-06-10; Phase E (local provider) blocked on hardware**
 
 The biggest Phase 5 build and the realisation of the masterplan's "runtime
 abstraction" milestone: Prismo's primary interaction surface becomes a harness
 Prismo owns. Fully designed across 2026-06-07 → 2026-06-09 sessions; PI-006
-promoted into three decisions:
+promoted into three decisions. Built across 2026-06-10 (phases A0–D: loop-server
+on port 8002, conversation continuity, workstreams, the phase gate); the gate's
+first live run red-teamed its own build plan, and all 12 findings were
+dispositioned 2026-06-12. Phase E (Ollama local provider) remains, blocked on the
+VM RAM upgrade. Detail in `../fergie/loop-build-plan.md`.
 
 - [[../decisions/036-loop-runtime-role-contract-billing|Decision 036]] —
   `loop_runtime` role (absorbs collaboration_runtime), tool-set-as-authority,

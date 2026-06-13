@@ -756,7 +756,7 @@ try:
     ws = ops.get('active_workstreams', [])
     print(f\"  active_workstreams: {len(ws)}\")
     for w in ws[:3]:
-        print(f\"    - {w.get('title','?')} ({w.get('contributor_id','?')}, {w.get('status','?')})\")
+        print(f\"    - {w.get('title','?')} ({w.get('id','?')}, {w.get('status','?')})\")
     doctrine = b.get('active_doctrine', [])
     print(f\"  active_doctrine: {len(doctrine)} canonical records\")
     for d in doctrine[:5]:
